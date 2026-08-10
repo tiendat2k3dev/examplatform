@@ -1,4 +1,4 @@
 const Home = () => {
-  return <div>Xin chao viet nam</div>;
+  return <h1>Bùi Văn Tuấn Lâm</h1>;
 };
 export default Home;

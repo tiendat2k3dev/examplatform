@@ -5,6 +5,6 @@ export const metadata: Metadata = {
   description: "Admin",
 };
 
-export default function Admin({ children }: { children: React.ReactNode }) {
+export default function User({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }

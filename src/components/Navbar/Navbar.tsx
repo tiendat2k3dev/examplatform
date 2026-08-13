@@ -12,7 +12,7 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const router = useRouter();
 
-  // State kiểm tra xem component đã mount trên client chưa
+  // State kiểm tra xem component đã mount trên client chưa (tránh Hydration Mismatch)
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -20,6 +20,11 @@ const Navbar = () => {
   }, []);
 
   const { currentUser } = useSelector((state: RootState) => state.authReducer);
+
+  // Nếu là Admin, không hiển thị Navbar
+  if (mounted && currentUser?.role === "Admin") {
+    return null;
+  }
 
   const handleLogout = () => {
     dispatch(logout());
@@ -60,11 +65,10 @@ const Navbar = () => {
           id="navbarContent"
         >
           <div className="d-flex align-items-center gap-3">
-            {/* Tránh render khác biệt giữa SSR và Client bằng cách check mounted */}
             {!mounted ? (
-              <div style={{ height: "35px" }}></div> // Khoảng trống giữ chỗ khi đang render trên server
+              <div style={{ height: "35px" }}></div>
             ) : currentUser ? (
-              // HIỂN THỊ KHI ĐÃ ĐĂNG NHẬP
+              // HIỂN THỊ KHI ĐÃ ĐĂNG NHẬP (USER THƯỜNG)
               <div className="d-flex align-items-center gap-3">
                 <span className="fw-semibold text-dark small">
                   {currentUser.role}:{" "}
@@ -74,7 +78,7 @@ const Navbar = () => {
                 </span>
 
                 <Link
-                  href={currentUser.role === "Admin" ? "/admin" : "/user"}
+                  href="/user"
                   className="btn btn-outline-primary btn-sm px-3 py-1.5 fw-semibold rounded-pill text-decoration-none d-flex align-items-center gap-1"
                 >
                   <i className="bi bi-person-circle"></i> Profile

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "concurrently \"json-server --watch db.json --port 4000\" \"next dev\"",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
@@ -11,6 +11,7 @@
   "dependencies": {
     "@reduxjs/toolkit": "^2.12.0",
     "axios": "^1.19.0",
+    "bcryptjs": "^3.0.3",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
     "formik": "^2.4.9",
@@ -22,6 +23,7 @@
     "yup": "^1.7.1"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "@types/bootstrap": "^5.2.11",
     "@types/node": "^20",
     "@types/react": "^19",

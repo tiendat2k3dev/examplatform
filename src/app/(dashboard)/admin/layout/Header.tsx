@@ -10,12 +10,11 @@ const Header = () => {
 
   // Xử lý đăng xuất
   const handleLogout = () => {
-    // Xóa token nếu bạn đang lưu trong localStorage
-    // localStorage.removeItem("accessToken");
-    // localStorage.removeItem("refreshToken");
-
     // Đóng menu
     setShowProfileMenu(false);
+
+    // Xóa dữ liệu user khỏi Local Storage
+    localStorage.removeItem("user");
 
     // Chuyển về trang login
     router.push("/");

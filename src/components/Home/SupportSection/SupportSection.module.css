@@ -1,0 +1,17 @@
+/* SupportSection.module.css */
+.supportSection {
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0e7490 100%);
+}
+
+.glowCircle {
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.4) 0%, rgba(0, 0, 0, 0) 70%);
+  top: -100px;
+  right: -50px;
+  pointer-events: none;
+}
+
+.contactCard {
+  background-color: rgba(255, 255, 255, 0.1);
+}

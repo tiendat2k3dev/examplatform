@@ -1,0 +1,32 @@
+/* Login.module.css */
+.mainContainer {
+  min-height: calc(100vh - 140px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.glowCircle1 {
+  width: 400px;
+  height: 400px;
+  /* Tăng độ đậm và độ rực của màu xanh dương (0.7 thay vì 0.4) */
+  background: radial-gradient(circle, rgba(13, 110, 253, 0.75) 0%, rgba(13, 110, 253, 0) 70%);
+  top: -30px;
+  left: 8%;
+  pointer-events: none;
+  opacity: 1 !important;
+  filter: blur(20px); /* Tạo hiệu ứng phát sáng mượt mà hơn */
+}
+
+.glowCircle2 {
+  width: 450px;
+  height: 450px;
+  /* Tăng độ đậm và rực của màu hồng tím (0.6 thay vì 0.3) */
+  background: radial-gradient(circle, rgba(217, 70, 239, 0.7) 0%, rgba(217, 70, 239, 0) 70%);
+  bottom: -30px;
+  right: 8%;
+  pointer-events: none;
+  opacity: 1 !important;
+  filter: blur(20px);
+}

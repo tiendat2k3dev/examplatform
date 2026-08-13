@@ -1,5 +1,5 @@
 import Link from "next/link";
-import styles from "./Navbar.module.css"; // Import CSS module
+import styles from "./Navbar.module.css";
 
 const Navbar = () => {
   return (
@@ -9,12 +9,12 @@ const Navbar = () => {
       <div className="container">
         <Link
           href="/"
-          className="navbar-brand d-flex align-items-center gap-2 m-0"
+          className="navbar-brand d-flex align-items-center gap-2 m-0 text-decoration-none"
         >
-          <div className="p-2 rounded-3 bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 d-flex align-items-center justify-content-center">
+          <div className={styles.brandIconContainer}>
             <i className="bi bi-code-slash fs-4"></i>
           </div>
-          <span className="fw-bold fs-5 text-dark">
+          <span className={styles.brandText}>
             CodeGym <span className="text-primary">Exam IT</span>
           </span>
         </Link>
@@ -36,22 +36,18 @@ const Navbar = () => {
           id="navbarContent"
         >
           <div className="d-flex align-items-center gap-2">
-            <button
-              type="button"
-              className="btn btn-outline-dark btn-sm px-3 py-2 fw-semibold rounded-pill"
+            <Link
+              href="/login"
+              className="btn btn-outline-dark btn-sm px-3 py-2 fw-semibold rounded-pill text-decoration-none"
             >
               <i className="bi bi-box-arrow-in-right me-1"></i> Đăng Nhập
-            </button>
-            <button
-              type="button"
-              className="btn btn-primary btn-sm px-3 py-2 fw-bold rounded-pill"
-              style={{
-                background: "linear-gradient(135deg, #0d6efd 0%, #8b5cf6 100%)",
-                border: "none",
-              }}
+            </Link>
+            <Link
+              href="/register"
+              className={`btn btn-primary btn-sm px-3 py-2 fw-bold rounded-pill text-decoration-none ${styles.registerBtn}`}
             >
               <i className="bi bi-person-plus-fill me-1"></i> Đăng Ký
-            </button>
+            </Link>
           </div>
         </div>
       </div>

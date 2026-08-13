@@ -1,10 +1,25 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const Header = () => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const router = useRouter();
+
+  // Xử lý đăng xuất
+  const handleLogout = () => {
+    // Xóa token nếu bạn đang lưu trong localStorage
+    // localStorage.removeItem("accessToken");
+    // localStorage.removeItem("refreshToken");
+
+    // Đóng menu
+    setShowProfileMenu(false);
+
+    // Chuyển về trang login
+    router.push("/");
+  };
 
   return (
     <header className="bg-white border-bottom">
@@ -44,7 +59,7 @@ const Header = () => {
                 onClick={() => setShowProfileMenu(!showProfileMenu)}
               >
                 <Image
-                  src="/images/avatar.jpg"
+                  src="/Untitled.png"
                   alt="Avatar"
                   width={36}
                   height={36}
@@ -86,6 +101,7 @@ const Header = () => {
                   <button
                     type="button"
                     className="btn w-100 text-start d-flex align-items-center gap-2 px-3 py-2 border-0 border-top rounded-0 text-danger"
+                    onClick={handleLogout}
                   >
                     <i className="bi bi-box-arrow-right"></i>
                     <span>Đăng xuất</span>

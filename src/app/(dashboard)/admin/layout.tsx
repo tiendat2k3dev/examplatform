@@ -1,6 +1,5 @@
 import Sidebar from "./layout/Sidebar";
 import Header from "./layout/Header";
-import Footer from "./layout/Footer";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -27,7 +26,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <main className="">{children}</main>
 
           {/* Footer */}
-          <Footer />
         </div>
       </div>
     </div>

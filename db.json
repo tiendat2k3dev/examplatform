@@ -1,0 +1,31 @@
+{
+  "users": [
+    {
+      "id": "JF1LyebLkG4",
+      "username": "Admin",
+      "password": "$2b$10$DjmpwM5OxnQE49C48Eir6.PFPmrfgC76u7Zmxi4cDLniUF896a0/O",
+      "fullName": "Admin",
+      "email": "Admin-QuanLyDe@gmail.com",
+      "phone": "0367797348",
+      "address": "Tổ 8A, Kp Bảo Vinh A, Bảo Vinh, Đồng Nai",
+      "role": "Admin",
+      "avatarUrl": "",
+      "createdAt": "2026-08-13T06:18:07.851Z",
+      "updatedAt": null
+    },
+    {
+      "id": "tqcjsIgtqp0",
+      "username": "BuiVanTuanLam",
+      "password": "$2b$10$V68eMN9oTZljGI6SPO7i4O46c8mNPR3RcEg/zbDM3S/N3lCwKTIDW",
+      "fullName": "Bùi Văn Tuấn Lâm ",
+      "email": "Dantethegodslayer2000@gmail.com",
+      "phone": "0367797348",
+      "address": "Tổ 8A, Kp Bảo Vinh A, Bảo Vinh, Đồng Nai",
+      "role": "User",
+      "avatarUrl": "",
+      "createdAt": "2026-08-13T06:46:55.588Z",
+      "updatedAt": "2026-08-13T07:20:09.586Z"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}

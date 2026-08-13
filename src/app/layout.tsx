@@ -1,8 +1,10 @@
-import Footer from "@/components/Footer/Footer";
 import type { Metadata } from "next";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import Navbar from "@/components/Navbar/Navbar";
+import Footer from "@/components/Footer/Footer";
 import ClientScript from "@/components/ClientScript";
+import { Providers } from "@/redux/Providers";
 
 export const metadata: Metadata = {
   title: "Create Next",
@@ -17,10 +19,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="d-flex flex-column vh-100">
-      <main className="flex-grow-1">{children}</main>
-        <Footer />
-        {/* Nhắn script js của bootstrap chạy ở client */}
-        <ClientScript />
+        <Providers>
+          <Navbar />
+          <main className="flex-grow-1">{children}</main>
+          <Footer />
+          <ClientScript />
+        </Providers>
       </body>
     </html>
   );

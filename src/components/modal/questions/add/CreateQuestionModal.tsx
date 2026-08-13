@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useFormik } from "formik";
+import questionSchema from "@/utils/questionsInput";
 
 interface AnswerOption {
   key: "A" | "B" | "C" | "D";
@@ -24,85 +25,57 @@ const CreateQuestionModal = ({
   onClose,
   onSubmit,
 }: CreateQuestionModalProps) => {
-  const [question, setQuestion] = useState("");
-
-  const [category, setCategory] = useState("");
-
-  const [correctAnswer, setCorrectAnswer] = useState<"A" | "B" | "C" | "D">(
-    "A",
-  );
-
-  const [answers, setAnswers] = useState<Record<"A" | "B" | "C" | "D", string>>(
-    {
-      A: "",
-      B: "",
-      C: "",
-      D: "",
+  const formik = useFormik({
+    initialValues: {
+      question: "",
+      category: "",
+      answers: {
+        A: "",
+        B: "",
+        C: "",
+        D: "",
+      },
+      correctAnswer: "A" as "A" | "B" | "C" | "D",
     },
-  );
+    validationSchema: questionSchema,
+    onSubmit: (values) => {
+      const allAnswers: AnswerOption[] = (
+        Object.keys(values.answers) as Array<"A" | "B" | "C" | "D">
+      ).map((key) => ({
+        key,
+        value: values.answers[key].trim(),
+      }));
+
+      onSubmit({
+        question: values.question.trim(),
+        category: values.category,
+        answers: allAnswers,
+        correctAnswer: values.correctAnswer,
+      });
+
+      formik.resetForm();
+      onClose();
+    },
+  });
 
   if (!show) {
     return null;
   }
 
-  // =========================
-  // THÊM
-  // =========================
-  const handleCreate = () => {
-    const allAnswers: AnswerOption[] = (
-      Object.keys(answers) as Array<"A" | "B" | "C" | "D">
-    ).map((key) => ({
-      key,
-      value: answers[key].trim(),
-    }));
-
-    // Validate
-    if (!question.trim()) {
-      alert("Vui lòng nhập câu hỏi");
-      return;
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+      formik.resetForm();
     }
-
-    if (!category.trim()) {
-      alert("Vui lòng chọn danh mục");
-      return;
-    }
-
-    if (allAnswers.some((item) => !item.value)) {
-      alert("Vui lòng nhập đầy đủ đáp án");
-      return;
-    }
-
-    // Gửi dữ liệu lên Questions
-    onSubmit({
-      question: question.trim(),
-      category,
-      answers: allAnswers,
-      correctAnswer,
-    });
-
-    // Reset form
-    setQuestion("");
-    setCategory("");
-    setCorrectAnswer("A");
-
-    setAnswers({
-      A: "",
-      B: "",
-      C: "",
-      D: "",
-    });
   };
 
   return (
     <>
-      {/* Overlay */}
-      <div className="modal-backdrop fade show" onClick={onClose}></div>
+      <div className="modal-backdrop fade show" onClick={handleBackdropClick}></div>
 
-      {/* Modal */}
       <div className="modal d-block" tabIndex={-1} role="dialog">
         <div className="modal-dialog modal-lg modal-dialog-centered">
           <div className="modal-content">
-            {/* Header */}
             <div
               className="modal-header text-white"
               style={{
@@ -114,112 +87,129 @@ const CreateQuestionModal = ({
               <button
                 type="button"
                 className="btn-close btn-close-white"
-                onClick={onClose}
+                onClick={() => {
+                  onClose();
+                  formik.resetForm();
+                }}
               ></button>
             </div>
 
-            {/* Body */}
-            <div className="modal-body">
-              {/* Câu hỏi */}
-              <div className="mb-4">
-                <label className="form-label">
-                  <span className="text-danger">*</span> Câu hỏi
-                </label>
+            <form onSubmit={formik.handleSubmit}>
+              <div className="modal-body">
+                <div className="mb-4">
+                  <label className="form-label">
+                    <span className="text-danger">*</span> Câu hỏi
+                  </label>
 
-                <textarea
-                  className="form-control"
-                  rows={3}
-                  autoFocus
-                  placeholder="Nhập câu hỏi..."
-                  value={question}
-                  onChange={(e) => setQuestion(e.target.value)}
-                />
-              </div>
+                  <textarea
+                    className={`form-control ${
+                      formik.touched.question && formik.errors.question
+                        ? "is-invalid"
+                        : ""
+                    }`}
+                    rows={3}
+                    autoFocus
+                    placeholder="Nhập câu hỏi..."
+                    {...formik.getFieldProps("question")}
+                  />
 
-              {/* Danh mục */}
-              <div className="mb-4">
-                <label className="form-label">
-                  <span className="text-danger">*</span> Danh mục
-                </label>
-
-                <select
-                  className="form-select"
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                >
-                  <option value="">Chọn danh mục</option>
-
-                  <option value="Toán">Toán</option>
-
-                  <option value="Khoa học">Khoa học</option>
-
-                  <option value="Lịch sử">Lịch sử</option>
-
-                  <option value="Văn học">Văn học</option>
-                </select>
-              </div>
-
-              {/* Đáp án */}
-              <div className="mb-4">
-                <label className="form-label fw-semibold">Đáp án</label>
-
-                {(["A", "B", "C", "D"] as const).map((option) => (
-                  <div key={option} className="d-flex align-items-center mb-2">
-                    {/* Radio */}
-                    <div
-                      className="form-check me-2"
-                      style={{
-                        minWidth: "44px",
-                      }}
-                    >
-                      <input
-                        className="form-check-input"
-                        type="radio"
-                        name="correctAnswer"
-                        value={option}
-                        checked={correctAnswer === option}
-                        onChange={() => setCorrectAnswer(option)}
-                      />
-
-                      <label className="form-check-label">{option}.</label>
+                  {formik.touched.question && formik.errors.question && (
+                    <div className="invalid-feedback">
+                      {formik.errors.question}
                     </div>
+                  )}
+                </div>
 
-                    {/* Input */}
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder={`Đáp án ${option}`}
-                      value={answers[option]}
-                      onChange={(e) =>
-                        setAnswers((prev) => ({
-                          ...prev,
-                          [option]: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-                ))}
+                <div className="mb-4">
+                  <label className="form-label">
+                    <span className="text-danger">*</span> Danh mục
+                  </label>
+
+                  <select
+                    className={`form-select ${
+                      formik.touched.category && formik.errors.category
+                        ? "is-invalid"
+                        : ""
+                    }`}
+                    {...formik.getFieldProps("category")}
+                  >
+                    <option value="">Chọn danh mục</option>
+
+                    <option value="Toán">Toán</option>
+
+                    <option value="Khoa học">Khoa học</option>
+
+                    <option value="Lịch sử">Lịch sử</option>
+
+                    <option value="Văn học">Văn học</option>
+                  </select>
+
+                  {formik.touched.category && formik.errors.category && (
+                    <div className="invalid-feedback">
+                      {formik.errors.category}
+                    </div>
+                  )}
+                </div>
+
+                <div className="mb-4">
+                  <label className="form-label fw-semibold">Đáp án</label>
+
+                  {(["A", "B", "C", "D"] as const).map((option) => (
+                    <div key={option} className="d-flex align-items-center mb-2">
+                      <div className="form-check me-2" style={{ minWidth: "44px" }}>
+                        <input
+                          className="form-check-input"
+                          type="radio"
+                          name="correctAnswer"
+                          value={option}
+                          checked={formik.values.correctAnswer === option}
+                          onChange={() =>
+                            formik.setFieldValue("correctAnswer", option)
+                          }
+                        />
+
+                        <label className="form-check-label">{option}.</label>
+                      </div>
+
+                      <input
+                        type="text"
+                        className={`form-control ${
+                          formik.touched.answers?.[option] &&
+                          formik.errors.answers?.[option]
+                            ? "is-invalid"
+                            : ""
+                        }`}
+                        placeholder={`Đáp án ${option}`}
+                        {...formik.getFieldProps(`answers.${option}`)}
+                      />
+                    </div>
+                  ))}
+
+                  {formik.touched.answers && formik.errors.answers && (
+                    <div className="text-danger small mt-1">
+                      {Object.values(formik.errors.answers).join(" ")}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
 
-            {/* Footer */}
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-outline-secondary"
-                onClick={onClose}
-              >
-                Cancel
-              </button>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary"
+                  onClick={() => {
+                    onClose();
+                    formik.resetForm();
+                  }}
+                >
+                  Cancel
+                </button>
 
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={handleCreate}
-              >
-                Create
-              </button>
-            </div>
+                <button type="submit" className="btn btn-primary">
+                  Create
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       </div>

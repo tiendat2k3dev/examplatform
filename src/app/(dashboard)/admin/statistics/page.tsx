@@ -1,4 +1,5 @@
+//Thống kê
 const Statistics = () => {
-  return <div></div>;
+  return <h1>thống kê</h1>;
 };
 export default Statistics;

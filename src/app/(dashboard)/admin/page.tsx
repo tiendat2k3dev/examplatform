@@ -1,6 +1,10 @@
-// đăng nhập vào admin
-const Admin = () => {
-  return <div>Admin</div>;
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Admin",
 };
 
-export default Admin;
+const AdminPage = () => {
+  return <h1>Trang Admin</h1>;
+};
+export default AdminPage;

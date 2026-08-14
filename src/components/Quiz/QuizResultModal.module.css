@@ -1,0 +1,109 @@
+/* src/components/Quiz/QuizResultModal.module.css */
+
+/* Backdrop nền mờ bao phủ toàn màn hình */
+.modalBackdrop {
+  background-color: rgba(15, 23, 42, 0.82);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Vòng tròn gradient phát sáng nền */
+.glowCircle {
+  position: absolute;
+  width: 450px;
+  height: 450px;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.glowSuccess {
+  background: radial-gradient(
+    circle,
+    rgba(25, 135, 84, 0.35) 0%,
+    rgba(0, 0, 0, 0) 70%
+  );
+}
+
+.glowDanger {
+  background: radial-gradient(
+    circle,
+    rgba(220, 53, 69, 0.35) 0%,
+    rgba(0, 0, 0, 0) 70%
+  );
+}
+
+/* Thẻ Modal Dialog phong cách Dark Glassmorphism */
+.modalCard {
+  background: linear-gradient(145deg, #0f172a 0%, #1e1b4b 100%);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(13, 110, 253, 0.5) !important;
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.5), 0 0 25px rgba(13, 110, 253, 0.25);
+  position: relative;
+  z-index: 1;
+}
+
+/* Icon tròn kết quả */
+.iconBadgeSuccess {
+  background-color: rgba(25, 135, 84, 0.2);
+  border-color: #198754 !important;
+}
+
+.iconBadgeDanger {
+  background-color: rgba(220, 53, 69, 0.2);
+  border-color: #dc3545 !important;
+}
+
+/* Gradient chữ tiêu đề */
+.titleGradientSuccess {
+  background: linear-gradient(90deg, #60a5fa, #c084fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.titleGradientDanger {
+  background: linear-gradient(90deg, #f87171, #fb923c);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Khối điểm số chính giữa */
+.scoreBox {
+  background-color: rgba(15, 23, 42, 0.6);
+}
+
+/* Tag Đạt / Chưa đạt */
+.tagBadgeSuccess {
+  background-color: rgba(25, 135, 84, 0.15);
+}
+
+.tagBadgeDanger {
+  background-color: rgba(220, 53, 69, 0.15);
+}
+
+/* Khối hiển thị chi tiết số câu đúng, sai, thời gian */
+.statBox {
+  background-color: rgba(15, 23, 42, 0.6);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.statBox:hover {
+  transform: translateY(-3px);
+  border-color: rgba(13, 202, 240, 0.4) !important;
+}
+
+/* Nút thi lại dạng Gradient tím - xanh */
+.btnRetry {
+  background: linear-gradient(135deg, #0d6efd 0%, #8b5cf6 100%);
+  border: none;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.btnRetry:hover {
+  opacity: 0.95;
+  transform: translateY(-2px);
+}

@@ -1,12 +1,12 @@
 /* src/app/exam-category/ExamCategory.module.css */
 .hoverCard {
-  transition: transform 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  transition: transform 0.25s ease-in-out, box-shadow 0.25s ease-in-out, border-color 0.25s ease-in-out;
 }
 
 .hoverCard:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.12) !important;
+  transform: translateY(-6px);
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.4), 0 0 20px rgba(13, 110, 253, 0.2) !important;
+  border-color: rgba(13, 110, 253, 0.8) !important;
 }
 
 .titleGradient {

@@ -823,6 +823,18 @@
       },
       "completedAt": "2026-08-14T04:52:51.735Z",
       "id": "s7YzONDVtnI"
+    },
+    {
+      "userId": "tqcjsIgtqp0",
+      "examId": "ex-db-1",
+      "examTitle": "SQL Basics: SELECT, WHERE & Aggregates",
+      "score": 0,
+      "totalQuestions": 3,
+      "correctAnswersCount": 0,
+      "timeTaken": 5,
+      "userAnswers": {},
+      "completedAt": "2026-08-14T06:25:37.990Z",
+      "id": "jO8czO2LHRw"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

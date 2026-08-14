@@ -1,0 +1,78 @@
+/* src/components/Sidebar/Sidebar.module.css */
+.sidebarContainer {
+  width: 260px;
+  min-width: 260px;
+  background-color: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  z-index: 100;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* Trạng thái thu gọn */
+.collapsed {
+  width: 70px;
+  min-width: 70px;
+}
+
+.collapsed .hideOnCollapse {
+  display: none !important;
+}
+
+.collapsed .navLink {
+  justify-content: center;
+  padding: 0.7rem 0;
+}
+
+.collapsed .toggleBtn {
+  margin: 0 auto !important;
+}
+
+/* Navigation Links */
+.navLink {
+  color: #4b5563 !important;
+  border-radius: 10px;
+  padding: 0.7rem 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+}
+
+.navLink:hover {
+  color: #0d6efd !important;
+  background-color: #f3f4f6;
+}
+
+.activeNavLink {
+  color: #0d6efd !important;
+  background-color: #e0edff;
+  font-weight: 700;
+}
+
+/* Nút Đăng xuất */
+.logoutBtn {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  transition: all 0.2s ease;
+}
+
+.logoutBtn:hover {
+  background-color: #dc2626;
+  color: #ffffff;
+}
+
+/* Style nút toggle thu mở */
+.toggleBtn {
+  width: 32px;
+  height: 32px;
+  transition: transform 0.2s ease;
+}
+
+.toggleBtn:hover {
+  background-color: #e0edff !important;
+}

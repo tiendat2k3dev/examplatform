@@ -1,19 +1,49 @@
 // src/app/(dashboard)/user/page.tsx
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
 import { RootState } from "@/redux/store";
+import { toast } from "react-toastify";
 import UpdateProfileModal from "@/components/Profile/UpdateProfileModal";
 import ChangePasswordModal from "@/components/Profile/ChangePasswordModal";
 import styles from "./User.module.css";
 
 const UserPage = () => {
+  const router = useRouter();
   // Lấy thông tin người dùng từ Redux store
   const { currentUser } = useSelector((state: RootState) => state.authReducer);
 
-  // State quản lý trạng thái đóng/mở modal cập nhật profile
+  // State kiểm tra đã hydrate client hay chưa
+  const [isMounted, setIsMounted] = useState(false);
+
+  // State quản lý trạng thái đóng/mở modal
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // ÉP QUAY LẠI TRANG LOGIN NẾU CHƯA ĐĂNG NHẬP
+  useEffect(() => {
+    if (isMounted && !currentUser) {
+      toast.warning("Vui lòng đăng nhập để xem thông tin cá nhân!");
+      router.push("/login");
+    }
+  }, [isMounted, currentUser, router]);
+
+  // Nếu chưa mounted hoặc không có user, hiển thị màn hình chờ (để tránh nháy UI)
+  if (!isMounted || !currentUser) {
+    return (
+      <div className="d-flex justify-content-center align-items-center min-vh-100 text-white">
+        <div className="spinner-border text-info" role="status">
+          <span className="visually-hidden">Đang tải...</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <main
       className={`container-fluid py-5 px-3 px-md-5 my-auto position-relative ${styles.mainContainer}`}

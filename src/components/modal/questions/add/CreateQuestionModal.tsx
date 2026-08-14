@@ -1,6 +1,7 @@
 "use client";
 
 import { useFormik } from "formik";
+import { toast } from "react-toastify";
 import questionSchema from "@/utils/questionsInput";
 
 interface AnswerOption {
@@ -53,6 +54,8 @@ const CreateQuestionModal = ({
         correctAnswer: values.correctAnswer,
       });
 
+      toast.success("Thêm câu hỏi thành công!");
+
       formik.resetForm();
       onClose();
     },
@@ -71,7 +74,10 @@ const CreateQuestionModal = ({
 
   return (
     <>
-      <div className="modal-backdrop fade show" onClick={handleBackdropClick}></div>
+      <div
+        className="modal-backdrop fade show"
+        onClick={handleBackdropClick}
+      ></div>
 
       <div className="modal d-block" tabIndex={-1} role="dialog">
         <div className="modal-dialog modal-lg modal-dialog-centered">
@@ -155,8 +161,14 @@ const CreateQuestionModal = ({
                   <label className="form-label fw-semibold">Đáp án</label>
 
                   {(["A", "B", "C", "D"] as const).map((option) => (
-                    <div key={option} className="d-flex align-items-center mb-2">
-                      <div className="form-check me-2" style={{ minWidth: "44px" }}>
+                    <div
+                      key={option}
+                      className="d-flex align-items-center mb-2"
+                    >
+                      <div
+                        className="form-check me-2"
+                        style={{ minWidth: "44px" }}
+                      >
                         <input
                           className="form-check-input"
                           type="radio"

@@ -1,5 +1,7 @@
 "use client";
 
+import { toast } from "react-toastify";
+
 interface Question {
   id: number;
   question: string;
@@ -72,6 +74,7 @@ const DeleteQuestionModal = ({
                 className="btn btn-danger"
                 onClick={() => {
                   onConfirm();
+                  toast.success("Xóa câu hỏi thành công!");
                   onClose();
                 }}
               >

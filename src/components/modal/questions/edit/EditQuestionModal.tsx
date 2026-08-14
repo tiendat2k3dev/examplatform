@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useFormik } from "formik";
+import { toast } from "react-toastify";
 import questionSchema from "@/utils/questionsInput";
 
 interface AnswerOption {
@@ -65,6 +66,8 @@ const EditQuestionModal = ({
 
         correctAnswer: values.correctAnswer,
       });
+
+      toast.success("Cập nhật câu hỏi thành công!");
 
       formik.resetForm();
       onClose();

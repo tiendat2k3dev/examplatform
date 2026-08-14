@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import "react-toastify/dist/ReactToastify.css";
 import Navbar from "@/components/Navbar/Navbar";
 import Footer from "@/components/Footer/Footer";
 import ClientScript from "@/components/ClientScript";
 import { Providers } from "@/redux/Providers";
+import { ToastContainer } from "react-toastify";
 
 export const metadata: Metadata = {
   title: "Create Next",
@@ -24,6 +26,7 @@ export default function RootLayout({
           <main className="flex-grow-1">{children}</main>
           <Footer />
           <ClientScript />
+          <ToastContainer position="top-right" autoClose={3000} />
         </Providers>
       </body>
     </html>

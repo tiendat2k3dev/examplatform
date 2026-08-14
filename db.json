@@ -37,7 +37,20 @@
       "role": "User",
       "avatarUrl": "",
       "createdAt": "2026-08-13T09:01:48.710Z",
-      "updatedAt": "2026-08-14T01:58:53.368Z"
+      "updatedAt":"2026-08-14T01:58:53.368Z"
+     },
+     { 
+      "id": "tiendat2k3",
+      "username": "tiendat2k3",
+      "password": "$2b$10$kINbX.PA4q/XkwcSCagg..OevBsQr87s7G6cGs.7mE1AVRZrIYiVW",
+      "fullName": "Tiến Đạt",
+      "email": "tiendat2k3@gmail.com",
+      "phone": "0987104234",
+      "address": "g",
+      "role": "User",
+      "avatarUrl": "",
+      "createdAt": "2026-08-13T00:00:00.000Z",
+      "updatedAt": "2026-08-13T09:40:22.846Z"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

@@ -1,4 +1,22 @@
+"use client";
+
+import ExamsQuestions from "../../../../components/questions/HeaderQuestions";
+
 const Exams = () => {
-  return <h1>Quản lý đề thi</h1>;
+  const handleAdd = () => {
+    console.log("Thêm câu hỏi");
+  };
+
+  return (
+    <div>
+      <ExamsQuestions
+        title="Quản lý đề thi"
+        description="Tạo, chỉnh sửa, xóa và quản lý đề thi"
+        add="Thêm"
+        onAdd={handleAdd}
+      />
+    </div>
+  );
 };
+
 export default Exams;

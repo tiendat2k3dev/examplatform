@@ -3,23 +3,27 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "@/redux/store";
+import { logout } from "@/redux/reducers/AuthReducer";
 
 const Header = () => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const router = useRouter();
+  const dispatch = useDispatch();
+  const { currentUser } = useSelector((state: RootState) => state.authReducer);
 
-  // Xử lý đăng xuất
   const handleLogout = () => {
-    // Xóa token nếu bạn đang lưu trong localStorage
-    // localStorage.removeItem("accessToken");
-    // localStorage.removeItem("refreshToken");
-
-    // Đóng menu
     setShowProfileMenu(false);
-
-    // Chuyển về trang login
+    dispatch(logout());
     router.push("/");
   };
+
+  const avatarSrc =
+    currentUser?.avatarUrl && currentUser.avatarUrl.trim() !== ""
+      ? currentUser.avatarUrl
+      : "/Untitled.png";
+  const displayName = currentUser?.fullName || currentUser?.username || "User";
 
   return (
     <header className="bg-white border-bottom">
@@ -59,7 +63,7 @@ const Header = () => {
                 onClick={() => setShowProfileMenu(!showProfileMenu)}
               >
                 <Image
-                  src="/Untitled.png"
+                  src={avatarSrc}
                   alt="Avatar"
                   width={36}
                   height={36}
@@ -79,6 +83,19 @@ const Header = () => {
                     zIndex: 1000,
                   }}
                 >
+                  {/* Thông tin user */}
+                  <div className="px-3 py-2 border-bottom">
+                    <div className="fw-semibold text-dark small text-truncate">
+                      {displayName}
+                    </div>
+                    <div
+                      className="text-muted small text-truncate"
+                      style={{ fontSize: "0.75rem" }}
+                    >
+                      {currentUser?.email}
+                    </div>
+                  </div>
+
                   {/* Cập nhật thông tin */}
                   <button
                     type="button"

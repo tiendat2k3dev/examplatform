@@ -37,9 +37,9 @@
       "role": "User",
       "avatarUrl": "",
       "createdAt": "2026-08-13T09:01:48.710Z",
-      "updatedAt":"2026-08-14T01:58:53.368Z"
-     },
-     { 
+      "updatedAt": "2026-08-14T01:58:53.368Z"
+    },
+    {
       "id": "tiendat2k3",
       "username": "tiendat2k3",
       "password": "$2b$10$kINbX.PA4q/XkwcSCagg..OevBsQr87s7G6cGs.7mE1AVRZrIYiVW",
@@ -51,6 +51,157 @@
       "avatarUrl": "",
       "createdAt": "2026-08-13T00:00:00.000Z",
       "updatedAt": "2026-08-13T09:40:22.846Z"
+    }
+  ],
+  "categories": [
+    {
+      "id": "cat-java",
+      "name": "Java Backend",
+      "description": "Java Core, OOP, Spring Boot, Collection Framework & Multithreading.",
+      "icon": "bi-cup-hot-fill",
+      "color": "danger"
+    },
+    {
+      "id": "cat-csharp",
+      "name": "C# & .NET",
+      "description": "C# Basic, .NET Core Web API, Entity Framework, LINQ & MVC Architecture.",
+      "icon": "bi-windows",
+      "color": "primary"
+    },
+    {
+      "id": "cat-frontend",
+      "name": "Frontend Web",
+      "description": "HTML5, CSS3, JavaScript ES6+, Bootstrap 5 & ReactJS căn bản.",
+      "icon": "bi-filetype-html",
+      "color": "warning"
+    },
+    {
+      "id": "cat-database",
+      "name": "Cơ Sở Dữ Liệu",
+      "description": "SQL Server, MySQL, các câu lệnh truy vấn Join, Group By, Subquery & Index.",
+      "icon": "bi-database-fill",
+      "color": "success"
+    },
+    {
+      "id": "cat-cpp",
+      "name": "C / C++ Base",
+      "description": "Cấu trúc dữ liệu & Giải thuật, Con trỏ, Mảng, Struct & Quản lý bộ nhớ.",
+      "icon": "bi-cpu-fill",
+      "color": "info"
+    },
+    {
+      "id": "cat-python",
+      "name": "Python Lập Trình",
+      "description": "Cú pháp cơ bản, String/List/Dict, Function, Module & Xử lý File trong Python.",
+      "icon": "bi-filetype-py",
+      "color": "secondary"
+    }
+  ],
+  "exams": [
+    {
+      "id": "ex-java-1",
+      "categoryId": "cat-java",
+      "title": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
+      "duration": 30,
+      "totalQuestions": 20
+    },
+    {
+      "id": "ex-java-2",
+      "categoryId": "cat-java",
+      "title": "Java Collection Framework & Xử Lý Ngoại Lệ",
+      "duration": 40,
+      "totalQuestions": 25
+    },
+    {
+      "id": "ex-java-3",
+      "categoryId": "cat-java",
+      "title": "Spring Boot RESTful API & Spring Data JPA",
+      "duration": 45,
+      "totalQuestions": 30
+    },
+    {
+      "id": "ex-csharp-1",
+      "categoryId": "cat-csharp",
+      "title": "C# Basic, Class, Method & Class Inheritance",
+      "duration": 30,
+      "totalQuestions": 20
+    },
+    {
+      "id": "ex-csharp-2",
+      "categoryId": "cat-csharp",
+      "title": ".NET Core Web API & Entity Framework Core",
+      "duration": 45,
+      "totalQuestions": 30
+    },
+    {
+      "id": "ex-frontend-1",
+      "categoryId": "cat-frontend",
+      "title": "HTML5, CSS3 & Responsive Web Design",
+      "duration": 30,
+      "totalQuestions": 20
+    },
+    {
+      "id": "ex-frontend-2",
+      "categoryId": "cat-frontend",
+      "title": "JavaScript ES6+ & DOM Manipulation",
+      "duration": 40,
+      "totalQuestions": 25
+    },
+    {
+      "id": "ex-frontend-3",
+      "categoryId": "cat-frontend",
+      "title": "ReactJS Components, State & Hooks Basis",
+      "duration": 45,
+      "totalQuestions": 30
+    },
+    {
+      "id": "ex-frontend-4",
+      "categoryId": "cat-frontend",
+      "title": "React Redux Toolkit & Asynchronous State",
+      "duration": 45,
+      "totalQuestions": 25
+    },
+    {
+      "id": "ex-db-1",
+      "categoryId": "cat-database",
+      "title": "SQL Basics: SELECT, WHERE & Aggregates",
+      "duration": 30,
+      "totalQuestions": 20
+    },
+    {
+      "id": "ex-db-2",
+      "categoryId": "cat-database",
+      "title": "Advanced SQL: JOIN, Subquery & GROUP BY",
+      "duration": 45,
+      "totalQuestions": 25
+    },
+    {
+      "id": "ex-cpp-1",
+      "categoryId": "cat-cpp",
+      "title": "C/C++ Mảng, Con Trỏ & Quản Lý Bộ Nhớ",
+      "duration": 30,
+      "totalQuestions": 20
+    },
+    {
+      "id": "ex-cpp-2",
+      "categoryId": "cat-cpp",
+      "title": "Cấu Trúc Dữ Liệu & Giải Thuật Cơ Bản",
+      "duration": 40,
+      "totalQuestions": 25
+    },
+    {
+      "id": "ex-python-1",
+      "categoryId": "cat-python",
+      "title": "Python Cú Pháp Cơ Bản & Built-in Data Types",
+      "duration": 30,
+      "totalQuestions": 20
+    },
+    {
+      "id": "ex-python-2",
+      "categoryId": "cat-python",
+      "title": "Python Functions, Modules & Handling Files",
+      "duration": 35,
+      "totalQuestions": 20
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

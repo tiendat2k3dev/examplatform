@@ -11,7 +11,7 @@ import type {
   CreateExamFormValues,
   EditExam,
   ExamQuestion,
-} from "../../../../components/modal/exams/examTypes";
+} from "@/types/exam";
 
 interface Exam {
   id: string;

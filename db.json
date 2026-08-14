@@ -835,6 +835,38 @@
       "userAnswers": {},
       "completedAt": "2026-08-14T06:25:37.990Z",
       "id": "jO8czO2LHRw"
+    },
+    {
+      "userId": "tiendat2k3",
+      "examId": "ex-java-1",
+      "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
+      "score": 33,
+      "totalQuestions": 3,
+      "correctAnswersCount": 1,
+      "timeTaken": 7,
+      "userAnswers": {
+        "q-j1-1": 2,
+        "q-j1-2": 2,
+        "q-j1-3": 2
+      },
+      "completedAt": "2026-08-14T06:50:53.430Z",
+      "id": "lVfyFDP07oY"
+    },
+    {
+      "userId": "tiendat2k3",
+      "examId": "ex-java-1",
+      "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
+      "score": 33,
+      "totalQuestions": 3,
+      "correctAnswersCount": 1,
+      "timeTaken": 15,
+      "userAnswers": {
+        "q-j1-1": 0,
+        "q-j1-2": 2,
+        "q-j1-3": 2
+      },
+      "completedAt": "2026-08-14T07:06:52.261Z",
+      "id": "OGB5Qzkk4Xo"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

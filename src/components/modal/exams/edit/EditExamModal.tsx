@@ -5,7 +5,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
 
-import type { CreateExamFormValues, EditExam, ExamQuestion } from "../examTypes";
+import type { CreateExamFormValues, EditExam, ExamQuestion } from "@/types/exam";
 
 export type { EditExam };
 

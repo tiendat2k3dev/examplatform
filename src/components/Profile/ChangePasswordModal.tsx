@@ -1,8 +1,7 @@
 "use client";
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/redux/store";
-import { useDispatch } from "react-redux";
 import { changePasswordApiAsync } from "@/redux/reducers/AuthReducer";
 import styles from "./ChangePasswordModal.module.css";
 
@@ -11,7 +10,10 @@ interface ChangePasswordModalProps {
   onClose: () => void;
 }
 
-const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ show, onClose }) => {
+const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
+  show,
+  onClose,
+}) => {
   const dispatch = useDispatch<AppDispatch>();
   const { currentUser } = useSelector((state: RootState) => state.authReducer);
 
@@ -36,30 +38,41 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ show, onClose
 
     dispatch(
       changePasswordApiAsync(currentUser.id, formData, () => {
-        setFormData({ oldPassword: "", newPassword: "", confirmNewPassword: "" });
+        setFormData({
+          oldPassword: "",
+          newPassword: "",
+          confirmNewPassword: "",
+        });
         onClose();
-      })
+      }),
     );
   };
 
   return (
     <div className={styles.modalOverlay}>
       {/* Vòng tròn phát sáng trang trí nền */}
-      <div className={`position-absolute rounded-circle opacity-30 ${styles.glowCircle}`}></div>
+      <div
+        className={`position-absolute rounded-circle opacity-30 ${styles.glowCircle}`}
+      ></div>
 
       <div className="container position-relative z-1">
         <div className="row justify-content-center">
           <div className="col-12 col-md-10 col-lg-8">
-            <div className={`modal-content border border-primary border-opacity-50 text-white rounded-4 overflow-hidden shadow-lg ${styles.modalContentCard}`}>
-              
+            <div
+              className={`modal-content border border-primary border-opacity-50 text-white rounded-4 overflow-hidden shadow-lg ${styles.modalContentCard}`}
+            >
               {/* Modal Header */}
               <div className="modal-header border-bottom border-secondary border-opacity-25 p-4">
                 <div className="d-flex align-items-center gap-3">
-                  <div className={`p-2 px-3 rounded-circle text-info border border-info border-opacity-50 ${styles.iconHeaderBox}`}>
+                  <div
+                    className={`p-2 px-3 rounded-circle text-info border border-info border-opacity-50 ${styles.iconHeaderBox}`}
+                  >
                     <i className="bi bi-shield-lock-fill fs-4"></i>
                   </div>
                   <div>
-                    <h5 className={`modal-title fw-bold m-0 ${styles.titleGradient}`}>
+                    <h5
+                      className={`modal-title fw-bold m-0 ${styles.titleGradient}`}
+                    >
                       Cập Nhật Mật Khẩu
                     </h5>
                     <small className="text-light opacity-75">
@@ -78,13 +91,17 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ show, onClose
               {/* Modal Body */}
               <div className="modal-body p-4 p-md-5">
                 <form id="changePasswordForm" onSubmit={handleSubmit}>
-                  
                   {/* Mật khẩu hiện tại */}
                   <div className="mb-3">
-                    <label htmlFor="oldPassword" className="form-label small fw-bold text-light opacity-90">
+                    <label
+                      htmlFor="oldPassword"
+                      className="form-label small fw-bold text-light opacity-90"
+                    >
                       Mật khẩu hiện tại <span className="text-danger">*</span>
                     </label>
-                    <div className={`input-group overflow-hidden rounded-3 border border-secondary border-opacity-50 ${styles.inputGroupCustom}`}>
+                    <div
+                      className={`input-group overflow-hidden rounded-3 border border-secondary border-opacity-50 ${styles.inputGroupCustom}`}
+                    >
                       <span className="input-group-text bg-transparent border-0 text-info">
                         <i className="bi bi-lock"></i>
                       </span>
@@ -103,10 +120,15 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ show, onClose
 
                   {/* Mật khẩu mới */}
                   <div className="mb-3">
-                    <label htmlFor="newPassword" className="form-label small fw-bold text-light opacity-90">
+                    <label
+                      htmlFor="newPassword"
+                      className="form-label small fw-bold text-light opacity-90"
+                    >
                       Mật khẩu mới <span className="text-danger">*</span>
                     </label>
-                    <div className={`input-group overflow-hidden rounded-3 border border-secondary border-opacity-50 ${styles.inputGroupCustom}`}>
+                    <div
+                      className={`input-group overflow-hidden rounded-3 border border-secondary border-opacity-50 ${styles.inputGroupCustom}`}
+                    >
                       <span className="input-group-text bg-transparent border-0 text-info">
                         <i className="bi bi-key"></i>
                       </span>
@@ -125,10 +147,16 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ show, onClose
 
                   {/* Xác nhận mật khẩu mới */}
                   <div className="mb-3">
-                    <label htmlFor="confirmNewPassword" className="form-label small fw-bold text-light opacity-90">
-                      Xác nhận mật khẩu mới <span className="text-danger">*</span>
+                    <label
+                      htmlFor="confirmNewPassword"
+                      className="form-label small fw-bold text-light opacity-90"
+                    >
+                      Xác nhận mật khẩu mới{" "}
+                      <span className="text-danger">*</span>
                     </label>
-                    <div className={`input-group overflow-hidden rounded-3 border border-secondary border-opacity-50 ${styles.inputGroupCustom}`}>
+                    <div
+                      className={`input-group overflow-hidden rounded-3 border border-secondary border-opacity-50 ${styles.inputGroupCustom}`}
+                    >
                       <span className="input-group-text bg-transparent border-0 text-info">
                         <i className="bi bi-shield-check"></i>
                       </span>
@@ -144,7 +172,6 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ show, onClose
                       />
                     </div>
                   </div>
-
                 </form>
               </div>
 
@@ -165,7 +192,6 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ show, onClose
                   <i className="bi bi-key-fill me-1"></i>Đổi Mật Khẩu
                 </button>
               </div>
-
             </div>
           </div>
         </div>

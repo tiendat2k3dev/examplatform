@@ -1,5 +1,6 @@
 // src/redux/reducers/AuthReducer.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { toast } from "react-toastify";
 import {
   User,
   AuthState,
@@ -15,17 +16,28 @@ import {
 } from "@/services/authService";
 import { AppDispatch } from "../store";
 
+// Khởi tạo initialState an toàn, không gọi window / localStorage ngay lúc khởi tạo module
 const initialState: AuthState = {
-  currentUser:
-    typeof window !== "undefined"
-      ? JSON.parse(localStorage.getItem("user") || "null")
-      : null,
+  currentUser: null,
 };
 
 const authReducer = createSlice({
   name: "authReducer",
   initialState,
   reducers: {
+    // Action đồng bộ state từ Client Side (Local Storage)
+    initCurrentUser: (state) => {
+      if (typeof window !== "undefined") {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          try {
+            state.currentUser = JSON.parse(storedUser);
+          } catch {
+            state.currentUser = null;
+          }
+        }
+      }
+    },
     register: (state, action: PayloadAction<User>) => {
       state.currentUser = action.payload;
     },
@@ -40,15 +52,16 @@ const authReducer = createSlice({
       if (typeof window !== "undefined") {
         localStorage.removeItem("user");
       }
+      toast.info("Đã đăng xuất tài khoản!");
     },
   },
 });
 
-export const { register, login, updateUser, logout } = authReducer.actions;
-
+export const { initCurrentUser, register, login, updateUser, logout } =
+  authReducer.actions;
 export default authReducer.reducer;
 
-// Async Thunks cho Register
+// Async Thunk cho Register
 export const registerApiAsync =
   (
     userData: Omit<
@@ -61,6 +74,7 @@ export const registerApiAsync =
     try {
       const data = await registerService(userData);
       dispatch(register(data));
+      toast.success("Đăng ký tài khoản thành công!");
       if (onSuccess) {
         onSuccess();
       }
@@ -68,7 +82,7 @@ export const registerApiAsync =
       const errorMsg =
         error.response?.data?.message || error.message || "Đăng ký thất bại!";
       console.error("Register error:", error);
-      alert(errorMsg);
+      toast.error(errorMsg);
       throw error;
     }
   };
@@ -79,7 +93,6 @@ export const loginApiAsync =
   async (dispatch: AppDispatch) => {
     try {
       const data = await loginService(payload);
-
       const { password, ...userWithoutPassword } = data;
 
       if (typeof window !== "undefined") {
@@ -87,6 +100,7 @@ export const loginApiAsync =
       }
 
       dispatch(login(userWithoutPassword as User));
+      toast.success("Đăng nhập thành công!");
 
       if (onSuccess) {
         onSuccess(data);
@@ -95,7 +109,7 @@ export const loginApiAsync =
       const errorMsg =
         error.response?.data?.message || error.message || "Đăng nhập thất bại!";
       console.error("Login error:", error);
-      alert(errorMsg);
+      toast.error(errorMsg);
       throw error;
     }
   };
@@ -110,7 +124,6 @@ export const updateUserApiAsync =
   async (dispatch: AppDispatch) => {
     try {
       const updatedUser = await updateUserService(userId, payload);
-
       const { password, ...userWithoutPassword } = updatedUser as any;
 
       if (typeof window !== "undefined") {
@@ -118,16 +131,16 @@ export const updateUserApiAsync =
       }
 
       dispatch(updateUser(userWithoutPassword as User));
+      toast.success("Cập nhật thông tin cá nhân thành công!");
 
       if (onSuccess) {
         onSuccess();
       }
-      alert("Cập nhật thông tin thành công!");
     } catch (error: any) {
       const errorMsg =
         error.response?.data?.message || error.message || "Cập nhật thất bại!";
       console.error("Update error:", error);
-      alert(errorMsg);
+      toast.error(errorMsg);
       throw error;
     }
   };
@@ -142,7 +155,7 @@ export const changePasswordApiAsync =
   async () => {
     try {
       await changePasswordService(userId, payload);
-      alert("Đổi mật khẩu thành công!");
+      toast.success("Đổi mật khẩu thành công!");
       if (onSuccess) {
         onSuccess();
       }
@@ -152,7 +165,7 @@ export const changePasswordApiAsync =
         error.message ||
         "Đổi mật khẩu thất bại!";
       console.error("Change password error:", error);
-      alert(errorMsg);
+      toast.error(errorMsg);
       throw error;
     }
   };

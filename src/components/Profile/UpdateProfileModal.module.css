@@ -51,6 +51,12 @@
   background-color: rgba(15, 23, 42, 0.6);
 }
 
+/* Thêm style để placeholder sáng rõ nét */
+.inputGroupCustom input::placeholder {
+  color: rgba(255, 255, 255, 0.75) !important;
+  opacity: 1;
+}
+
 .submitBtn {
   background: linear-gradient(135deg, #0d6efd 0%, #8b5cf6 100%);
   border: none;

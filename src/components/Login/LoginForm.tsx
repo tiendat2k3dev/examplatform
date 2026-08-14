@@ -1,4 +1,3 @@
-// src/components/Login/LoginForm.tsx
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -22,8 +21,7 @@ const LoginForm = () => {
     onSubmit: async (values) => {
       dispatch(
         loginApiAsync(values, (user) => {
-          alert("Đăng nhập thành công!");
-          // Kiểm tra phân quyền (role) để điều hướng trang phù hợp
+          // Xóa alert(), Toastify đã được tự động bắn từ Redux Thunk
           if (user.role === "Admin") {
             router.push("/admin");
           } else {
@@ -65,7 +63,7 @@ const LoginForm = () => {
                   <div className="mb-2">
                     <label
                       htmlFor="username"
-                      className="form-label small fw-bold text-light opacity-90 mb-1"
+                      className="form-label small fw-bold text-black opacity-90 mb-1"
                     >
                       Tên đăng nhập <span className="text-danger">*</span>
                     </label>
@@ -94,7 +92,7 @@ const LoginForm = () => {
                   <div className="mb-2">
                     <label
                       htmlFor="password"
-                      className="form-label small fw-bold text-light opacity-90 mb-1"
+                      className="form-label small fw-bold text-black opacity-90 mb-1"
                     >
                       Mật khẩu <span className="text-danger">*</span>
                     </label>

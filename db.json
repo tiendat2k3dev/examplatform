@@ -27,6 +27,19 @@
       "updatedAt": "2026-08-13T07:20:09.586Z"
     },
     {
+      "id": "x1tVKJ6qB0o",
+      "username": "TuanLam",
+      "password": "$2b$10$RcVh/w4XoL5F9vSJsO6J0eZe6uk7aQPkB.L55Xfwg3BbnmqXNe.gm",
+      "fullName": "Tuấn Lâm",
+      "email": "Lam@gmail.com",
+      "phone": "0367797348",
+      "address": "250 Khu Phố 1, Phường Xuân Hòa",
+      "role": "User",
+      "avatarUrl": "",
+      "createdAt": "2026-08-13T09:01:48.710Z",
+      "updatedAt":"2026-08-14T01:58:53.368Z"
+     },
+     { 
       "id": "tiendat2k3",
       "username": "tiendat2k3",
       "password": "$2b$10$kINbX.PA4q/XkwcSCagg..OevBsQr87s7G6cGs.7mE1AVRZrIYiVW",

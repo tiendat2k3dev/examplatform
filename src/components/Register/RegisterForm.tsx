@@ -29,7 +29,7 @@ const RegisterForm = () => {
 
       dispatch(
         registerApiAsync(userData, () => {
-          alert("Đăng ký thành công!");
+          // Xóa alert(), Toastify đã được tự động bắn từ Redux Thunk
           router.push("/login");
         }),
       );
@@ -62,12 +62,12 @@ const RegisterForm = () => {
 
               {/* CỘT PHẢI */}
               <div className="col-lg-8 ps-lg-4">
-                <form onSubmit={formik.handleSubmit}>
+                <form onSubmit={formik.handleSubmit} suppressHydrationWarning>
                   {/* Tên đăng nhập */}
                   <div className="mb-2">
                     <label
                       htmlFor="username"
-                      className="form-label small fw-bold text-light opacity-90 mb-1"
+                      className="form-label small fw-bold text-black opacity-90 mb-1"
                     >
                       Tên đăng nhập <span className="text-danger">*</span>
                     </label>
@@ -97,7 +97,7 @@ const RegisterForm = () => {
                     <div className="col-md-6">
                       <label
                         htmlFor="password"
-                        className="form-label small fw-bold text-light opacity-90 mb-1"
+                        className="form-label small fw-bold text-black opacity-90 mb-1"
                       >
                         Mật khẩu <span className="text-danger">*</span>
                       </label>
@@ -125,7 +125,7 @@ const RegisterForm = () => {
                     <div className="col-md-6">
                       <label
                         htmlFor="confirmPassword"
-                        className="form-label small fw-bold text-light opacity-90 mb-1"
+                        className="form-label small fw-bold text-black opacity-90 mb-1"
                       >
                         Xác nhận <span className="text-danger">*</span>
                       </label>
@@ -156,7 +156,7 @@ const RegisterForm = () => {
                     <div className="col-md-6">
                       <label
                         htmlFor="fullName"
-                        className="form-label small fw-bold text-light opacity-90 mb-1"
+                        className="form-label small fw-bold text-black opacity-90 mb-1"
                       >
                         Họ và tên <span className="text-danger">*</span>
                       </label>
@@ -184,7 +184,7 @@ const RegisterForm = () => {
                     <div className="col-md-6">
                       <label
                         htmlFor="email"
-                        className="form-label small fw-bold text-light opacity-90 mb-1"
+                        className="form-label small fw-bold text-black opacity-90 mb-1"
                       >
                         Email <span className="text-danger">*</span>
                       </label>
@@ -215,7 +215,7 @@ const RegisterForm = () => {
                     <div className="col-md-6">
                       <label
                         htmlFor="phone"
-                        className="form-label small fw-bold text-light opacity-90 mb-1"
+                        className="form-label small fw-bold text-black opacity-90 mb-1"
                       >
                         Số điện thoại <span className="text-danger">*</span>
                       </label>
@@ -243,7 +243,7 @@ const RegisterForm = () => {
                     <div className="col-md-6">
                       <label
                         htmlFor="address"
-                        className="form-label small fw-bold text-light opacity-90 mb-1"
+                        className="form-label small fw-bold text-black opacity-90 mb-1"
                       >
                         Địa chỉ <span className="text-danger">*</span>
                       </label>

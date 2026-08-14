@@ -1,0 +1,38 @@
+.quizContainer {
+  min-height: 85vh;
+}
+
+.timerBadge {
+  font-size: 1.15rem;
+  letter-spacing: 1px;
+}
+
+.optionCard {
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  border: 1.5px solid #dee2e6;
+  border-radius: 12px;
+}
+
+.optionCard:hover {
+  border-color: #0d6efd;
+  background-color: rgba(13, 110, 253, 0.03);
+}
+
+.optionCardActive {
+  border-color: #0d6efd !important;
+  background-color: rgba(13, 110, 253, 0.08) !important;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+}
+
+.navCircleBtn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.2s ease;
+}

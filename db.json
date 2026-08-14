@@ -103,105 +103,738 @@
       "categoryId": "cat-java",
       "title": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
       "duration": 30,
-      "totalQuestions": 20
+      "totalQuestions": 3
     },
     {
       "id": "ex-java-2",
       "categoryId": "cat-java",
       "title": "Java Collection Framework & Xử Lý Ngoại Lệ",
       "duration": 40,
-      "totalQuestions": 25
+      "totalQuestions": 3
     },
     {
       "id": "ex-java-3",
       "categoryId": "cat-java",
       "title": "Spring Boot RESTful API & Spring Data JPA",
       "duration": 45,
-      "totalQuestions": 30
+      "totalQuestions": 3
     },
     {
       "id": "ex-csharp-1",
       "categoryId": "cat-csharp",
       "title": "C# Basic, Class, Method & Class Inheritance",
       "duration": 30,
-      "totalQuestions": 20
+      "totalQuestions": 3
     },
     {
       "id": "ex-csharp-2",
       "categoryId": "cat-csharp",
       "title": ".NET Core Web API & Entity Framework Core",
       "duration": 45,
-      "totalQuestions": 30
+      "totalQuestions": 3
     },
     {
       "id": "ex-frontend-1",
       "categoryId": "cat-frontend",
       "title": "HTML5, CSS3 & Responsive Web Design",
       "duration": 30,
-      "totalQuestions": 20
+      "totalQuestions": 3
     },
     {
       "id": "ex-frontend-2",
       "categoryId": "cat-frontend",
       "title": "JavaScript ES6+ & DOM Manipulation",
       "duration": 40,
-      "totalQuestions": 25
+      "totalQuestions": 3
     },
     {
       "id": "ex-frontend-3",
       "categoryId": "cat-frontend",
       "title": "ReactJS Components, State & Hooks Basis",
       "duration": 45,
-      "totalQuestions": 30
+      "totalQuestions": 3
     },
     {
       "id": "ex-frontend-4",
       "categoryId": "cat-frontend",
       "title": "React Redux Toolkit & Asynchronous State",
       "duration": 45,
-      "totalQuestions": 25
+      "totalQuestions": 3
     },
     {
       "id": "ex-db-1",
       "categoryId": "cat-database",
       "title": "SQL Basics: SELECT, WHERE & Aggregates",
       "duration": 30,
-      "totalQuestions": 20
+      "totalQuestions": 3
     },
     {
       "id": "ex-db-2",
       "categoryId": "cat-database",
       "title": "Advanced SQL: JOIN, Subquery & GROUP BY",
       "duration": 45,
-      "totalQuestions": 25
+      "totalQuestions": 3
     },
     {
       "id": "ex-cpp-1",
       "categoryId": "cat-cpp",
       "title": "C/C++ Mảng, Con Trỏ & Quản Lý Bộ Nhớ",
       "duration": 30,
-      "totalQuestions": 20
+      "totalQuestions": 3
     },
     {
       "id": "ex-cpp-2",
       "categoryId": "cat-cpp",
       "title": "Cấu Trúc Dữ Liệu & Giải Thuật Cơ Bản",
       "duration": 40,
-      "totalQuestions": 25
+      "totalQuestions": 3
     },
     {
       "id": "ex-python-1",
       "categoryId": "cat-python",
       "title": "Python Cú Pháp Cơ Bản & Built-in Data Types",
       "duration": 30,
-      "totalQuestions": 20
+      "totalQuestions": 3
     },
     {
       "id": "ex-python-2",
       "categoryId": "cat-python",
       "title": "Python Functions, Modules & Handling Files",
       "duration": 35,
-      "totalQuestions": 20
+      "totalQuestions": 3
+    }
+  ],
+  "questions": [
+    {
+      "id": "q-j1-1",
+      "examId": "ex-java-1",
+      "questionText": "Ngôn ngữ Java có hỗ trợ Đa kế thừa (Multiple Inheritance) trực tiếp qua Class không?",
+      "options": [
+        "Có hỗ trợ",
+        "Không hỗ trợ",
+        "Chỉ hỗ trợ trong Java 8 trở lên",
+        "Tùy thuộc vào JVM"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Java không hỗ trợ đa kế thừa class để tránh hiện tượng xung đột Diamond Problem. Thay vào đó Java cho phép 1 class implements nhiều Interface."
+    },
+    {
+      "id": "q-j1-2",
+      "examId": "ex-java-1",
+      "questionText": "Từ khóa nào trong Java được sử dụng để ngăn một class không cho phép kế thừa?",
+      "options": [
+        "abstract",
+        "static",
+        "final",
+        "super"
+      ],
+      "correctAnswer": 2,
+      "explanation": "Từ khóa 'final' khi đặt trước một class sẽ biến class đó thành Final Class, khiến cho không class nào khác có thể extends nó."
+    },
+    {
+      "id": "q-j1-3",
+      "examId": "ex-java-1",
+      "questionText": "Tính chất nào của OOP cho phép che giấu chi tiết cài đặt và chỉ cung cấp các phương thức công khai ra bên ngoài?",
+      "options": [
+        "Tính kế thừa (Inheritance)",
+        "Tính đóng gói (Encapsulation)",
+        "Tính đa hình (Polymorphism)",
+        "Tính trừu tượng (Abstraction)"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Encapsulation (Tính đóng gói) sử dụng private/protected cho thuộc tính và cung cấp Getter/Setter public để bảo vệ dữ liệu."
+    },
+    {
+      "id": "q-j2-1",
+      "examId": "ex-java-2",
+      "questionText": "Interface nào trong Java Collection Framework lưu trữ các phần tử duy nhất (không trùng lặp)?",
+      "options": [
+        "List",
+        "Set",
+        "Queue",
+        "Map"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Set interface đảm bảo tất cả các phần tử chứa trong nó là duy nhất (Unique)."
+    },
+    {
+      "id": "q-j2-2",
+      "examId": "ex-java-2",
+      "questionText": "Khối lệnh nào trong try-catch luôn luôn được thực thi dù có ngoại lệ (Exception) xảy ra hay không?",
+      "options": [
+        "try",
+        "catch",
+        "finally",
+        "throw"
+      ],
+      "correctAnswer": 2,
+      "explanation": "Khối 'finally' luôn chạy kể cả khi xảy ra Exception hay không, dùng để giải phóng tài nguyên (Close file, connection...)."
+    },
+    {
+      "id": "q-j2-3",
+      "examId": "ex-java-2",
+      "questionText": "ArrayList khác với LinkedList ở điểm nào?",
+      "options": [
+        "ArrayList duyệt phần tử nhanh hơn bằng Index O(1)",
+        "LinkedList chèn xóa phần tử O(1) chậm hơn ArrayList",
+        "ArrayList là Danh sách liên kết",
+        "LinkedList lưu trữ phần tử liên tục trong bộ nhớ"
+      ],
+      "correctAnswer": 0,
+      "explanation": "ArrayList dựa trên mảng động nên truy cập ngẫu nhiên qua index mất O(1), trong khi LinkedList dựa trên Danh sách liên kết đôi."
+    },
+    {
+      "id": "q-j3-1",
+      "examId": "ex-java-3",
+      "questionText": "Annotation nào trong Spring Boot dùng để định nghĩa một RESTful Controller trả về JSON?",
+      "options": [
+        "@Controller",
+        "@RestController",
+        "@Service",
+        "@Component"
+      ],
+      "correctAnswer": 1,
+      "explanation": "@RestController = @Controller + @ResponseBody, giúp tự động serialize kết quả trả về thành định dạng JSON/XML."
+    },
+    {
+      "id": "q-j3-2",
+      "examId": "ex-java-3",
+      "questionText": "Annotation nào được sử dụng để tự động inject (tiêm) một Dependency Bean trong Spring?",
+      "options": [
+        "@Autowired",
+        "@InjectBean",
+        "@Bean",
+        "@Value"
+      ],
+      "correctAnswer": 0,
+      "explanation": "@Autowired được Spring IoC Container dùng để inject Dependency vào Field, Constructor hoặc Setter."
+    },
+    {
+      "id": "q-j3-3",
+      "examId": "ex-java-3",
+      "questionText": "Spring Data JPA extends interface nào để cung cấp sẵn các hàm CRUD chuẩn?",
+      "options": [
+        "CrudRepository",
+        "JpaRepository",
+        "PagingAndSortingRepository",
+        "Tất cả các đáp án trên"
+      ],
+      "correctAnswer": 3,
+      "explanation": "JpaRepository kế thừa từ PagingAndSortingRepository, vốn là con của CrudRepository."
+    },
+    {
+      "id": "q-cs1-1",
+      "examId": "ex-csharp-1",
+      "questionText": "Từ khóa nào trong C# cho phép ghi đè (override) một phương thức của class cha?",
+      "options": [
+        "virtual / override",
+        "abstract / new",
+        "static / override",
+        "sealed / override"
+      ],
+      "correctAnswer": 0,
+      "explanation": "Phương thức lớp cha phải khai báo 'virtual' (hoặc abstract) và phương thức lớp con dùng 'override' để ghi đè."
+    },
+    {
+      "id": "q-cs1-2",
+      "examId": "ex-csharp-1",
+      "questionText": "Kiểu dữ liệu 'int?' trong C# có ý nghĩa gì?",
+      "options": [
+        "int chỉ nhận giá trị dương",
+        "Nullable<int> - kiểu int có thể gán giá trị null",
+        "int tự động ép kiểu sang string",
+        "Con trỏ trỏ đến số nguyên int"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Dấu '?' sau Value Type biến nó thành Nullable Type, cho phép lưu trữ giá trị null."
+    },
+    {
+      "id": "q-cs1-3",
+      "examId": "ex-csharp-1",
+      "questionText": "Cấu trúc Garbage Collection (GC) trong .NET có vai trò gì?",
+      "options": [
+        "Xử lý ngoại lệ ứng dụng",
+        "Quản lý và giải phóng bộ nhớ Heap tự động",
+        "Biên dịch code C# sang MSIL",
+        "Tối ưu hóa vòng lặp for"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Garbage Collector (GC) tự động theo dõi và giải phóng các đối tượng không còn được tham chiếu trên bộ nhớ Managed Heap."
+    },
+    {
+      "id": "q-cs2-1",
+      "examId": "ex-csharp-2",
+      "questionText": "Trong Entity Framework Core, phương thức nào dùng để áp dụng Migration vào Database?",
+      "options": [
+        "Add-Migration",
+        "Update-Database",
+        "Remove-Migration",
+        "Script-Migration"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Lệnh Update-Database áp dụng các file Migration chưa được thực thi vào CSDL thực tế."
+    },
+    {
+      "id": "q-cs2-2",
+      "examId": "ex-csharp-2",
+      "questionText": "HTTP Method nào phù hợp nhất cho hành động Cập nhật toàn bộ tài nguyên trong Web API?",
+      "options": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE"
+      ],
+      "correctAnswer": 2,
+      "explanation": "HTTP PUT được dùng để cập nhật đè (Replace/Update full) một tài nguyên."
+    },
+    {
+      "id": "q-cs2-3",
+      "examId": "ex-csharp-2",
+      "questionText": "Kỹ thuật 'AsNoTracking()' trong Entity Framework Core có tác dụng gì?",
+      "options": [
+        "Ngăn lưu thay đổi vào DB",
+        "Tăng tốc độ truy vấn SELECT do không cần Change Tracker theo dõi",
+        "Tự động mã hóa dữ liệu",
+        "Bắt buộc ép kiểu Lazy Loading"
+      ],
+      "correctAnswer": 1,
+      "explanation": "AsNoTracking() bỏ qua cơ chế theo dõi sự thay đổi (Change Tracking), giúp tăng hiệu năng cho các truy vấn Read-Only."
+    },
+    {
+      "id": "q-fe1-1",
+      "examId": "ex-frontend-1",
+      "questionText": "Thẻ HTML5 nào được dùng để khai báo thanh điều hướng của trang web?",
+      "options": [
+        "<header>",
+        "<nav>",
+        "<section>",
+        "<aside>"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Thẻ `<nav>` được định nghĩa trong HTML5 chuẩn ngữ nghĩa (Semantic HTML) dành riêng cho thanh điều hướng Navigation."
+    },
+    {
+      "id": "q-fe1-2",
+      "examId": "ex-frontend-2",
+      "questionText": "Thuộc tính CSS nào điều chỉnh layout dạng lưới 2 chiều (hàng và cột)?",
+      "options": [
+        "display: flex",
+        "display: grid",
+        "display: block",
+        "position: absolute"
+      ],
+      "correctAnswer": 1,
+      "explanation": "CSS Grid (display: grid) là hệ thống layout 2 chiều (Rows & Columns), khác với Flexbox là 1 chiều."
+    },
+    {
+      "id": "q-fe1-3",
+      "examId": "ex-frontend-1",
+      "questionText": "Trong CSS Box Model, thứ tự tính tổng chiều rộng thực tế của phần tử là gì?",
+      "options": [
+        "Content + Padding + Border",
+        "Content + Margin",
+        "Content + Border + Margin",
+        "Padding + Border + Margin"
+      ],
+      "correctAnswer": 0,
+      "explanation": "Box Model chuẩn bao gồm Content Width + Padding (Trái/Phải) + Border (Trái/Phải). (Nếu box-sizing: content-box)."
+    },
+    {
+      "id": "q-fe2-1",
+      "examId": "ex-frontend-2",
+      "questionText": "Từ khóa 'const' trong JavaScript ES6 có đặc điểm gì?",
+      "options": [
+        "Khai báo biến hằng số - không thể gán lại giá trị mới",
+        "Biến const có phạm vi Function Scope",
+        "Có thể hoisiting và sử dụng trước khi khai báo",
+        "Cho phép khai báo lại cùng tên trong cùng block"
+      ],
+      "correctAnswer": 0,
+      "explanation": "Từ khóa const tạo một Re-binding Immutable Reference, tức là không thể gán đại số (=) lại giá trị khác."
+    },
+    {
+      "id": "q-fe2-2",
+      "examId": "ex-frontend-2",
+      "questionText": "Phương thức mảng nào trả về một mảng MỚI sau khi biến đổi từng phần tử?",
+      "options": [
+        "forEach()",
+        "map()",
+        "filter()",
+        "reduce()"
+      ],
+      "correctAnswer": 1,
+      "explanation": "map() duyệt qua các phần tử và trả về mảng mới dựa trên kết quả của callback function."
+    },
+    {
+      "id": "q-fe2-3",
+      "examId": "ex-frontend-2",
+      "questionText": "Kết quả của biểu thức: typeof null trong JavaScript là gì?",
+      "options": [
+        "'null'",
+        "'undefined'",
+        "'object'",
+        "'boolean'"
+      ],
+      "correctAnswer": 2,
+      "explanation": "Đây là một bug huyền thoại từ phiên bản đầu tiên của JavaScript: typeof null trả về 'object'."
+    },
+    {
+      "id": "q-fe3-1",
+      "examId": "ex-frontend-3",
+      "questionText": "Hook nào trong ReactJS được sử dụng để quản lý Side Effect (gọi API, subscription, DOM manipulation)?",
+      "options": [
+        "useState",
+        "useContext",
+        "useEffect",
+        "useReducer"
+      ],
+      "correctAnswer": 2,
+      "explanation": "useEffect cho phép thực thi side-effects sau mỗi lần component render hoặc khi dependency array thay đổi."
+    },
+    {
+      "id": "q-fe3-2",
+      "examId": "ex-frontend-3",
+      "questionText": "Quy tắc quan trọng nhất khi cập nhật State trong React là gì?",
+      "options": [
+        "Thay đổi trực tiếp biến state (State Mutation)",
+        "Không mutate trực tiếp mà luôn truyền giá trị/object mới (Immutability)",
+        "Chỉ được update state trong hàm render",
+        "Gán state trực tiếp qua dấu '='"
+      ],
+      "correctAnswer": 1,
+      "explanation": "React dựa vào so sánh tham chiếu (Shallow Compare) để trigger re-render, do đó bắt buộc tuân thủ nguyên tắc Immutability."
+    },
+    {
+      "id": "q-fe3-3",
+      "examId": "ex-frontend-3",
+      "questionText": "Thuộc tính 'key' khi lặp danh sách (map) trong React có tác dụng gì?",
+      "options": [
+        "Tạo CSS style riêng cho phần tử",
+        "Giúp React Virtual DOM định danh chính xác phần tử để tối ưu Re-render",
+        "Bắt buộc phải là index của mảng",
+        "Lưu giá trị vào Redux Store"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Key giúp thuật toán Reconciliation của Virtual DOM xác định phần tử nào bị thêm, sửa, xóa."
+    },
+    {
+      "id": "q-fe4-1",
+      "examId": "ex-frontend-4",
+      "questionText": "Trong Redux Toolkit, hàm nào được dùng để tạo Reducer và các Action tương ứng cùng một lúc?",
+      "options": [
+        "createStore",
+        "createSlice",
+        "combineReducers",
+        "configureStore"
+      ],
+      "correctAnswer": 1,
+      "explanation": "createSlice() nhận tên slice, initialState và mảng reducers để tự động generate Action Creators và Action Types."
+    },
+    {
+      "id": "q-fe4-2",
+      "examId": "ex-frontend-4",
+      "questionText": "Thư viện nào được Redux Toolkit tích hợp sẵn bên trong createSlice để xử lý Mutable Code an toàn?",
+      "options": [
+        "Lodash",
+        "Immer.js",
+        "Axios",
+        "RxJS"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Immer.js giúp chúng ta viết code biến đổi state dạng mutable (như state.value = 10) nhưng bên dưới tự chuyển thành Immutable State."
+    },
+    {
+      "id": "q-fe4-3",
+      "examId": "ex-frontend-4",
+      "questionText": "Hook nào dùng để lấy State từ Redux Store xuống Functional Component?",
+      "options": [
+        "useDispatch",
+        "useSelector",
+        "useStore",
+        "useContextState"
+      ],
+      "correctAnswer": 1,
+      "explanation": "useSelector() cho phép trích xuất dữ liệu từ Redux Store State bằng một Selector function."
+    },
+    {
+      "id": "q-db1-1",
+      "examId": "ex-db-1",
+      "questionText": "Câu lệnh SQL nào dùng để loại bỏ các bản ghi trùng lặp trong kết quả SELECT?",
+      "options": [
+        "SELECT UNIQUE",
+        "SELECT DISTINCT",
+        "SELECT DIFFERENT",
+        "SELECT GROUP"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Từ khóa DISTINCT giúp loại bỏ tất cả các dòng trùng lặp trong bảng dữ liệu kết quả."
+    },
+    {
+      "id": "q-db1-2",
+      "examId": "ex-db-1",
+      "questionText": "Mệnh đề nào dùng để lọc kết quả dựa trên hàm gom nhóm (Aggregate Function như COUNT, SUM)?",
+      "options": [
+        "WHERE",
+        "ORDER BY",
+        "HAVING",
+        "GROUP BY"
+      ],
+      "correctAnswer": 2,
+      "explanation": "WHERE lọc dòng trước khi gom nhóm, còn HAVING lọc các nhóm sau khi đã GROUP BY."
+    },
+    {
+      "id": "q-db1-3",
+      "examId": "ex-db-1",
+      "questionText": "Toán tử SQL nào dùng để tìm kiếm các giá trị theo mẫu chuỗi (Pattern Matching)?",
+      "options": [
+        "IN",
+        "LIKE",
+        "BETWEEN",
+        "EXISTS"
+      ],
+      "correctAnswer": 1,
+      "explanation": "LIKE kết hợp với ký tự đại diện % và _ được dùng để tìm kiếm chuỗi mẫu."
+    },
+    {
+      "id": "q-db2-1",
+      "examId": "ex-db-2",
+      "questionText": "Loại JOIN nào trả về tất cả các dòng ở Bảng Trái và các dòng khớp ở Bảng Phải?",
+      "options": [
+        "INNER JOIN",
+        "LEFT JOIN",
+        "RIGHT JOIN",
+        "FULL OUTER JOIN"
+      ],
+      "correctAnswer": 1,
+      "explanation": "LEFT JOIN (hoặc LEFT OUTER JOIN) giữ lại toàn bộ dữ liệu bảng bên trái, dòng bảng phải không khớp sẽ mang giá trị NULL."
+    },
+    {
+      "id": "q-db2-2",
+      "examId": "ex-db-2",
+      "questionText": "Kỹ thuật Clustered Index trong Database có đặc điểm gì?",
+      "options": [
+        "Sắp xếp và lưu trữ dữ liệu thực tế của bảng theo thứ tự Index",
+        "Mỗi bảng có thể tạo được tối đa 254 Clustered Index",
+        "Không ảnh hưởng tới tốc độ tìm kiếm",
+        "Lưu trữ độc lập hoàn toàn với bảng gốc"
+      ],
+      "correctAnswer": 0,
+      "explanation": "Mỗi bảng chỉ có duy nhất 1 Clustered Index vì nó quyết định thứ tự vật lý sắp xếp dữ liệu trên ổ đĩa (thường gắn với Primary Key)."
+    },
+    {
+      "id": "q-db2-3",
+      "examId": "ex-db-2",
+      "questionText": "Đặc tính 'A' trong chuẩn ACID của giao dịch CSDL (Transaction) là viết tắt của từ gì?",
+      "options": [
+        "Accuracy",
+        "Atomicity",
+        "Availability",
+        "Authentication"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Atomicity (Tính nguyên tố): Tất cả các thao tác trong transaction phải thành công hết hoặc thất bại hết (All or Nothing)."
+    },
+    {
+      "id": "q-cpp1-1",
+      "examId": "ex-cpp-1",
+      "questionText": "Toán tử nào trong C++ dùng để giải phóng bộ nhớ được cấp phát động bằng 'new'?",
+      "options": [
+        "free()",
+        "delete / delete[]",
+        "remove()",
+        "clear()"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Trong C++, biến cấp phát bằng new/new[] bắt buộc phải hủy tương ứng bằng delete/delete[] để tránh rò rỉ bộ nhớ (Memory Leak)."
+    },
+    {
+      "id": "q-cpp1-2",
+      "examId": "ex-cpp-1",
+      "questionText": "Con trỏ Null (nullptr) trong C++11 có ý nghĩa gì?",
+      "options": [
+        "Trỏ đến vị trí bộ nhớ 0x0000",
+        "Là hằng số số nguyên 0",
+        "Đại diện cho con trỏ không trỏ tới bất kỳ vùng nhớ hợp lệ nào",
+        "Con trỏ bị lỗi phân vùng"
+      ],
+      "correctAnswer": 2,
+      "explanation": "nullptr là hằng con trỏ chuẩn Type-safe trong C++11 thay thế cho macro NULL số nguyên kiểu cũ."
+    },
+    {
+      "id": "q-cpp1-3",
+      "examId": "ex-cpp-1",
+      "questionText": "Thao tác gán int *p = &a; có ý nghĩa gì?",
+      "options": [
+        "Lấy giá trị của a gán vào p",
+        "Gán địa chỉ bộ nhớ của biến a cho con trỏ p",
+        "Tăng giá trị của biến a lên 1",
+        "Nhân địa chỉ a với p"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Toán tử '&' dùng để lấy địa chỉ ô nhớ của biến 'a' và lưu vào con trỏ 'p'."
+    },
+    {
+      "id": "q-cpp2-1",
+      "examId": "ex-cpp-2",
+      "questionText": "Độ phức tạp thời gian trung bình của thuật toán Sắp xếp nhanh (Quick Sort) là bao nhiêu?",
+      "options": [
+        "O(N)",
+        "O(N log N)",
+        "O(N^2)",
+        "O(1)"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Quick Sort đạt hiệu năng O(N log N) trung bình nhờ phương pháp Chia để trị (Divide and Conquer)."
+    },
+    {
+      "id": "q-cpp2-2",
+      "examId": "ex-cpp-2",
+      "questionText": "Cấu trúc dữ liệu Ngăn xếp (Stack) hoạt động theo nguyên lý nào?",
+      "options": [
+        "FIFO (First In First Out)",
+        "LIFO (Last In First Out)",
+        "Random Access",
+        "Priority Queue"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Stack là LIFO (Vào sau Ra trước) - phần tử nào đẩy vào sau cùng sẽ được lấy ra đầu tiên."
+    },
+    {
+      "id": "q-cpp2-3",
+      "examId": "ex-cpp-2",
+      "questionText": "Cấu trúc dữ liệu Hàng đợi (Queue) sử dụng 2 thao tác cơ bản nào?",
+      "options": [
+        "Push & Pop",
+        "Enqueue & Dequeue",
+        "Insert & Remove",
+        "Add & Delete"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Enqueue (thêm vào cuối hàng) và Dequeue (lấy ra từ đầu hàng) theo nguyên lý FIFO."
+    },
+    {
+      "id": "q-py1-1",
+      "examId": "ex-python-1",
+      "questionText": "Kiểu dữ liệu nào trong Python là Immutable (không thể chỉnh sửa sau khi khởi tạo)?",
+      "options": [
+        "List",
+        "Dictionary",
+        "Tuple",
+        "Set"
+      ],
+      "correctAnswer": 2,
+      "explanation": "Tuple được bao bởi dấu ngoặc đơn () và là Immutable, không thể thêm/sửa/xóa phần tử."
+    },
+    {
+      "id": "q-py1-2",
+      "examId": "ex-python-1",
+      "questionText": "Kết quả của đoạn code Python: print(type([])) là gì?",
+      "options": [
+        "<class 'tuple'>",
+        "<class 'list'>",
+        "<class 'dict'>",
+        "<class 'set'>"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Dấu ngoặc vuông [] đại diện cho kiểu dữ liệu List trong Python."
+    },
+    {
+      "id": "q-py1-3",
+      "examId": "ex-python-1",
+      "questionText": "Hàm built-in nào trả về độ dài (số lượng phần tử) của một Sequence trong Python?",
+      "options": [
+        "count()",
+        "size()",
+        "len()",
+        "length()"
+      ],
+      "correctAnswer": 2,
+      "explanation": "Hàm len() được dùng phổ biến để lấy độ dài của string, list, tuple, dictionary..."
+    },
+    {
+      "id": "q-py2-1",
+      "examId": "ex-python-2",
+      "questionText": "Từ khóa nào được sử dụng để khai báo một hàm (Function) trong Python?",
+      "options": [
+        "func",
+        "def",
+        "function",
+        "lambda"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Từ khóa 'def' (define) được Python sử dụng để bắt đầu định nghĩa một hàm."
+    },
+    {
+      "id": "q-py2-2",
+      "examId": "ex-python-2",
+      "questionText": "Cú pháp mở file an toàn tự đóng resource trong Python là gì?",
+      "options": [
+        "with open('file.txt', 'r') as f:",
+        "f = open('file.txt')",
+        "try open('file.txt')",
+        "using open('file.txt')"
+      ],
+      "correctAnswer": 0,
+      "explanation": "Câu lệnh Context Manager 'with open()' giúp tự động gọi hàm close() giải phóng file sau khi kết thúc khối lệnh."
+    },
+    {
+      "id": "q-py2-3",
+      "examId": "ex-python-2",
+      "questionText": "Biểu thức Lambda trong Python được gọi là gì?",
+      "options": [
+        "Hàm định danh cố định",
+        "Hàm vô danh (Anonymous Function) viết ngắn gọn trên 1 dòng",
+        "Vòng lặp đặc biệt",
+        "Biến toàn cục"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Lambda là một Anonymous Function nhỏ gọn có thể nhận nhiều tham số nhưng chỉ có 1 biểu thức trả về."
+    }
+  ],
+  "histories": [
+    {
+      "userId": "tqcjsIgtqp0",
+      "examId": "ex-java-1",
+      "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
+      "score": 0,
+      "totalQuestions": 3,
+      "correctAnswersCount": 0,
+      "timeTaken": 96,
+      "userAnswers": {
+        "q-j1-1": 0,
+        "q-j1-2": 1,
+        "q-j1-3": 0
+      },
+      "completedAt": "2026-08-14T04:49:13.455Z",
+      "id": "OJasRinKy-4"
+    },
+    {
+      "userId": "tqcjsIgtqp0",
+      "examId": "ex-java-1",
+      "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
+      "score": 100,
+      "totalQuestions": 3,
+      "correctAnswersCount": 3,
+      "timeTaken": 38,
+      "userAnswers": {
+        "q-j1-1": 1,
+        "q-j1-2": 2,
+        "q-j1-3": 1
+      },
+      "completedAt": "2026-08-14T04:52:51.735Z",
+      "id": "s7YzONDVtnI"
+    },
+    {
+      "userId": "tqcjsIgtqp0",
+      "examId": "ex-db-1",
+      "examTitle": "SQL Basics: SELECT, WHERE & Aggregates",
+      "score": 0,
+      "totalQuestions": 3,
+      "correctAnswersCount": 0,
+      "timeTaken": 5,
+      "userAnswers": {},
+      "completedAt": "2026-08-14T06:25:37.990Z",
+      "id": "jO8czO2LHRw"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

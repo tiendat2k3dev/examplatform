@@ -1,0 +1,640 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import { toast } from "react-toastify";
+
+import type { CreateExamFormValues, EditExam, ExamQuestion } from "../examTypes";
+
+export type { EditExam };
+
+interface EditExamModalProps {
+  show: boolean;
+  exam: EditExam | null;
+  questions: ExamQuestion[];
+  onClose: () => void;
+  onUpdate: (
+    examId: string,
+    values: CreateExamFormValues,
+  ) => Promise<void> | void;
+}
+
+const validationSchema = Yup.object({
+  id: Yup.string()
+    .trim()
+    .required("Vui lòng nhập mã đề thi")
+    .max(50, "Mã đề thi tối đa 50 ký tự"),
+
+  name: Yup.string()
+    .trim()
+    .required("Vui lòng nhập tên đề thi")
+    .max(200, "Tên đề thi tối đa 200 ký tự"),
+
+  category: Yup.string().required("Vui lòng chọn danh mục"),
+
+  duration: Yup.number()
+    .typeError("Thời gian phải là số")
+    .required("Vui lòng nhập thời gian")
+    .min(1, "Thời gian phải lớn hơn 0")
+    .max(600, "Thời gian tối đa 600 phút"),
+
+  passScore: Yup.number()
+    .typeError("Điểm phải là số")
+    .required("Vui lòng nhập điểm pass")
+    .min(0, "Điểm tối thiểu là 0")
+    .max(10, "Điểm tối đa là 10"),
+
+  status: Yup.string().oneOf(["Hoạt động", "Khóa"]).required(),
+
+  questionIds: Yup.array()
+    .of(Yup.string())
+    .min(1, "Vui lòng chọn ít nhất 1 câu hỏi"),
+});
+
+const EditExamModal = ({
+  show,
+  exam,
+  questions,
+  onClose,
+  onUpdate,
+}: EditExamModalProps) => {
+  const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const pageSize = 4;
+
+  const formik = useFormik<CreateExamFormValues>({
+    enableReinitialize: true,
+
+    initialValues: {
+      id: exam?.id ?? "",
+      name: exam?.name ?? "",
+      category: exam?.category ?? "",
+      duration: exam?.duration ?? 45,
+      passScore: exam?.passScore ?? 5,
+      status: exam?.status ?? "Hoạt động",
+      questionIds: exam?.questionIds ?? [],
+    },
+
+    validationSchema,
+
+    onSubmit: async (values, { setSubmitting }) => {
+      if (!exam) {
+        return;
+      }
+
+      try {
+        await onUpdate(exam.id, values);
+
+        toast.success("Cập nhật đề thi thành công!");
+
+        onClose();
+      } catch (error) {
+        console.error(error);
+
+        toast.error("Không thể cập nhật đề thi!");
+      } finally {
+        setSubmitting(false);
+      }
+    },
+  });
+
+  useEffect(() => {
+    if (!show) {
+      setSearch("");
+      setCurrentPage(1);
+    }
+  }, [show]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search]);
+
+  const filteredQuestions = useMemo(() => {
+    const keyword = search.trim().toLowerCase();
+
+    if (!keyword) {
+      return questions;
+    }
+
+    return questions.filter((question) => {
+      return (
+        question.content.toLowerCase().includes(keyword) ||
+        question.category.toLowerCase().includes(keyword)
+      );
+    });
+  }, [questions, search]);
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredQuestions.length / pageSize),
+  );
+
+  const safePage = Math.min(currentPage, totalPages);
+
+  const startIndex = (safePage - 1) * pageSize;
+
+  const currentQuestions = filteredQuestions.slice(
+    startIndex,
+    startIndex + pageSize,
+  );
+
+  const isSelected = (id: string) => {
+    return formik.values.questionIds.includes(id);
+  };
+
+  const handleSelectQuestion = (id: string) => {
+    const currentIds = formik.values.questionIds;
+
+    if (currentIds.includes(id)) {
+      formik.setFieldValue(
+        "questionIds",
+        currentIds.filter((questionId) => questionId !== id),
+      );
+    } else {
+      formik.setFieldValue("questionIds", [...currentIds, id]);
+    }
+  };
+
+  const allCurrentSelected =
+    currentQuestions.length > 0 &&
+    currentQuestions.every((question) =>
+      formik.values.questionIds.includes(question.id),
+    );
+
+  const handleSelectAll = () => {
+    const currentIds = currentQuestions.map((question) => question.id);
+
+    if (allCurrentSelected) {
+      formik.setFieldValue(
+        "questionIds",
+        formik.values.questionIds.filter((id) => !currentIds.includes(id)),
+      );
+    } else {
+      formik.setFieldValue("questionIds", [
+        ...new Set([...formik.values.questionIds, ...currentIds]),
+      ]);
+    }
+  };
+
+  if (!show || !exam) {
+    return null;
+  }
+
+  return (
+    <div
+      className="modal d-block"
+      tabIndex={-1}
+      style={{
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+        zIndex: 1055,
+      }}
+    >
+      <div
+        className="modal-dialog modal-xl modal-dialog-centered"
+        style={{ maxWidth: "1200px" }}
+      >
+        <div className="modal-content border-0 shadow">
+          <div className="modal-header">
+            <div>
+              <h5 className="modal-title fw-bold" style={{ color: "#173b69" }}>
+                Chỉnh sửa đề thi
+              </h5>
+
+              <small className="text-secondary">
+                Cập nhật thông tin bài kiểm tra.
+              </small>
+            </div>
+
+            <button
+              type="button"
+              className="btn-close"
+              onClick={onClose}
+              disabled={formik.isSubmitting}
+            />
+          </div>
+
+          <form onSubmit={formik.handleSubmit}>
+            <div className="modal-body">
+              <div className="row g-3">
+                <div className="col-lg-3">
+                  <div className="border rounded p-3 h-100">
+                    <h6 className="fw-bold mb-4" style={{ color: "#173b69" }}>
+                      Thông tin chung
+                    </h6>
+
+                    <div className="mb-3">
+                      <label
+                        htmlFor="edit-id"
+                        className="form-label small fw-semibold"
+                      >
+                        Mã đề thi <span className="text-danger">*</span>
+                      </label>
+
+                      <input
+                        id="edit-id"
+                        name="id"
+                        type="text"
+                        className={`form-control form-control-sm ${
+                          formik.touched.id && formik.errors.id
+                            ? "is-invalid"
+                            : ""
+                        }`}
+                        value={formik.values.id}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                      />
+
+                      {formik.touched.id && formik.errors.id && (
+                        <div className="invalid-feedback">
+                          {formik.errors.id}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="mb-3">
+                      <label
+                        htmlFor="edit-name"
+                        className="form-label small fw-semibold"
+                      >
+                        Tên đề thi <span className="text-danger">*</span>
+                      </label>
+
+                      <input
+                        id="edit-name"
+                        name="name"
+                        type="text"
+                        className={`form-control form-control-sm ${
+                          formik.touched.name && formik.errors.name
+                            ? "is-invalid"
+                            : ""
+                        }`}
+                        value={formik.values.name}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                      />
+
+                      {formik.touched.name && formik.errors.name && (
+                        <div className="invalid-feedback">
+                          {formik.errors.name}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="mb-3">
+                      <label
+                        htmlFor="edit-category"
+                        className="form-label small fw-semibold"
+                      >
+                        Danh mục <span className="text-danger">*</span>
+                      </label>
+
+                      <select
+                        id="edit-category"
+                        name="category"
+                        className={`form-select form-select-sm ${
+                          formik.touched.category && formik.errors.category
+                            ? "is-invalid"
+                            : ""
+                        }`}
+                        value={formik.values.category}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                      >
+                        <option value="">Chọn danh mục</option>
+
+                        <option value="Toán học">Toán học</option>
+
+                        <option value="Vật lý">Vật lý</option>
+
+                        <option value="Hóa học">Hóa học</option>
+
+                        <option value="Sinh học">Sinh học</option>
+                      </select>
+
+                      {formik.touched.category && formik.errors.category && (
+                        <div className="invalid-feedback">
+                          {formik.errors.category}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="row g-2">
+                      <div className="col-6">
+                        <label
+                          htmlFor="edit-duration"
+                          className="form-label small fw-semibold"
+                        >
+                          Thời gian (phút)
+                        </label>
+
+                        <input
+                          id="edit-duration"
+                          name="duration"
+                          type="number"
+                          min={1}
+                          className={`form-control form-control-sm ${
+                            formik.touched.duration && formik.errors.duration
+                              ? "is-invalid"
+                              : ""
+                          }`}
+                          value={formik.values.duration}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
+                        />
+
+                        {formik.touched.duration && formik.errors.duration && (
+                          <div className="invalid-feedback">
+                            {formik.errors.duration}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="col-6">
+                        <label
+                          htmlFor="edit-passScore"
+                          className="form-label small fw-semibold"
+                        >
+                          Điểm để pass
+                        </label>
+
+                        <input
+                          id="edit-passScore"
+                          name="passScore"
+                          type="number"
+                          min={0}
+                          max={10}
+                          step={0.5}
+                          className={`form-control form-control-sm ${
+                            formik.touched.passScore && formik.errors.passScore
+                              ? "is-invalid"
+                              : ""
+                          }`}
+                          value={formik.values.passScore}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
+                        />
+
+                        {formik.touched.passScore &&
+                          formik.errors.passScore && (
+                            <div className="invalid-feedback">
+                              {formik.errors.passScore}
+                            </div>
+                          )}
+                      </div>
+                    </div>
+
+                    <div className="mt-3">
+                      <label className="form-label small fw-semibold">
+                        Trạng thái
+                      </label>
+
+                      <div className="d-flex gap-3">
+                        <div className="form-check">
+                          <input
+                            id="edit-open"
+                            type="radio"
+                            name="status"
+                            value="Hoạt động"
+                            className="form-check-input"
+                            checked={formik.values.status === "Hoạt động"}
+                            onChange={formik.handleChange}
+                          />
+
+                          <label
+                            htmlFor="edit-open"
+                            className="form-check-label small"
+                          >
+                            Mở đề
+                          </label>
+                        </div>
+
+                        <div className="form-check">
+                          <input
+                            id="edit-locked"
+                            type="radio"
+                            name="status"
+                            value="Khóa"
+                            className="form-check-input"
+                            checked={formik.values.status === "Khóa"}
+                            onChange={formik.handleChange}
+                          />
+
+                          <label
+                            htmlFor="edit-locked"
+                            className="form-check-label small"
+                          >
+                            Khóa đề
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="alert alert-primary py-2 mt-4 mb-0 small">
+                      Đã chọn{" "}
+                      <strong>{formik.values.questionIds.length}</strong> câu
+                      hỏi
+                    </div>
+                  </div>
+                </div>
+
+                <div className="col-lg-9">
+                  <div className="border rounded overflow-hidden">
+                    <div className="bg-light p-3 d-flex justify-content-between align-items-center gap-3">
+                      <div>
+                        <h6
+                          className="fw-bold mb-1"
+                          style={{ color: "#173b69" }}
+                        >
+                          Chọn câu hỏi từ ngân hàng
+                        </h6>
+
+                        <small className="text-secondary">
+                          Đã chọn:{" "}
+                          <strong>{formik.values.questionIds.length}</strong>{" "}
+                          câu hỏi
+                        </small>
+                      </div>
+
+                      <div
+                        className="input-group input-group-sm"
+                        style={{ maxWidth: "240px" }}
+                      >
+                        <span className="input-group-text bg-white">
+                          <i className="bi bi-search" />
+                        </span>
+
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Tìm kiếm nội dung..."
+                          value={search}
+                          onChange={(e) => setSearch(e.target.value)}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="table-responsive">
+                      <table className="table table-hover align-middle mb-0">
+                        <thead className="table-light">
+                          <tr>
+                            <th style={{ width: "40px" }}>
+                              <input
+                                type="checkbox"
+                                className="form-check-input"
+                                checked={allCurrentSelected}
+                                onChange={handleSelectAll}
+                              />
+                            </th>
+
+                            <th>Nội dung câu hỏi</th>
+
+                            <th style={{ width: "110px" }}>Danh mục</th>
+                          </tr>
+                        </thead>
+
+                        <tbody>
+                          {currentQuestions.length === 0 ? (
+                            <tr>
+                              <td
+                                colSpan={3}
+                                className="text-center text-secondary py-5"
+                              >
+                                Không tìm thấy câu hỏi
+                              </td>
+                            </tr>
+                          ) : (
+                            currentQuestions.map((question) => (
+                              <tr key={question.id}>
+                                <td>
+                                  <input
+                                    type="checkbox"
+                                    className="form-check-input"
+                                    checked={isSelected(question.id)}
+                                    onChange={() =>
+                                      handleSelectQuestion(question.id)
+                                    }
+                                  />
+                                </td>
+
+                                <td>
+                                  <div
+                                    className="small"
+                                    title={question.content}
+                                  >
+                                    {question.content}
+                                  </div>
+                                </td>
+
+                                <td className="small text-secondary">
+                                  {question.category}
+                                </td>
+                              </tr>
+                            ))
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div className="d-flex justify-content-between align-items-center p-2 border-top">
+                      <small className="text-secondary">
+                        Hiển thị{" "}
+                        {filteredQuestions.length === 0 ? 0 : startIndex + 1}-
+                        {Math.min(
+                          startIndex + pageSize,
+                          filteredQuestions.length,
+                        )}{" "}
+                        trên tổng {filteredQuestions.length} câu hỏi
+                      </small>
+
+                      <div className="d-flex gap-1">
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-light"
+                          disabled={safePage === 1}
+                          onClick={() =>
+                            setCurrentPage(Math.max(1, safePage - 1))
+                          }
+                        >
+                          ‹
+                        </button>
+
+                        {Array.from(
+                          { length: totalPages },
+                          (_, index) => index + 1,
+                        ).map((page) => (
+                          <button
+                            key={page}
+                            type="button"
+                            className={`btn btn-sm ${
+                              safePage === page ? "btn-primary" : "btn-light"
+                            }`}
+                            onClick={() => setCurrentPage(page)}
+                          >
+                            {page}
+                          </button>
+                        ))}
+
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-light"
+                          disabled={safePage === totalPages}
+                          onClick={() =>
+                            setCurrentPage(Math.min(totalPages, safePage + 1))
+                          }
+                        >
+                          ›
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {formik.touched.questionIds && formik.errors.questionIds && (
+                    <div className="text-danger small mt-2">
+                      {formik.errors.questionIds as string}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button
+                type="button"
+                className="btn btn-outline-secondary"
+                onClick={onClose}
+                disabled={formik.isSubmitting}
+              >
+                Hủy
+              </button>
+
+              <button
+                type="submit"
+                className="btn btn-primary px-4"
+                disabled={formik.isSubmitting}
+              >
+                {formik.isSubmitting ? (
+                  <>
+                    <span
+                      className="spinner-border spinner-border-sm me-2"
+                      role="status"
+                    />
+                    Đang lưu...
+                  </>
+                ) : (
+                  <>
+                    <i className="bi bi-save me-2" />
+                    Lưu thay đổi
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default EditExamModal;

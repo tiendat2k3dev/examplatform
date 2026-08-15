@@ -393,104 +393,63 @@ const Questions = () => {
   // ====================================================
 
   return (
-    <div className="container-fluid p-3">
-      {/* ==================================================
-          HEADER
-      ================================================== */}
+    <div
+      className="container-fluid py-4"
+      style={{ backgroundColor: "#f8f9fa" }}
+    >
+      <div className="bg-white p-4 rounded-3 shadow-sm">
+        <HeaderQuestions
+          title="Quản lý câu hỏi"
+          description="Tạo, chỉnh sửa, xóa và quản lý câu hỏi"
+          add="Thêm"
+          onAdd={() => setShowCreateModal(true)}
+        />
 
-      <HeaderQuestions
-        title="Quản lý câu hỏi"
-        description="Tạo, chỉnh sửa, xóa và quản lý câu hỏi"
-        add="Thêm"
-        // Click nút Thêm
-        // => mở CreateQuestionModal
-        onAdd={() => setShowCreateModal(true)}
-      />
+        <div className="row mb-4 g-3">
+          <div className="col-md-12">
+            <div className="input-group">
+              <span className="input-group-text border-0 bg-light">
+                <i className="bi bi-search"></i>
+              </span>
 
-      {/* ==================================================
-          SEARCH
-      ================================================== */}
+              <input
+                id="searchQuestion"
+                type="text"
+                className="form-control border-0 bg-light"
+                placeholder="Tìm kiếm câu hỏi hoặc danh mục..."
+                value={searchKeyword}
+                onChange={(e) => setSearchKeyword(e.target.value)}
+              />
 
-      <div className="card border-0 shadow-sm mb-3">
-        <div className="card-body">
-          <div className="row">
-            <div className="col-md-6">
-              {/* Label của ô tìm kiếm */}
-              <label
-                htmlFor="searchQuestion"
-                className="form-label fw-semibold"
-              >
-                Tìm kiếm
-              </label>
-
-              <div className="input-group">
-                {/* Icon tìm kiếm */}
-                <span className="input-group-text">
-                  <i className="bi bi-search"></i>
-                </span>
-
-                {/* Ô nhập tìm kiếm */}
-                <input
-                  id="searchQuestion"
-                  type="text"
-                  className="form-control"
-                  placeholder="Tìm kiếm câu hỏi hoặc danh mục..."
-                  // Giá trị của input lấy từ state
-                  value={searchKeyword}
-                  // Mỗi khi người dùng nhập
-                  // cập nhật searchKeyword
-                  onChange={(e) => setSearchKeyword(e.target.value)}
-                />
-
-                {/* Chỉ hiển thị nút X
-                    khi đang có từ khóa */}
-                {searchKeyword && (
-                  <button
-                    type="button"
-                    className="btn btn-outline-secondary"
-                    // Xóa từ khóa tìm kiếm
-                    onClick={() => setSearchKeyword("")}
-                    title="Xóa tìm kiếm"
-                  >
-                    <i className="bi bi-x-lg"></i>
-                  </button>
-                )}
-              </div>
+              {searchKeyword && (
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary border-0 bg-light"
+                  onClick={() => setSearchKeyword("")}
+                  title="Xóa tìm kiếm"
+                >
+                  <i className="bi bi-x-lg"></i>
+                </button>
+              )}
             </div>
           </div>
         </div>
-      </div>
 
-      {/* ==================================================
-          TABLE
-      ================================================== */}
-
-      <div className="card border-0 shadow-sm">
         <div className="table-responsive">
-          <table className="table table-hover align-middle mb-0">
-            {/* ================================
-                TABLE HEADER
-            ================================= */}
-
-            <thead className="table-primary">
+          <table className="table table-hover mb-0">
+            <thead className="table-light">
               <tr>
-                {/* Duyệt qua mảng table
-                    để tạo các cột */}
                 {table.map((item, index) => (
                   <th
                     key={index}
-                    // Cột đầu tiên có padding trái/phải
-                    className={index === 0 ? "px-3" : ""}
+                    className="fw-bold text-dark"
                     style={{
-                      // Cột STT rộng 70px
                       width:
                         index === 0
                           ? "70px"
-                          : // Cột danh mục rộng 180px
-                            index === 2
+                          : index === 2
                             ? "180px"
-                            : // Cột thao tác rộng 150px
-                              index === 3
+                            : index === 3
                               ? "150px"
                               : undefined,
                     }}
@@ -545,44 +504,29 @@ const Questions = () => {
                     ========================== */}
 
                     <td>
-                      <div className="d-flex gap-3">
-                        {/* ======================
-                            XEM
-                        ======================= */}
-
+                      <div className="d-flex gap-2">
                         <button
                           type="button"
-                          className="btn btn-link text-primary p-0"
+                          className="btn btn-sm btn-outline-secondary p-1"
                           title="Xem"
-                          // Mở modal xem
                           onClick={() => handleOpenView(item)}
                         >
                           <i className="bi bi-eye"></i>
                         </button>
 
-                        {/* ======================
-                            SỬA
-                        ======================= */}
-
                         <button
                           type="button"
-                          className="btn btn-link text-warning p-0"
+                          className="btn btn-sm btn-outline-primary p-1"
                           title="Sửa"
-                          // Mở modal sửa
                           onClick={() => handleOpenEdit(item)}
                         >
                           <i className="bi bi-pencil"></i>
                         </button>
 
-                        {/* ======================
-                            XÓA
-                        ======================= */}
-
                         <button
                           type="button"
-                          className="btn btn-link text-danger p-0"
+                          className="btn btn-sm btn-outline-danger p-1"
                           title="Xóa"
-                          // Mở modal xác nhận xóa
                           onClick={() => handleOpenDelete(item)}
                         >
                           <i className="bi bi-trash"></i>
@@ -596,66 +540,29 @@ const Questions = () => {
           </table>
         </div>
 
-        {/* ==================================================
-            FOOTER + PAGINATION
-        ================================================== */}
-
-        <div className="d-flex justify-content-between align-items-center p-3 border-top">
-          {/* Hiển thị số lượng câu hỏi */}
+        <div className="d-flex justify-content-between align-items-center mt-4">
           <span className="text-secondary small">
-            Showing 1 to {filteredQuestions.length} of{" "}
-            {filteredQuestions.length} entries
+            Hiển thị 1-{filteredQuestions.length} trong tổng{" "}
+            {filteredQuestions.length} câu hỏi
           </span>
 
-          {/* Pagination */}
           <nav>
-            <ul className="pagination pagination-sm mb-0">
-              {/* Previous */}
+            <ul className="pagination mb-0">
               <li className="page-item disabled">
                 <button type="button" className="page-link">
-                  Previous
+                  <i className="bi bi-chevron-left"></i>
                 </button>
               </li>
 
-              {/* Trang 1 */}
               <li className="page-item active">
                 <button type="button" className="page-link">
                   1
                 </button>
               </li>
 
-              {/* Trang 2 */}
               <li className="page-item">
                 <button type="button" className="page-link">
-                  2
-                </button>
-              </li>
-
-              {/* Trang 3 */}
-              <li className="page-item">
-                <button type="button" className="page-link">
-                  3
-                </button>
-              </li>
-
-              {/* Dấu ... */}
-              <li className="page-item">
-                <button type="button" className="page-link">
-                  ...
-                </button>
-              </li>
-
-              {/* Trang 10 */}
-              <li className="page-item">
-                <button type="button" className="page-link">
-                  10
-                </button>
-              </li>
-
-              {/* Next */}
-              <li className="page-item">
-                <button type="button" className="page-link">
-                  Next
+                  <i className="bi bi-chevron-right"></i>
                 </button>
               </li>
             </ul>

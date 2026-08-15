@@ -1,20 +1,20 @@
 "use client";
 
-interface HeaderQuestionsProps {
+interface HeaderExamGroupsPageProps {
   title: string;
   description: string;
   add: string;
   onAdd: () => void;
 }
 
-const HeaderQuestions = ({
+const HeaderExamGroupsPage = ({
   title,
   description,
   add,
   onAdd,
-}: HeaderQuestionsProps) => {
+}: HeaderExamGroupsPageProps) => {
   return (
-    <div className="d-flex justify-content-between align-items-start mb-4">
+    <div className="d-flex justify-content-between align-items-center mb-4">
       <div>
         <h2 className="fw-bold mb-1">{title}</h2>
 
@@ -29,4 +29,4 @@ const HeaderQuestions = ({
   );
 };
 
-export default HeaderQuestions;
+export default HeaderExamGroupsPage;

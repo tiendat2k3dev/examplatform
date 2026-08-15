@@ -3,9 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { toast } from "react-toastify";
 
-import type { CreateExamFormValues, EditExam, ExamQuestion } from "@/types/exam";
+import type { CreateExamFormValues, EditExam, ExamGroup, ExamQuestion } from "@/types/exam";
 
 export type { EditExam };
 
@@ -18,6 +17,7 @@ interface EditExamModalProps {
     examId: string,
     values: CreateExamFormValues,
   ) => Promise<void> | void;
+  examGroups: ExamGroup[];
 }
 
 const validationSchema = Yup.object({
@@ -32,6 +32,8 @@ const validationSchema = Yup.object({
     .max(200, "Tên đề thi tối đa 200 ký tự"),
 
   category: Yup.string().required("Vui lòng chọn danh mục"),
+
+  examGroupId: Yup.string().required("Vui lòng chọn nhóm đề thi"),
 
   duration: Yup.number()
     .typeError("Thời gian phải là số")
@@ -58,6 +60,7 @@ const EditExamModal = ({
   questions,
   onClose,
   onUpdate,
+  examGroups,
 }: EditExamModalProps) => {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -71,6 +74,7 @@ const EditExamModal = ({
       id: exam?.id ?? "",
       name: exam?.name ?? "",
       category: exam?.category ?? "",
+      examGroupId: exam?.examGroupId ?? "",
       duration: exam?.duration ?? 45,
       passScore: exam?.passScore ?? 5,
       status: exam?.status ?? "Hoạt động",
@@ -87,13 +91,9 @@ const EditExamModal = ({
       try {
         await onUpdate(exam.id, values);
 
-        toast.success("Cập nhật đề thi thành công!");
-
         onClose();
       } catch (error) {
         console.error(error);
-
-        toast.error("Không thể cập nhật đề thi!");
       } finally {
         setSubmitting(false);
       }
@@ -316,6 +316,41 @@ const EditExamModal = ({
                       {formik.touched.category && formik.errors.category && (
                         <div className="invalid-feedback">
                           {formik.errors.category}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="mb-3">
+                      <label
+                        htmlFor="edit-examGroupId"
+                        className="form-label small fw-semibold"
+                      >
+                        Nhóm đề thi <span className="text-danger">*</span>
+                      </label>
+
+                      <select
+                        id="edit-examGroupId"
+                        name="examGroupId"
+                        className={`form-select form-select-sm ${
+                          formik.touched.examGroupId && formik.errors.examGroupId
+                            ? "is-invalid"
+                            : ""
+                        }`}
+                        value={formik.values.examGroupId}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                      >
+                        <option value="">Chọn nhóm đề thi</option>
+                        {examGroups.map((group) => (
+                          <option key={group.id} value={group.id}>
+                            {group.name}
+                          </option>
+                        ))}
+                      </select>
+
+                      {formik.touched.examGroupId && formik.errors.examGroupId && (
+                        <div className="invalid-feedback">
+                          {formik.errors.examGroupId}
                         </div>
                       )}
                     </div>

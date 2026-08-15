@@ -1,31 +1,31 @@
 "use client";
 
-interface Exam {
-  id: string;
-  name: string;
-  category: string;
+interface Member {
+  id: number;
+  fullName: string;
+  email: string;
 }
 
-interface DeleteExamModalProps {
+interface DeleteMembersModalProps {
   show: boolean;
+  member: Member | null;
   onClose: () => void;
   onConfirm: () => void;
-  exam: Exam | null;
 }
 
-const DeleteExamModal = ({
+const DeleteMembersModal = ({
   show,
+  member,
   onClose,
   onConfirm,
-  exam,
-}: DeleteExamModalProps) => {
-  if (!show || !exam) {
+}: DeleteMembersModalProps) => {
+  if (!show || !member) {
     return null;
   }
 
   return (
     <>
-      <div className="modal-backdrop fade show" onClick={onClose}></div>
+      <div className="modal-backdrop fade show" onClick={onClose} />
 
       <div className="modal d-block" tabIndex={-1} role="dialog">
         <div className="modal-dialog modal-dialog-centered">
@@ -36,26 +36,25 @@ const DeleteExamModal = ({
                 background: "linear-gradient(90deg, #d92d20, #ef4444)",
               }}
             >
-              <h5 className="modal-title fw-bold">Xóa đề thi</h5>
+              <h5 className="modal-title fw-bold">Xóa người dùng</h5>
 
               <button
                 type="button"
                 className="btn-close btn-close-white"
                 onClick={onClose}
-              ></button>
+              />
             </div>
 
             <div className="modal-body">
               <p className="mb-0">
-                Bạn có chắc chắn muốn xóa đề thi này không?
+                Bạn có chắc chắn muốn xóa người dùng này không?
               </p>
 
               <div className="mt-3 p-3 border rounded bg-light">
-                <strong>{exam.name}</strong>
+                <strong>{member.fullName}</strong>
                 <div className="text-secondary small mt-1">
-                  {exam.category}
+                  {member.email}
                 </div>
-                <div className="text-secondary small">Mã: {exam.id}</div>
               </div>
             </div>
 
@@ -68,14 +67,14 @@ const DeleteExamModal = ({
                 Hủy
               </button>
 
-                <button
-                  type="button"
-                  className="btn btn-danger"
-                  onClick={() => {
-                    onConfirm();
-                    onClose();
-                  }}
-                >
+              <button
+                type="button"
+                className="btn btn-danger"
+                onClick={() => {
+                  onConfirm();
+                  onClose();
+                }}
+              >
                 Xóa
               </button>
             </div>
@@ -86,4 +85,4 @@ const DeleteExamModal = ({
   );
 };
 
-export default DeleteExamModal;
+export default DeleteMembersModal;

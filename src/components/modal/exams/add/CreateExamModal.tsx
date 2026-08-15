@@ -5,13 +5,18 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
 
-import type { CreateExamFormValues, ExamQuestion } from "@/types/exam";
+import type {
+  CreateExamFormValues,
+  ExamGroup,
+  ExamQuestion,
+} from "@/types/exam";
 
 interface CreateExamModalProps {
   show: boolean;
   onClose: () => void;
   onCreate: (values: CreateExamFormValues) => Promise<void> | void;
   questions: ExamQuestion[];
+  examGroups: ExamGroup[];
 }
 
 const validationSchema = Yup.object({
@@ -26,6 +31,8 @@ const validationSchema = Yup.object({
     .max(200, "Tên đề thi tối đa 200 ký tự"),
 
   category: Yup.string().required("Vui lòng chọn danh mục"),
+
+  examGroupId: Yup.string().required("Vui lòng chọn nhóm đề thi"),
 
   duration: Yup.number()
     .typeError("Thời gian phải là số")
@@ -50,6 +57,7 @@ const initialValues: CreateExamFormValues = {
   id: "",
   name: "",
   category: "",
+  examGroupId: "",
   duration: 45,
   passScore: 5,
   status: "Hoạt động",
@@ -61,6 +69,7 @@ const CreateExamModal = ({
   onClose,
   onCreate,
   questions,
+  examGroups,
 }: CreateExamModalProps) => {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -83,7 +92,6 @@ const CreateExamModal = ({
         onClose();
       } catch (error) {
         console.error(error);
-
         toast.error("Không thể tạo đề thi!");
       } finally {
         setSubmitting(false);
@@ -312,6 +320,43 @@ const CreateExamModal = ({
                           {formik.errors.category}
                         </div>
                       )}
+                    </div>
+
+                    <div className="mb-3">
+                      <label
+                        htmlFor="create-examGroupId"
+                        className="form-label small fw-semibold"
+                      >
+                        Nhóm đề thi <span className="text-danger">*</span>
+                      </label>
+
+                      <select
+                        id="create-examGroupId"
+                        name="examGroupId"
+                        className={`form-select form-select-sm ${
+                          formik.touched.examGroupId &&
+                          formik.errors.examGroupId
+                            ? "is-invalid"
+                            : ""
+                        }`}
+                        value={formik.values.examGroupId}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                      >
+                        <option value="">Chọn nhóm đề thi</option>
+                        {examGroups.map((group) => (
+                          <option key={group.id} value={group.id}>
+                            {group.name}
+                          </option>
+                        ))}
+                      </select>
+
+                      {formik.touched.examGroupId &&
+                        formik.errors.examGroupId && (
+                          <div className="invalid-feedback">
+                            {formik.errors.examGroupId}
+                          </div>
+                        )}
                     </div>
 
                     <div className="row g-2">

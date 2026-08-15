@@ -867,6 +867,50 @@
       },
       "completedAt": "2026-08-14T07:06:52.261Z",
       "id": "OGB5Qzkk4Xo"
+    },
+    {
+      "userId": "tiendat2k3",
+      "examId": "ex-java-1",
+      "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
+      "score": 33,
+      "totalQuestions": 3,
+      "correctAnswersCount": 1,
+      "timeTaken": 7,
+      "userAnswers": {
+        "q-j1-1": 0,
+        "q-j1-2": 1,
+        "q-j1-3": 1
+      },
+      "completedAt": "2026-08-14T15:30:55.244Z",
+      "id": "SnR9mOw9WQQ"
+    },
+    {
+      "userId": "tiendat2k3",
+      "examId": "ex-java-1",
+      "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
+      "score": 0,
+      "totalQuestions": 3,
+      "correctAnswersCount": 0,
+      "timeTaken": 12,
+      "userAnswers": {},
+      "completedAt": "2026-08-14T15:31:54.276Z",
+      "id": "ClEAGBavVgk"
+    },
+    {
+      "userId": "tiendat2k3",
+      "examId": "ex-java-1",
+      "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
+      "score": 67,
+      "totalQuestions": 3,
+      "correctAnswersCount": 2,
+      "timeTaken": 7,
+      "userAnswers": {
+        "q-j1-1": 1,
+        "q-j1-2": 1,
+        "q-j1-3": 1
+      },
+      "completedAt": "2026-08-15T00:54:59.479Z",
+      "id": "bahMkfDG8Iw"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

@@ -1,3 +1,8 @@
+export interface ExamGroup {
+  id: string;
+  name: string;
+}
+
 export interface Exam {
   id: string;
   categoryId: string;
@@ -18,6 +23,7 @@ export interface CreateExamFormValues {
   id: string;
   name: string;
   category: string;
+  examGroupId: string;
   duration: number;
   passScore: number;
   status: "Hoạt động" | "Khóa";
@@ -28,6 +34,7 @@ export interface EditExam {
   id: string;
   name: string;
   category: string;
+  examGroupId?: string;
   questions: number;
   duration: number;
   status: "Hoạt động" | "Khóa";

@@ -64,7 +64,6 @@ const CreateQuestionModal = ({
   if (!show) {
     return null;
   }
-
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
       onClose();

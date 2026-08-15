@@ -6,8 +6,7 @@ interface HeaderQuestionsProps {
   add: string;
   onAdd: () => void;
 }
-
-const HeaderQuestions = ({
+const HeaderMembers = ({
   title,
   description,
   add,
@@ -28,5 +27,4 @@ const HeaderQuestions = ({
     </div>
   );
 };
-
-export default HeaderQuestions;
+export default HeaderMembers;

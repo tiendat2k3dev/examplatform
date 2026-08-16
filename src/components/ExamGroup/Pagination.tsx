@@ -1,6 +1,6 @@
-// src/components/common/Pagination.tsx
+// src/components/ExamGroup/Pagination.tsx
 import React from "react";
-import styles from "@/app/exam-category/ExamCategory.module.css";
+import styles from "@/app/exam-group/ExamGroup.module.css";
 
 interface PaginationProps {
   currentPage: number;
@@ -41,7 +41,7 @@ export const Pagination = ({
           >
             {page}
           </button>
-        ),
+        )
       )}
 
       <button

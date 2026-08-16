@@ -1,20 +1,15 @@
-// src/components/Category/CategoryCard.tsx
+// src/components/ExamGroup/ExamGroupCard.tsx
 import React from "react";
 import Link from "next/link";
-import { Category } from "@/types/category";
-import styles from "@/app/exam-category/ExamCategory.module.css";
+import { ExamGroup } from "@/types/examGroup";
+import styles from "@/app/exam-group/ExamGroup.module.css";
 
-interface CategoryCardProps {
-  category: Category;
+interface ExamGroupCardProps {
+  examGroup: ExamGroup;
   examCount: number;
-  attemptsCount?: number;
 }
 
-export const CategoryCard = ({
-  category,
-  examCount,
-  attemptsCount = 1200,
-}: CategoryCardProps) => {
+export const ExamGroupCard = ({ examGroup, examCount }: ExamGroupCardProps) => {
   return (
     <div className="col">
       <div
@@ -25,38 +20,35 @@ export const CategoryCard = ({
         }}
       >
         <div className="card-body p-4 d-flex flex-column">
-          {/* Top Icon & Badge */}
           <div className="d-flex align-items-center justify-content-between mb-3">
             <div
-              className={`p-3 rounded-3 text-${category.color} border border-${category.color} border-opacity-50`}
+              className={`p-3 rounded-3 text-${examGroup.color} border border-${examGroup.color} border-opacity-50`}
               style={{ background: "rgba(255, 255, 255, 0.05)" }}
             >
-              <i className={`bi ${category.icon} fs-2`}></i>
+              <i className={`bi ${examGroup.icon} fs-2`}></i>
             </div>
 
             <span
-              className={`badge text-${category.color} border border-${category.color} px-3 py-2 rounded-pill fw-bold`}
+              className={`badge text-${examGroup.color} border border-${examGroup.color} px-3 py-2 rounded-pill fw-bold`}
               style={{ backgroundColor: "rgba(255, 255, 255, 0.05)" }}
             >
               {examCount} Đề thi
             </span>
           </div>
 
-          {/* Tiêu đề & Mô tả */}
-          <h4 className="fw-bold mb-2 text-white">{category.name}</h4>
+          <h4 className="fw-bold mb-2 text-white">{examGroup.name}</h4>
           <p className="text-light opacity-75 small mb-4 flex-grow-1">
-            {category.description}
+            {examGroup.description}
           </p>
 
-          {/* Footer */}
           <div className="d-flex align-items-center justify-content-between border-top border-secondary border-opacity-25 pt-3 mt-auto">
             <small className="text-light opacity-50">
-              <i className="bi bi-people me-1"></i>
-              {attemptsCount.toLocaleString("vi-VN")} lượt thi
+              <i className="bi bi-people me-1"></i>1,200 lượt thi
             </small>
 
+            {/* Cập nhật link sang /exam-group/[id] */}
             <Link
-              href={`/exam-category/${category.id}`}
+              href={`/exam-group/${examGroup.id}`}
               className="btn btn-outline-info btn-sm fw-bold rounded-pill px-3"
             >
               Xem Đề Thi <i className="bi bi-arrow-right ms-1"></i>

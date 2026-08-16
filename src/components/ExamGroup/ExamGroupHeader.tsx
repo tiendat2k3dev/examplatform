@@ -1,8 +1,8 @@
-// src/app/exam-category/components/CategoryHeader.tsx
+// src/components/ExamGroup/ExamGroupHeader.tsx
 import React from "react";
-import styles from "../../app/exam-category/ExamCategory.module.css";
+import styles from "@/app/exam-group/ExamGroup.module.css";
 
-export const CategoryHeader = () => {
+export const ExamGroupHeader = () => {
   return (
     <div className="mb-4 text-center text-md-start">
       <span className="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill mb-2 fw-bold border border-primary border-opacity-25">

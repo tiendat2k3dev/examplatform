@@ -132,7 +132,7 @@
       "updatedAt": null
     }
   ],
-  "categories": [
+  "ExamGroup": [
     {
       "id": "cat-java",
       "name": "Java Backend",

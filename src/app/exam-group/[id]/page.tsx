@@ -1,15 +1,16 @@
-// src/app/exam-category/[id]/page.tsx
+// src/app/exam-group/[id]/page.tsx
 "use client";
 import React, { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/redux/store";
-import { fetchCategoriesApiAsync } from "@/redux/reducers/CategoryReducer";
+import { fetchExamGroupsApiAsync } from "@/redux/reducers/ExamGroupReducer";
 import { fetchPaginatedExamsApiAsync } from "@/redux/reducers/ExamReducer";
 import { toast } from "react-toastify";
-import { ExamHeader } from "@/components/Category/ExamHeader";
-import { ExamCard } from "@/components/Category/ExamCard";
-import { Pagination } from "@/components/Category/Pagination";
+import { ExamHeader } from "@/components/ExamGroup/ExamHeader";
+import { ExamCard } from "@/components/ExamGroup/ExamCard";
+import { Pagination } from "@/components/ExamGroup/Pagination";
+
 
 const CategoryExamsPage = () => {
   const params = useParams();
@@ -18,8 +19,8 @@ const CategoryExamsPage = () => {
 
   const categoryId = params.id as string;
 
-  const { categories = [] } = useSelector(
-    (state: RootState) => state.categoryReducer
+  const { examGroups = [] } = useSelector(
+    (state: RootState) => state.examGroupReducer
   );
 
   const {
@@ -32,16 +33,16 @@ const CategoryExamsPage = () => {
 
   const { currentUser } = useSelector((state: RootState) => state.authReducer);
 
-  const currentCategory = categories.find((cat) => cat.id === categoryId);
+  const currentGroup = examGroups.find((group) => group.id === categoryId);
 
   useEffect(() => {
-    if (categories.length === 0) {
-      dispatch(fetchCategoriesApiAsync());
+    if (examGroups.length === 0) {
+      dispatch(fetchExamGroupsApiAsync());
     }
     if (categoryId) {
       dispatch(fetchPaginatedExamsApiAsync(1, limit, categoryId));
     }
-  }, [dispatch, categoryId, limit, categories.length]);
+  }, [dispatch, categoryId, limit, examGroups.length]);
 
   const totalPages = Math.ceil(totalCount / limit);
 
@@ -72,10 +73,8 @@ const CategoryExamsPage = () => {
 
   return (
     <div className="container py-5">
-      {/* Header nhóm bài thi */}
-      <ExamHeader category={currentCategory} totalExams={totalCount} />
+      <ExamHeader examGroup={currentGroup} totalExams={totalCount} />
 
-      {/* Danh sách bài thi */}
       <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
         {exams && exams.length > 0 ? (
           exams.map((exam) => (
@@ -93,7 +92,6 @@ const CategoryExamsPage = () => {
         )}
       </div>
 
-      {/* Phân trang */}
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}

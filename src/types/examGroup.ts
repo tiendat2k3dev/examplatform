@@ -1,4 +1,5 @@
-export interface Category {
+// src/types/examGroup.ts
+export interface ExamGroup {
   id: string;
   name: string;
   description: string;

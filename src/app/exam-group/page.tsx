@@ -1,45 +1,49 @@
-// src/app/exam-category/page.tsx
+// src/app/exam-group/page.tsx
 "use client";
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/redux/store";
-import { fetchPaginatedCategoriesApiAsync } from "@/redux/reducers/CategoryReducer";
+import { fetchPaginatedExamGroupsApiAsync } from "@/redux/reducers/ExamGroupReducer";
 import { fetchExamsApiAsync } from "@/redux/reducers/ExamReducer";
-import { CategoryHeader } from "@/components/Category/CategoryHeader";
-import { CategoryCard } from "@/components/Category/CategoryCard";
-import { Pagination } from "@/components/Category/Pagination";
+import { ExamGroupHeader } from "@/components/ExamGroup/ExamGroupHeader";
+import { ExamGroupCard } from "@/components/ExamGroup/ExamGroupCard";
+import { Pagination } from "@/components/ExamGroup/Pagination";
 
-const ExamCategoryPage = () => {
+const ExamGroupPage = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   const {
-    categories = [],
+    examGroups = [],
     totalCount = 0,
     currentPage = 1,
     limit = 3,
-    loading: catLoading,
-  } = useSelector((state: RootState) => state.categoryReducer);
+    loading: groupLoading,
+  } = useSelector((state: RootState) => state.examGroupReducer);
 
   const { exams = [] } = useSelector((state: RootState) => state.examReducer);
 
   useEffect(() => {
-    dispatch(fetchPaginatedCategoriesApiAsync(1, limit));
+    dispatch(fetchPaginatedExamGroupsApiAsync(1, limit));
     dispatch(fetchExamsApiAsync());
   }, [dispatch, limit]);
+
+  // Log kiểm tra dữ liệu
+  console.log("ExamGroups State:", examGroups);
+  console.log("Total Count:", totalCount);
 
   const getExamCount = (categoryId: string) => {
     return exams.filter((exam) => exam.categoryId === categoryId).length;
   };
 
-  const totalPages = Math.ceil(totalCount / limit);
+  const totalPages = Math.max(1, Math.ceil(totalCount / limit));
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
-      dispatch(fetchPaginatedCategoriesApiAsync(newPage, limit));
+      dispatch(fetchPaginatedExamGroupsApiAsync(newPage, limit));
     }
   };
 
-  if (catLoading && categories.length === 0) {
+  if (groupLoading && (!examGroups || examGroups.length === 0)) {
     return (
       <div className="d-flex justify-content-center align-items-center min-vh-100">
         <div className="spinner-border text-primary" role="status">
@@ -51,17 +55,15 @@ const ExamCategoryPage = () => {
 
   return (
     <div className="container py-5">
-      {/* Tiêu đề trang */}
-      <CategoryHeader />
+      <ExamGroupHeader />
 
-      {/* Danh sách nhóm đề thi */}
       <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
-        {categories && categories.length > 0 ? (
-          categories.map((cat) => (
-            <CategoryCard
-              key={cat.id}
-              category={cat}
-              examCount={getExamCount(cat.id)}
+        {Array.isArray(examGroups) && examGroups.length > 0 ? (
+          examGroups.map((group) => (
+            <ExamGroupCard
+              key={group.id}
+              examGroup={group}
+              examCount={getExamCount(group.id)}
             />
           ))
         ) : (
@@ -71,15 +73,16 @@ const ExamCategoryPage = () => {
         )}
       </div>
 
-      {/* Thanh phân trang */}
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        loading={catLoading}
-        onPageChange={handlePageChange}
-      />
+      {totalPages > 1 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          loading={groupLoading}
+          onPageChange={handlePageChange}
+        />
+      )}
     </div>
   );
 };
 
-export default ExamCategoryPage;
+export default ExamGroupPage;

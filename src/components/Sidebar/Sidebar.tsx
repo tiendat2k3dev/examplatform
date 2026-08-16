@@ -6,14 +6,36 @@ import { usePathname, useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/redux/store";
 import { logout } from "@/redux/reducers/AuthReducer";
-import { toast } from "react-toastify";
 import styles from "./Sidebar.module.css";
 
 const menuItems = [
-  { label: "Trang Chủ", href: "/", icon: "bi-house-door-fill", requiresAuth: false },
-  { label: "Danh Sách Nhóm Đề Thi", href: "/exam-category", icon: "bi-journal-text", requiresAuth: false },
-  { label: "Lịch Sử Thi", href: "/history", icon: "bi-clock-history", requiresAuth: true },
-  { label: "Xếp Hạng", href: "/leaderboard", icon: "bi-trophy-fill", requiresAuth: true },
+  // Public: Luôn luôn hiển thị
+  {
+    label: "Trang Chủ",
+    href: "/",
+    icon: "bi-house-door-fill",
+    requiresAuth: false,
+  },
+  {
+    label: "Danh Sách Nhóm Đề Thi",
+    href: "/exam-group",
+    icon: "bi-journal-text",
+    requiresAuth: false,
+  },
+
+  // Private: Chỉ hiển thị khi đã đăng nhập
+  {
+    label: "Lịch Sử Thi",
+    href: "/history",
+    icon: "bi-clock-history",
+    requiresAuth: true,
+  },
+  {
+    label: "Xếp Hạng",
+    href: "/leaderboard",
+    icon: "bi-trophy-fill",
+    requiresAuth: true,
+  },
 ];
 
 const Sidebar = () => {
@@ -32,15 +54,10 @@ const Sidebar = () => {
     router.push("/login");
   };
 
-  // Xử lý sự kiện click menu
-  const handleNavClick = (e: React.MouseEvent, item: typeof menuItems[0]) => {
-    // Nếu trang yêu cầu đăng nhập mà người dùng chưa đăng nhập
-    if (item.requiresAuth && !currentUser) {
-      e.preventDefault(); // Ngăn chuyển trang
-      toast.warning("Vui lòng đăng nhập để xem " + item.label.toLowerCase() + "!");
-      router.push("/login");
-    }
-  };
+  // Lọc: Nếu chưa đăng nhập thì chỉ lấy các mục có requiresAuth: false
+  const visibleMenuItems = menuItems.filter(
+    (item) => !item.requiresAuth || Boolean(currentUser),
+  );
 
   return (
     <aside
@@ -74,13 +91,12 @@ const Sidebar = () => {
       {/* DANH SÁCH MENU */}
       <div className="p-2 flex-grow-1 overflow-y-auto">
         <nav className="d-flex flex-column gap-1">
-          {menuItems.map((item) => {
+          {visibleMenuItems.map((item) => {
             const isActive = pathname === item.href;
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                onClick={(e) => handleNavClick(e, item)}
                 className={`${styles.navLink} ${
                   isActive ? styles.activeNavLink : ""
                 }`}

@@ -835,6 +835,50 @@
       "userAnswers": {},
       "completedAt": "2026-08-14T06:25:37.990Z",
       "id": "jO8czO2LHRw"
+    },
+    {
+      "userId": "tqcjsIgtqp0",
+      "examId": "ex-db-1",
+      "examTitle": "SQL Basics: SELECT, WHERE & Aggregates",
+      "score": 0,
+      "totalQuestions": 3,
+      "correctAnswersCount": 0,
+      "timeTaken": 1,
+      "userAnswers": {},
+      "completedAt": "2026-08-14T07:36:36.119Z",
+      "id": "ZZOgBeQxRkk"
+    },
+    {
+      "userId": "tqcjsIgtqp0",
+      "examId": "ex-java-1",
+      "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
+      "score": 100,
+      "totalQuestions": 3,
+      "correctAnswersCount": 3,
+      "timeTaken": 11,
+      "userAnswers": {
+        "q-j1-1": 1,
+        "q-j1-2": 2,
+        "q-j1-3": 1
+      },
+      "completedAt": "2026-08-14T09:31:59.501Z",
+      "id": "css1Qoqg6_k"
+    },
+    {
+      "userId": "tqcjsIgtqp0",
+      "examId": "ex-java-1",
+      "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
+      "score": 33,
+      "totalQuestions": 3,
+      "correctAnswersCount": 1,
+      "timeTaken": 40,
+      "userAnswers": {
+        "q-j1-1": 0,
+        "q-j1-2": 2,
+        "q-j1-3": 2
+      },
+      "completedAt": "2026-08-14T09:32:48.367Z",
+      "id": "ae-x0rzC2CM"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

@@ -1,12 +1,10 @@
 // src/services/historyService.ts
 import { History, SubmitExamPayload } from "@/types/history";
-import axios from "axios";
-
-const API_URL = "http://localhost:4000";
+import api from "../lib/apiClient.js";
 
 // 1. Lưu kết quả làm bài vào db.json
 export const submitExamResultService = async (
-  payload: SubmitExamPayload
+  payload: SubmitExamPayload,
 ): Promise<History> => {
   try {
     const newRecord = {
@@ -14,10 +12,8 @@ export const submitExamResultService = async (
       completedAt: new Date().toISOString(),
     };
 
-    const response = await axios.post<History>(
-      `${API_URL}/histories`,
-      newRecord
-    );
+    const response = await api.post<History>("/histories", newRecord);
+
     return response.data;
   } catch (error) {
     console.error("Lỗi khi lưu kết quả bài thi:", error);
@@ -25,14 +21,13 @@ export const submitExamResultService = async (
   }
 };
 
-// 2. Lấy chi tiết 1 lượt thi theo ID (Dùng cho Result)
+// 2. Lấy chi tiết 1 lượt thi theo ID
 export const getHistoryByIdService = async (
-  historyId: string
+  historyId: string,
 ): Promise<History> => {
   try {
-    const response = await axios.get<History>(
-      `${API_URL}/histories/${historyId}`
-    );
+    const response = await api.get<History>(`/histories/${historyId}`);
+
     return response.data;
   } catch (error) {
     console.error("Lỗi khi lấy chi tiết lượt thi:", error);
@@ -42,29 +37,40 @@ export const getHistoryByIdService = async (
 
 // 3. Lấy danh sách lịch sử làm bài của User
 export const getUserHistoriesService = async (
-  userId: string
+  userId: string,
 ): Promise<History[]> => {
   try {
-    const response = await axios.get<any>(
-      `${API_URL}/histories?userId=${userId}`
+    const response = await api.get<History[] | { data: History[] }>(
+      `/histories?userId=${userId}`,
     );
 
     const resData = response.data;
+
     let list: History[] = [];
 
+    // json-server trả về mảng
     if (Array.isArray(resData)) {
       list = resData;
-    } else if (resData && Array.isArray(resData.data)) {
+    }
+
+    // Trường hợp API trả về object { data: [...] }
+    else if (
+      resData &&
+      typeof resData === "object" &&
+      "data" in resData &&
+      Array.isArray(resData.data)
+    ) {
       list = resData.data;
     }
 
-    // Tự động sắp xếp ngày thi mới nhất lên trên đầu
+    // Sắp xếp lượt thi mới nhất lên đầu
     return list.sort(
       (a, b) =>
-        new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime()
+        new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime(),
     );
   } catch (error) {
     console.error("Lỗi khi tải lịch sử bài thi của người dùng:", error);
+
     throw error;
   }
 };

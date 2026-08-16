@@ -3,54 +3,133 @@
     {
       "id": "JF1LyebLkG4",
       "username": "Admin",
-      "password": "$2b$10$DjmpwM5OxnQE49C48Eir6.PFPmrfgC76u7Zmxi4cDLniUF896a0/O",
+      "password": "$2b$10$feYiYWLp4D3gAn4kBiUFL.UfeVuIpL4rEQ2vPNdIseFgLoFsBcWOa",
       "fullName": "Admin",
       "email": "Admin-QuanLyDe@gmail.com",
       "phone": "0367797348",
       "address": "Tổ 8A, Kp Bảo Vinh A, Bảo Vinh, Đồng Nai",
       "role": "Admin",
+      "status": "Mở",
       "avatarUrl": "",
       "createdAt": "2026-08-13T06:18:07.851Z",
+      "updatedAt": "2026-08-16T13:05:01.959Z"
+    },
+    {
+      "id": "K1_tvWkZ69k",
+      "username": "d",
+      "password": "Lam@0367797348",
+      "fullName": "Hai Dong",
+      "address": "Quận Cầu Giấy, Hà Nội",
+      "phone": "0367797348",
+      "email": "tiendat2k3.dev@gmail.com",
+      "role": "Member",
+      "status": "Mở",
+      "createdAt": "2026-08-16T10:46:55.221Z",
+      "updatedAt": "2026-08-16T10:47:04.750Z"
+    },
+    {
+      "id": "jEPjfpgJCyU",
+      "username": "1233",
+      "password": "123456",
+      "fullName": "Hai Dongs",
+      "address": "Quận Cầu Giấy, Hà Nội",
+      "phone": "0367797348",
+      "email": "tiendat2k3.dev@gmail.com",
+      "role": "Member",
+      "status": "Mở",
+      "createdAt": "2026-08-16T10:49:16.578Z",
+      "updatedAt": "2026-08-16T10:55:06.742Z"
+    },
+    {
+      "id": "7-aAS6OFENw",
+      "username": "do",
+      "password": "Lam@0367797348",
+      "fullName": "Hai Dong",
+      "address": "Quận Cầu Giấy, Hà Nội",
+      "phone": "0367797348",
+      "email": "tiendat2k3.dev@gmail.com",
+      "role": "Member",
+      "status": "Mở",
+      "createdAt": "2026-08-16T10:55:21.316Z",
+      "updatedAt": "2026-08-16T10:55:28.068Z"
+    },
+    {
+      "id": "CNWNVPt45qU",
+      "username": "anhga",
+      "password": "12345",
+      "fullName": "Hai Dong",
+      "address": "Quận Cầu Giấy, Hà Nội",
+      "phone": "0367797348",
+      "email": "tiendat2k3.dev@gmail.com",
+      "role": "Member",
+      "status": "Mở",
+      "createdAt": "2026-08-16T10:55:51.720Z",
       "updatedAt": null
     },
     {
-      "id": "tqcjsIgtqp0",
-      "username": "BuiVanTuanLam",
-      "password": "$2b$10$V68eMN9oTZljGI6SPO7i4O46c8mNPR3RcEg/zbDM3S/N3lCwKTIDW",
-      "fullName": "Bùi Văn Tuấn Lâm ",
-      "email": "Dantethegodslayer2000@gmail.com",
+      "id": "TRxBn582BfY",
+      "username": "a",
+      "password": "123",
+      "fullName": "Hai Dong",
+      "address": "Quận Cầu Giấy, Hà Nội",
       "phone": "0367797348",
-      "address": "Tổ 8A, Kp Bảo Vinh A, Bảo Vinh, Đồng Nai",
-      "role": "User",
-      "avatarUrl": "",
-      "createdAt": "2026-08-13T06:46:55.588Z",
-      "updatedAt": "2026-08-13T07:20:09.586Z"
+      "email": "tiendat2k3.dev@gmail.com",
+      "role": "Admin",
+      "status": "Khóa",
+      "createdAt": "2026-08-16T10:56:27.500Z",
+      "updatedAt": null
     },
     {
-      "id": "x1tVKJ6qB0o",
-      "username": "TuanLam",
-      "password": "$2b$10$RcVh/w4XoL5F9vSJsO6J0eZe6uk7aQPkB.L55Xfwg3BbnmqXNe.gm",
-      "fullName": "Tuấn Lâm",
-      "email": "Lam@gmail.com",
+      "id": "wzv1RpAyS44",
+      "username": "go",
+      "password": "123456",
+      "fullName": "Hai Dong",
+      "address": "Quận Cầu Giấy, Hà Nội",
       "phone": "0367797348",
-      "address": "250 Khu Phố 1, Phường Xuân Hòa",
-      "role": "User",
-      "avatarUrl": "",
-      "createdAt": "2026-08-13T09:01:48.710Z",
-      "updatedAt": "2026-08-14T01:58:53.368Z"
+      "email": "tiendat2k3.dev@gmail.com",
+      "role": "Member",
+      "status": "Mở",
+      "createdAt": "2026-08-16T10:58:19.441Z",
+      "updatedAt": null
     },
     {
-      "id": "tiendat2k3",
-      "username": "tiendat2k3",
-      "password": "$2b$10$kINbX.PA4q/XkwcSCagg..OevBsQr87s7G6cGs.7mE1AVRZrIYiVW",
-      "fullName": "Tiến Đạt",
-      "email": "tiendat2k3@gmail.com",
-      "phone": "0987104234",
-      "address": "g",
-      "role": "User",
-      "avatarUrl": "",
-      "createdAt": "2026-08-13T00:00:00.000Z",
-      "updatedAt": "2026-08-13T09:40:22.846Z"
+      "id": "7WAloQJaRUA",
+      "username": "hhh",
+      "password": "123555",
+      "fullName": "Hai Dong",
+      "address": "Quận Cầu Giấy, Hà Nội",
+      "phone": "0367797348",
+      "email": "Admin-QuanLyDe@gmail.com",
+      "role": "Member",
+      "status": "Mở",
+      "createdAt": "2026-08-16T10:59:09.062Z",
+      "updatedAt": null
+    },
+    {
+      "id": "RgfA8na0ZoU",
+      "username": "a",
+      "password": "Lam@0367797348",
+      "fullName": "aaaa",
+      "address": "Quận Cầu Giấy, Hà Nội",
+      "phone": "0367797348",
+      "email": "tiendat2k3.dev@gmail.com",
+      "role": "Member",
+      "status": "Mở",
+      "createdAt": "2026-08-16T11:00:06.412Z",
+      "updatedAt": null
+    },
+    {
+      "id": "khArCD0RRoY",
+      "username": "x",
+      "password": "d",
+      "fullName": "123456",
+      "address": "Quận Cầu Giấy, Hà Nội",
+      "phone": "0367797348",
+      "email": "tiendat2k3.dev@gmail.com",
+      "role": "Member",
+      "status": "Khóa",
+      "createdAt": "2026-08-16T11:03:47.994Z",
+      "updatedAt": null
     }
   ],
   "categories": [
@@ -793,7 +872,7 @@
   ],
   "histories": [
     {
-      "userId": "tqcjsIgtqp0",
+      "userId": null,
       "examId": "ex-java-1",
       "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
       "score": 0,
@@ -809,7 +888,7 @@
       "id": "OJasRinKy-4"
     },
     {
-      "userId": "tqcjsIgtqp0",
+      "userId": null,
       "examId": "ex-java-1",
       "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
       "score": 100,
@@ -825,7 +904,7 @@
       "id": "s7YzONDVtnI"
     },
     {
-      "userId": "tqcjsIgtqp0",
+      "userId": null,
       "examId": "ex-db-1",
       "examTitle": "SQL Basics: SELECT, WHERE & Aggregates",
       "score": 0,
@@ -837,7 +916,7 @@
       "id": "jO8czO2LHRw"
     },
     {
-      "userId": "tiendat2k3",
+      "userId": null,
       "examId": "ex-java-1",
       "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
       "score": 33,
@@ -853,7 +932,7 @@
       "id": "lVfyFDP07oY"
     },
     {
-      "userId": "tiendat2k3",
+      "userId": null,
       "examId": "ex-java-1",
       "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
       "score": 33,
@@ -869,7 +948,7 @@
       "id": "OGB5Qzkk4Xo"
     },
     {
-      "userId": "tiendat2k3",
+      "userId": null,
       "examId": "ex-java-1",
       "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
       "score": 33,
@@ -885,7 +964,7 @@
       "id": "SnR9mOw9WQQ"
     },
     {
-      "userId": "tiendat2k3",
+      "userId": null,
       "examId": "ex-java-1",
       "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
       "score": 0,
@@ -897,7 +976,7 @@
       "id": "ClEAGBavVgk"
     },
     {
-      "userId": "tiendat2k3",
+      "userId": null,
       "examId": "ex-java-1",
       "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
       "score": 67,
@@ -911,6 +990,18 @@
       },
       "completedAt": "2026-08-15T00:54:59.479Z",
       "id": "bahMkfDG8Iw"
+    },
+    {
+      "userId": null,
+      "examId": "ex-java-1",
+      "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
+      "score": 0,
+      "totalQuestions": 3,
+      "correctAnswersCount": 0,
+      "timeTaken": 22,
+      "userAnswers": {},
+      "completedAt": "2026-08-16T01:50:58.605Z",
+      "id": "5LChoemlEhk"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

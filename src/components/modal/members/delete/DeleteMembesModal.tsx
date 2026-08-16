@@ -1,16 +1,14 @@
 "use client";
 
-interface Member {
-  id: number;
-  fullName: string;
-  email: string;
-}
+import { toast } from "react-toastify";
+
+import { User } from "@/types/user";
 
 interface DeleteMembersModalProps {
   show: boolean;
-  member: Member | null;
+  member: User | null;
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm: () => Promise<void>;
 }
 
 const DeleteMembersModal = ({
@@ -30,6 +28,7 @@ const DeleteMembersModal = ({
       <div className="modal d-block" tabIndex={-1} role="dialog">
         <div className="modal-dialog modal-dialog-centered">
           <div className="modal-content border-0 shadow">
+            {/* Header */}
             <div
               className="modal-header text-white"
               style={{
@@ -45,6 +44,7 @@ const DeleteMembersModal = ({
               />
             </div>
 
+            {/* Body */}
             <div className="modal-body">
               <p className="mb-0">
                 Bạn có chắc chắn muốn xóa người dùng này không?
@@ -52,12 +52,12 @@ const DeleteMembersModal = ({
 
               <div className="mt-3 p-3 border rounded bg-light">
                 <strong>{member.fullName}</strong>
-                <div className="text-secondary small mt-1">
-                  {member.email}
-                </div>
+
+                <div className="text-secondary small mt-1">{member.email}</div>
               </div>
             </div>
 
+            {/* Footer */}
             <div className="modal-footer">
               <button
                 type="button"
@@ -70,9 +70,18 @@ const DeleteMembersModal = ({
               <button
                 type="button"
                 className="btn btn-danger"
-                onClick={() => {
-                  onConfirm();
-                  onClose();
+                onClick={async () => {
+                  try {
+                    await onConfirm();
+
+                    toast.success("Xóa người dùng thành công!");
+
+                    onClose();
+                  } catch (error) {
+                    console.error("Lỗi khi xóa người dùng:", error);
+
+                    toast.error("Không thể xóa người dùng!");
+                  }
                 }}
               >
                 Xóa

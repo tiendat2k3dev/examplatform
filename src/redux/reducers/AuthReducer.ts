@@ -1,6 +1,8 @@
 // src/redux/reducers/AuthReducer.ts
+
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
+
 import {
   User,
   AuthState,
@@ -8,27 +10,68 @@ import {
   UpdateUserPayload,
   ChangePasswordPayload,
 } from "@/types/user";
+
 import {
   registerService,
   loginService,
   updateUserService,
   changePasswordService,
 } from "@/services/authService";
+
 import { AppDispatch } from "../store";
 
-// Khởi tạo initialState an toàn, không gọi window / localStorage ngay lúc khởi tạo module
+// ===============================
+// Initial State
+// ===============================
+
 const initialState: AuthState = {
   currentUser: null,
 };
 
+// ===============================
+// Error Helper
+// ===============================
+
+const getErrorMessage = (error: unknown, defaultMessage: string): string => {
+  if (typeof error === "object" && error !== null) {
+    const errorObject = error as {
+      response?: {
+        data?: {
+          message?: string;
+        };
+      };
+      message?: string;
+    };
+
+    return (
+      errorObject.response?.data?.message ||
+      errorObject.message ||
+      defaultMessage
+    );
+  }
+
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return defaultMessage;
+};
+
+// ===============================
+// Auth Slice
+// ===============================
+
 const authReducer = createSlice({
   name: "authReducer",
+
   initialState,
+
   reducers: {
-    // Action đồng bộ state từ Client Side (Local Storage)
+    // Đồng bộ currentUser từ LocalStorage
     initCurrentUser: (state) => {
       if (typeof window !== "undefined") {
         const storedUser = localStorage.getItem("user");
+
         if (storedUser) {
           try {
             state.currentUser = JSON.parse(storedUser);
@@ -38,30 +81,48 @@ const authReducer = createSlice({
         }
       }
     },
+
+    // Register
     register: (state, action: PayloadAction<User>) => {
       state.currentUser = action.payload;
     },
+
+    // Login
     login: (state, action: PayloadAction<User>) => {
       state.currentUser = action.payload;
     },
+
+    // Update user
     updateUser: (state, action: PayloadAction<User>) => {
       state.currentUser = action.payload;
     },
+
+    // Logout
     logout: (state) => {
       state.currentUser = null;
+
       if (typeof window !== "undefined") {
         localStorage.removeItem("user");
       }
+
       toast.info("Đã đăng xuất tài khoản!");
     },
   },
 });
 
+// ===============================
+// Export Actions
+// ===============================
+
 export const { initCurrentUser, register, login, updateUser, logout } =
   authReducer.actions;
+
 export default authReducer.reducer;
 
-// Async Thunk cho Register
+// ===============================
+// Register API Async
+// ===============================
+
 export const registerApiAsync =
   (
     userData: Omit<
@@ -73,48 +134,63 @@ export const registerApiAsync =
   async (dispatch: AppDispatch) => {
     try {
       const data = await registerService(userData);
+
       dispatch(register(data));
+
       toast.success("Đăng ký tài khoản thành công!");
+
       if (onSuccess) {
         onSuccess();
       }
-    } catch (error: any) {
-      const errorMsg =
-        error.response?.data?.message || error.message || "Đăng ký thất bại!";
+    } catch (error: unknown) {
+      const errorMsg = getErrorMessage(error, "Đăng ký thất bại!");
+
       console.error("Register error:", error);
+
       toast.error(errorMsg);
+
       throw error;
     }
   };
 
-// Async Thunk cho Login
+// ===============================
+// Login API Async
+// ===============================
+
 export const loginApiAsync =
   (payload: LoginPayload, onSuccess?: (user: User) => void) =>
   async (dispatch: AppDispatch) => {
     try {
       const data = await loginService(payload);
-      const { password, ...userWithoutPassword } = data;
+
+      const { password: _password, ...userWithoutPassword } = data;
 
       if (typeof window !== "undefined") {
         localStorage.setItem("user", JSON.stringify(userWithoutPassword));
       }
 
       dispatch(login(userWithoutPassword as User));
+
       toast.success("Đăng nhập thành công!");
 
       if (onSuccess) {
-        onSuccess(data);
+        onSuccess(userWithoutPassword as User);
       }
-    } catch (error: any) {
-      const errorMsg =
-        error.response?.data?.message || error.message || "Đăng nhập thất bại!";
+    } catch (error: unknown) {
+      const errorMsg = getErrorMessage(error, "Đăng nhập thất bại!");
+
       console.error("Login error:", error);
+
       toast.error(errorMsg);
+
       throw error;
     }
   };
 
-// Async Thunk cho Update User
+// ===============================
+// Update User API Async
+// ===============================
+
 export const updateUserApiAsync =
   (
     userId: string | number,
@@ -124,28 +200,33 @@ export const updateUserApiAsync =
   async (dispatch: AppDispatch) => {
     try {
       const updatedUser = await updateUserService(userId, payload);
-      const { password, ...userWithoutPassword } = updatedUser as any;
+
+      const { password: _password, ...userWithoutPassword } = updatedUser;
 
       if (typeof window !== "undefined") {
         localStorage.setItem("user", JSON.stringify(userWithoutPassword));
       }
 
       dispatch(updateUser(userWithoutPassword as User));
-      toast.success("Cập nhật thông tin cá nhân thành công!");
 
       if (onSuccess) {
         onSuccess();
       }
-    } catch (error: any) {
-      const errorMsg =
-        error.response?.data?.message || error.message || "Cập nhật thất bại!";
+    } catch (error: unknown) {
+      const errorMsg = getErrorMessage(error, "Cập nhật thất bại!");
+
       console.error("Update error:", error);
+
       toast.error(errorMsg);
+
       throw error;
     }
   };
 
-// Async Thunk cho Change Password
+// ===============================
+// Change Password API Async
+// ===============================
+
 export const changePasswordApiAsync =
   (
     userId: string | number,
@@ -155,17 +236,17 @@ export const changePasswordApiAsync =
   async () => {
     try {
       await changePasswordService(userId, payload);
-      toast.success("Đổi mật khẩu thành công!");
+
       if (onSuccess) {
         onSuccess();
       }
-    } catch (error: any) {
-      const errorMsg =
-        error.response?.data?.message ||
-        error.message ||
-        "Đổi mật khẩu thất bại!";
+    } catch (error: unknown) {
+      const errorMsg = getErrorMessage(error, "Đổi mật khẩu thất bại!");
+
       console.error("Change password error:", error);
+
       toast.error(errorMsg);
+
       throw error;
     }
   };

@@ -1,4 +1,5 @@
 // src/types/user.ts
+
 export interface User {
   id: string | number;
   username: string;
@@ -8,7 +9,7 @@ export interface User {
   phone: string;
   address: string;
   role: string;
-  avatarUrl: string;
+  status: string;
   createdAt: string;
   updatedAt: string | null;
 }
@@ -27,6 +28,9 @@ export interface UpdateUserPayload {
   email?: string;
   phone?: string;
   address?: string;
+  avatarUrl?: string;
+  role?: string;
+  status?: string;
 }
 
 export interface ChangePasswordPayload {

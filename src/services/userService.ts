@@ -1,4 +1,5 @@
 import { User } from "../types/user";
+import bcrypt from "bcryptjs";
 import api from "../lib/apiClient.js";
 
 // Lấy danh sách người dùng
@@ -32,8 +33,13 @@ export const createUserService = async (
   userData: Omit<User, "id" | "createdAt" | "updatedAt">,
 ): Promise<User> => {
   try {
+    // Mã hóa mật khẩu trước khi lưu
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(userData.password, salt);
+
     const response = await api.post<User>("/users", {
       ...userData,
+      password: hashedPassword,
       createdAt: new Date().toISOString(),
       updatedAt: null,
     });
@@ -51,10 +57,15 @@ export const updateUserService = async (
   userData: Partial<User>,
 ): Promise<User> => {
   try {
-    const response = await api.patch<User>(`/users/${userId}`, {
+    const payload: Partial<User> = {
       ...userData,
       updatedAt: new Date().toISOString(),
-    });
+    };
+
+    // Không xử lý password ở đây.
+    // Khi cập nhật thông tin user, password cũ phải được giữ nguyên.
+
+    const response = await api.patch<User>(`/users/${userId}`, payload);
 
     return response.data;
   } catch (error) {

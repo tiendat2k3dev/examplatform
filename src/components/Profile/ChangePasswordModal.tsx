@@ -1,3 +1,4 @@
+// src/components/User/ChangePasswordModal.tsx
 "use client";
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
@@ -17,11 +18,17 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
   const dispatch = useDispatch<AppDispatch>();
   const { currentUser } = useSelector((state: RootState) => state.authReducer);
 
+  // Quản lý dữ liệu form
   const [formData, setFormData] = useState({
     oldPassword: "",
     newPassword: "",
     confirmNewPassword: "",
   });
+
+  // Quản lý trạng thái ẩn/hiện cho từng ô mật khẩu
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   if (!show) return null;
 
@@ -106,7 +113,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
                         <i className="bi bi-lock"></i>
                       </span>
                       <input
-                        type="password"
+                        type={showOldPassword ? "text" : "password"}
                         className="form-control bg-transparent border-0 text-white shadow-none fs-6"
                         id="oldPassword"
                         name="oldPassword"
@@ -115,6 +122,20 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
                         placeholder="Nhập mật khẩu hiện tại..."
                         required
                       />
+                      <button
+                        type="button"
+                        className="btn bg-transparent border-0 text-info px-3 shadow-none"
+                        onClick={() => setShowOldPassword(!showOldPassword)}
+                        tabIndex={-1}
+                      >
+                        <i
+                          className={`bi ${
+                            showOldPassword
+                              ? "bi-eye-slash-fill"
+                              : "bi-eye-fill"
+                          }`}
+                        ></i>
+                      </button>
                     </div>
                   </div>
 
@@ -133,7 +154,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
                         <i className="bi bi-key"></i>
                       </span>
                       <input
-                        type="password"
+                        type={showNewPassword ? "text" : "password"}
                         className="form-control bg-transparent border-0 text-white shadow-none fs-6"
                         id="newPassword"
                         name="newPassword"
@@ -142,6 +163,20 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
                         placeholder="Nhập mật khẩu mới..."
                         required
                       />
+                      <button
+                        type="button"
+                        className="btn bg-transparent border-0 text-info px-3 shadow-none"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                        tabIndex={-1}
+                      >
+                        <i
+                          className={`bi ${
+                            showNewPassword
+                              ? "bi-eye-slash-fill"
+                              : "bi-eye-fill"
+                          }`}
+                        ></i>
+                      </button>
                     </div>
                   </div>
 
@@ -161,7 +196,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
                         <i className="bi bi-shield-check"></i>
                       </span>
                       <input
-                        type="password"
+                        type={showConfirmPassword ? "text" : "password"}
                         className="form-control bg-transparent border-0 text-white shadow-none fs-6"
                         id="confirmNewPassword"
                         name="confirmNewPassword"
@@ -170,6 +205,22 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
                         placeholder="Nhập lại mật khẩu mới..."
                         required
                       />
+                      <button
+                        type="button"
+                        className="btn bg-transparent border-0 text-info px-3 shadow-none"
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
+                        tabIndex={-1}
+                      >
+                        <i
+                          className={`bi ${
+                            showConfirmPassword
+                              ? "bi-eye-slash-fill"
+                              : "bi-eye-fill"
+                          }`}
+                        ></i>
+                      </button>
                     </div>
                   </div>
                 </form>

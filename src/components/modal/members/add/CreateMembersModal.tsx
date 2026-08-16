@@ -43,6 +43,7 @@ const CreateMembersModal = ({
   onCreate,
 }: CreateMembersModalProps) => {
   const [submitting, setSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const formik = useFormik({
     initialValues: {
@@ -228,28 +229,47 @@ const CreateMembersModal = ({
 
                 <div className="col-md-6">
                   <label className="form-label small fw-semibold">
-                    Mật khẩu <span className="text-danger">*</span>
+                    Mật khẩu{" "}
+                    <span className="text-danger">*</span>
                   </label>
 
-                  <input
-                    type="password"
-                    name="password"
-                    className={`form-control form-control-sm ${
-                      formik.touched.password && formik.errors.password
-                        ? "is-invalid"
-                        : ""
-                    }`}
-                    placeholder="Nhập mật khẩu"
-                    value={formik.values.password}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                  />
+                  <div className="input-group input-group-sm">
+                    <input
+                      type={
+                        showPassword
+                          ? "text"
+                          : "password"
+                      }
+                      name="password"
+                      className={`form-control ${
+                        formik.touched.password &&
+                        formik.errors.password
+                          ? "is-invalid"
+                          : ""
+                      }`}
+                      placeholder="Nhập mật khẩu"
+                      value={formik.values.password}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                    />
 
-                  {formik.touched.password && formik.errors.password && (
-                    <div className="invalid-feedback">
-                      {formik.errors.password}
-                    </div>
-                  )}
+                    <button
+                      type="button"
+                      className="btn btn-outline-secondary"
+                      onClick={() =>
+                        setShowPassword((prev) => !prev)
+                      }
+                      tabIndex={-1}
+                    >
+                      <i
+                        className={`bi ${
+                          showPassword
+                            ? "bi-eye-slash"
+                            : "bi-eye"
+                        }`}
+                      />
+                    </button>
+                  </div>
                 </div>
 
                 {/* =================================

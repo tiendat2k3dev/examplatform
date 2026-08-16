@@ -7,7 +7,7 @@ interface HeaderQuestionsProps {
   onAdd: () => void;
 }
 
-const HeaderQuestions = ({
+const HeaderCategories = ({
   title,
   description,
   add,
@@ -29,4 +29,4 @@ const HeaderQuestions = ({
   );
 };
 
-export default HeaderQuestions;
+export default HeaderCategories;

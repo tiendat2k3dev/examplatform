@@ -18,6 +18,7 @@ const Sidebar = () => {
 
       {/* Menu */}
       <nav className="d-flex flex-column gap-1 px-2 py-2">
+        {/* Trang chủ */}
         <Link
           href="/admin"
           className="d-flex align-items-center text-decoration-none text-dark rounded px-3"
@@ -27,6 +28,7 @@ const Sidebar = () => {
           <span>Trang chủ</span>
         </Link>
 
+        {/* Quản lý thành viên */}
         <Link
           href="/admin/members"
           className="d-flex align-items-center text-decoration-none text-dark rounded px-3"
@@ -36,6 +38,7 @@ const Sidebar = () => {
           <span>Quản lý thành viên</span>
         </Link>
 
+        {/* Quản lý danh mục */}
         <Link
           href="/admin/categories"
           className="d-flex align-items-center text-decoration-none text-dark rounded px-3"
@@ -45,6 +48,17 @@ const Sidebar = () => {
           <span>Quản lý danh mục</span>
         </Link>
 
+        {/* Quản lý nhóm đề thi */}
+        <Link
+          href="/admin/exam-groups"
+          className="d-flex align-items-center text-decoration-none text-dark rounded px-3"
+          style={{ height: "40px", fontSize: "13px" }}
+        >
+          <i className="bi bi-collection me-2" style={{ width: "24px" }}></i>
+          <span>Nhóm đề thi</span>
+        </Link>
+
+        {/* Quản lý đề thi */}
         <Link
           href="/admin/exams"
           className="d-flex align-items-center text-decoration-none text-dark rounded px-3"
@@ -57,6 +71,7 @@ const Sidebar = () => {
           <span>Quản lý đề thi</span>
         </Link>
 
+        {/* Ngân hàng câu hỏi */}
         <Link
           href="/admin/questions"
           className="d-flex align-items-center text-decoration-none text-dark rounded px-3"
@@ -66,6 +81,7 @@ const Sidebar = () => {
           <span>Ngân hàng câu hỏi</span>
         </Link>
 
+        {/* Xếp hạng */}
         <Link
           href="/admin/ranking"
           className="d-flex align-items-center text-decoration-none text-dark rounded px-3"
@@ -75,6 +91,7 @@ const Sidebar = () => {
           <span>Xếp hạng</span>
         </Link>
 
+        {/* Thống kê */}
         <Link
           href="/admin/statistics"
           className="d-flex align-items-center text-decoration-none text-dark rounded px-3"

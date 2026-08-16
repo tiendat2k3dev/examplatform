@@ -1,9 +1,11 @@
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { useFormik } from "formik";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "@/redux/store";
+import { RootState } from "@/redux/store";
 import { loginApiAsync } from "@/redux/reducers/AuthReducer";
 import { loginSchema } from "@/schemas/loginSchema";
 import styles from "./LoginForm.module.css";
@@ -11,6 +13,17 @@ import styles from "./LoginForm.module.css";
 const LoginForm = () => {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
+  const { currentUser } = useSelector((state: RootState) => state.authReducer);
+
+  useEffect(() => {
+    if (currentUser) {
+      if (currentUser.role === "Admin") {
+        router.push("/admin");
+      } else {
+        router.push("/user");
+      }
+    }
+  }, [currentUser, router]);
 
   const formik = useFormik({
     initialValues: {
@@ -21,7 +34,6 @@ const LoginForm = () => {
     onSubmit: async (values) => {
       dispatch(
         loginApiAsync(values, (user) => {
-          // Xóa alert(), Toastify đã được tự động bắn từ Redux Thunk
           if (user.role === "Admin") {
             router.push("/admin");
           } else {

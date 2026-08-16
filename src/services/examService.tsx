@@ -12,12 +12,12 @@ export interface PaginatedExamsResponse {
 export const getPaginatedExamsService = async (
   page: number = 1,
   limit: number = 6,
-  categoryId?: string
+  categoryId?: string,
 ): Promise<PaginatedExamsResponse> => {
   try {
     const categoryParam = categoryId ? `&categoryId=${categoryId}` : "";
     const response = await axios.get<any>(
-      `${API_URL}/exams?_page=${page}&_per_page=${limit}${categoryParam}`
+      `${API_URL}/exams?_page=${page}&_per_page=${limit}${categoryParam}`,
     );
 
     const resData = response.data;

@@ -1,17 +1,20 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import HeaderQuestions from "../../../../components/exams/ExamsQuestions";
+import { toast } from "react-toastify";
+
+import HeaderExams from "../../../../components/exams/HeaderExams";
 import CreateExamModal from "../../../../components/modal/exams/add/CreateExamModal";
 import EditExamModal from "../../../../components/modal/exams/edit/EditExamModal";
 import DeleteExamModal from "../../../../components/modal/exams/delete/DeleteExamModal";
 import ViewExams from "../../../../components/modal/exams/view/ViewExams";
 import ConfirmModal from "../../../../components/modal/common/ConfirmModal";
+
 import type {
   CreateExamFormValues,
   EditExam,
   ExamQuestion,
-} from "../../../../components/modal/exams/examTypes";
+} from "@/types/exam";
 
 interface Exam {
   id: string;
@@ -22,6 +25,7 @@ interface Exam {
   status: "Hoạt động" | "Khóa";
   passScore: number;
   questionIds: string[];
+  examGroupId?: string;
 }
 
 const questionBank: ExamQuestion[] = [
@@ -104,7 +108,10 @@ const questionBank: ExamQuestion[] = [
     category: "Vật lý",
     answers: [
       { key: "A", value: "Năng lượng có thể bị mất đi" },
-      { key: "B", value: "Năng lượng có thể được tạo ra từ hư không" },
+      {
+        key: "B",
+        value: "Năng lượng có thể được tạo ra từ hư không",
+      },
       {
         key: "C",
         value:
@@ -128,70 +135,74 @@ const questionBank: ExamQuestion[] = [
   },
 ];
 
-const initialExamData: Exam[] = [
+const initialExams: Exam[] = [
   {
-    id: "EXAM-2023-001",
-    name: "Kiểm tra giữa kì Toán 10",
+    id: "EX001",
+    name: "Đề thi Toán học cơ bản",
     category: "Toán học",
-    questions: 30,
-    duration: 45,
+    questions: 3,
+    duration: 30,
     status: "Hoạt động",
     passScore: 5,
     questionIds: ["Q001", "Q003", "Q006"],
+    examGroupId: "grp-1",
   },
   {
-    id: "EXAM-2023-002",
-    name: "Đề thi thử THPTQG Vật lí",
+    id: "EX002",
+    name: "Đề thi Vật lý cơ bản",
     category: "Vật lý",
-    questions: 40,
-    duration: 60,
+    questions: 2,
+    duration: 30,
     status: "Hoạt động",
     passScore: 5,
     questionIds: ["Q002", "Q007"],
+    examGroupId: "grp-2",
   },
   {
-    id: "EXAM-2023-003",
-    name: "Bài tập trắc nghiệm Hóa hữu cơ",
+    id: "EX003",
+    name: "Đề thi Hóa học cơ bản",
     category: "Hóa học",
-    questions: 10,
-    duration: 30,
+    questions: 2,
+    duration: 20,
     status: "Khóa",
-    passScore: 4,
+    passScore: 5,
     questionIds: ["Q004", "Q008"],
+    examGroupId: "grp-3",
   },
   {
-    id: "EXAM-2023-004",
-    name: "Ôn tập Sinh học 10",
+    id: "EX004",
+    name: "Đề thi Sinh học cơ bản",
     category: "Sinh học",
-    questions: 20,
-    duration: 45,
+    questions: 1,
+    duration: 15,
     status: "Hoạt động",
     passScore: 5,
     questionIds: ["Q005"],
-  },
-  {
-    id: "EXAM-2023-005",
-    name: "Kiểm tra 15 phút Toán đại số",
-    category: "Toán học",
-    questions: 10,
-    duration: 15,
-    status: "Khóa",
-    passScore: 5,
-    questionIds: ["Q001", "Q003"],
+    examGroupId: "grp-4",
   },
 ];
 
+const examGroups = [
+  { id: "grp-1", name: "Nhóm Toán học" },
+  { id: "grp-2", name: "Nhóm Vật lý" },
+  { id: "grp-3", name: "Nhóm Hóa học" },
+  { id: "grp-4", name: "Nhóm Sinh học" },
+];
+
 const ExamManagement = () => {
-  const [exams, setExams] = useState<Exam[]>(initialExamData);
+  const [exams, setExams] = useState<Exam[]>(initialExams);
+
   const [searchText, setSearchText] = useState("");
   const [category, setCategory] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState("status");
+
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+
   const [selectedExam, setSelectedExam] = useState<EditExam | null>(null);
   const [pendingToggleId, setPendingToggleId] = useState<string | null>(null);
 
@@ -210,14 +221,19 @@ const ExamManagement = () => {
     const matchCategory = !category || exam.category === category;
 
     const matchStatus =
-      sortBy === "status" || exam.status === sortBy;
+      sortBy === "status" ||
+      (sortBy === "active" && exam.status === "Hoạt động") ||
+      (sortBy === "locked" && exam.status === "Khóa");
 
     return matchText && matchCategory && matchStatus;
   });
 
   const totalPages = Math.max(1, Math.ceil(filteredExams.length / 10));
+
   const safePage = Math.min(currentPage, totalPages);
+
   const startIndex = (safePage - 1) * 10;
+
   const pagedExams = filteredExams.slice(startIndex, startIndex + 10);
 
   const handleAdd = () => {
@@ -228,7 +244,18 @@ const ExamManagement = () => {
     const exam = exams.find((item) => item.id === id);
 
     if (exam) {
-      setSelectedExam(exam);
+      setSelectedExam({
+        id: exam.id,
+        name: exam.name,
+        category: exam.category,
+        examGroupId: exam.examGroupId,
+        questions: exam.questions,
+        duration: exam.duration,
+        status: exam.status,
+        passScore: exam.passScore,
+        questionIds: exam.questionIds,
+      });
+
       setShowEditModal(true);
     }
   };
@@ -239,48 +266,79 @@ const ExamManagement = () => {
   };
 
   const handleCreateExam = async (values: CreateExamFormValues) => {
-    const newExam: Exam = {
-      id: values.id,
-      name: values.name,
-      category: values.category,
-      questions: values.questionIds.length,
-      duration: values.duration,
-      status: values.status,
-      passScore: values.passScore,
-      questionIds: values.questionIds,
-    };
+    try {
+      const newExam: Exam = {
+        id: `EX${String(exams.length + 1).padStart(3, "0")}`,
+        name: values.name,
+        category: values.category,
+        examGroupId: values.examGroupId,
+        questions: values.questionIds.length,
+        duration: values.duration,
+        status: values.status,
+        passScore: values.passScore,
+        questionIds: values.questionIds,
+      };
 
-    setExams((prev) => [newExam, ...prev]);
+      setExams((prev) => [...prev, newExam]);
+
+      toast.success("Tạo đề thi thành công!");
+
+      setShowCreateModal(false);
+    } catch (error) {
+      console.error(error);
+      toast.error("Không thể tạo đề thi!");
+    }
   };
 
   const handleUpdateExam = async (
     examId: string,
     values: CreateExamFormValues,
   ) => {
-    setExams((prev) =>
-      prev.map((exam) =>
-        exam.id === examId
-          ? {
-              ...exam,
-              id: values.id,
-              name: values.name,
-              category: values.category,
-              questions: values.questionIds.length,
-              duration: values.duration,
-              status: values.status,
-              passScore: values.passScore,
-              questionIds: values.questionIds,
-            }
-          : exam,
-      ),
-    );
+    try {
+      setExams((prev) =>
+        prev.map((exam) =>
+          exam.id === examId
+            ? {
+                ...exam,
+                name: values.name,
+                category: values.category,
+                examGroupId: values.examGroupId,
+                questions: values.questionIds.length,
+                duration: values.duration,
+                status: values.status,
+                passScore: values.passScore,
+                questionIds: values.questionIds,
+              }
+            : exam,
+        ),
+      );
+
+      toast.success("Cập nhật đề thi thành công!");
+
+      setShowEditModal(false);
+      setSelectedExam(null);
+    } catch (error) {
+      console.error(error);
+      toast.error("Không thể cập nhật đề thi!");
+    }
   };
 
   const handleDelete = (id: string) => {
     const exam = exams.find((item) => item.id === id);
 
     if (exam) {
-      setSelectedExam(exam);
+      setSelectedExam({
+        id: exam.id,
+        name: exam.name,
+        category: exam.category,
+        examGroupId: exam.examGroupId,
+        questions: exam.questions,
+        duration: exam.duration,
+        status: exam.status,
+        passScore: exam.passScore,
+        questionIds: exam.questionIds,
+      });
+
       setShowDeleteModal(true);
     }
   };
@@ -290,19 +348,40 @@ const ExamManagement = () => {
     setSelectedExam(null);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (!selectedExam) {
       return;
     }
 
-    setExams((prev) => prev.filter((exam) => exam.id !== selectedExam.id));
+    try {
+      setExams((prev) => prev.filter((exam) => exam.id !== selectedExam.id));
+
+      toast.success("Xóa đề thi thành công!");
+
+      setShowDeleteModal(false);
+      setSelectedExam(null);
+    } catch (error) {
+      console.error(error);
+      toast.error("Không thể xóa đề thi!");
+    }
   };
 
   const handleView = (id: string) => {
     const exam = exams.find((item) => item.id === id);
 
     if (exam) {
-      setSelectedExam(exam);
+      setSelectedExam({
+        id: exam.id,
+        name: exam.name,
+        category: exam.category,
+        examGroupId: exam.examGroupId,
+        questions: exam.questions,
+        duration: exam.duration,
+        status: exam.status,
+        passScore: exam.passScore,
+        questionIds: exam.questionIds,
+      });
+
       setShowViewModal(true);
     }
   };
@@ -323,7 +402,11 @@ const ExamManagement = () => {
     return (
       <div
         className="form-check form-switch"
-        style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "8px",
+        }}
       >
         <input
           className="form-check-input"
@@ -339,10 +422,12 @@ const ExamManagement = () => {
         />
 
         <span
-          className={`badge ${
-            isActive ? "bg-success" : "bg-danger"
-          }`}
-          style={{ fontSize: "0.75rem", minWidth: "90px", textAlign: "center" }}
+          className={`badge ${isActive ? "bg-success" : "bg-danger"}`}
+          style={{
+            fontSize: "0.75rem",
+            minWidth: "90px",
+            textAlign: "center",
+          }}
         >
           {isActive ? "Mở bài thi" : "Khóa bài thi"}
         </span>
@@ -350,12 +435,41 @@ const ExamManagement = () => {
     );
   };
 
-  const handleConfirmToggle = () => {
-    if (pendingToggleId) {
-      handleToggleStatus(pendingToggleId);
-      setPendingToggleId(null);
+  const handleConfirmToggle = async () => {
+    if (!pendingToggleId) {
+      return;
     }
-    setShowConfirmModal(false);
+
+    try {
+      const exam = exams.find((e) => e.id === pendingToggleId);
+
+      if (!exam) {
+        return;
+      }
+
+      const newStatus = exam.status === "Hoạt động" ? "Khóa" : "Hoạt động";
+
+      setExams((prev) =>
+        prev.map((item) =>
+          item.id === pendingToggleId
+            ? {
+                ...item,
+                status: newStatus,
+              }
+            : item,
+        ),
+      );
+
+      toast.success(
+        newStatus === "Hoạt động" ? "Đã mở bài thi!" : "Đã khóa bài thi!",
+      );
+    } catch (error) {
+      console.error(error);
+      toast.error("Không thể cập nhật trạng thái!");
+    } finally {
+      setPendingToggleId(null);
+      setShowConfirmModal(false);
+    }
   };
 
   const handleCloseConfirm = () => {
@@ -364,25 +478,19 @@ const ExamManagement = () => {
   };
 
   const getConfirmTitle = () => {
-    if (!pendingToggleId) return "";
+    if (!pendingToggleId) {
+      return "";
+    }
+
     const exam = exams.find((e) => e.id === pendingToggleId);
-    if (!exam) return "";
+
+    if (!exam) {
+      return "";
+    }
+
     return exam.status === "Hoạt động"
       ? "Bạn có chắc muốn khóa bài thi này?"
       : "Bạn có chắc muốn mở bài thi này?";
-  };
-
-  const handleToggleStatus = (id: string) => {
-    setExams((prev) =>
-      prev.map((exam) =>
-        exam.id === id
-          ? {
-              ...exam,
-              status: exam.status === "Hoạt động" ? "Khóa" : "Hoạt động",
-            }
-          : exam,
-      ),
-    );
   };
 
   return (
@@ -392,10 +500,10 @@ const ExamManagement = () => {
     >
       <div className="bg-white p-4 rounded-3 shadow-sm">
         {/* Header */}
-        <HeaderQuestions
+        <HeaderExams
           title="Quản lý đề thi"
           description="Tạo, chỉnh sửa, xóa và quản lý đề thi"
-          add="Thêm đề thi"
+          add="Thêm"
           onAdd={handleAdd}
         />
 
@@ -426,10 +534,10 @@ const ExamManagement = () => {
               onChange={(e) => setCategory(e.target.value)}
             >
               <option value="">Chọn danh mục</option>
-              <option value="math">Toán học</option>
-              <option value="physics">Vật lý</option>
-              <option value="chemistry">Hóa học</option>
-              <option value="biology">Sinh học</option>
+              <option value="Toán học">Toán học</option>
+              <option value="Vật lý">Vật lý</option>
+              <option value="Hóa học">Hóa học</option>
+              <option value="Sinh học">Sinh học</option>
             </select>
           </div>
 
@@ -452,6 +560,8 @@ const ExamManagement = () => {
           <table className="table table-hover mb-0">
             <thead className="table-light">
               <tr>
+                <th className="fw-bold text-dark">STT</th>
+
                 <th className="fw-bold text-dark">Mã đề thi</th>
 
                 <th className="fw-bold text-dark">Tên đề thi</th>
@@ -469,62 +579,72 @@ const ExamManagement = () => {
             </thead>
 
             <tbody>
-              {pagedExams.map((exam) => (
-                <tr key={exam.id} className="border-bottom">
-                  {/* Mã đề thi */}
-                  <td className="fw-bold text-primary">{exam.id}</td>
+              {pagedExams.length > 0 ? (
+                pagedExams.map((exam, index) => (
+                  <tr key={exam.id} className="border-bottom">
+                    <td>{startIndex + index + 1}</td>
 
-                  {/* Tên đề thi */}
-                  <td>{exam.name}</td>
+                    {/* Mã đề thi */}
+                    <td className="fw-bold text-primary">{exam.id}</td>
 
-                  {/* Danh mục */}
-                  <td>{exam.category}</td>
+                    {/* Tên đề thi */}
+                    <td>{exam.name}</td>
 
-                  {/* Số câu hỏi */}
-                  <td>{exam.questions}</td>
+                    {/* Danh mục */}
+                    <td>{exam.category}</td>
 
-                  {/* Thời gian thi */}
-                  <td>{exam.duration} phút</td>
+                    {/* Số câu hỏi */}
+                    <td>{exam.questions}</td>
 
-                  {/* Trạng thái */}
-                  <td>{getStatusBadge(exam.status, exam.id)}</td>
+                    {/* Thời gian thi */}
+                    <td>{exam.duration} phút</td>
 
-                  {/* Thao tác */}
-                  <td>
-                    <div className="d-flex gap-2">
-                      {/* Xem */}
-                      <button
-                        type="button"
-                        className="btn btn-sm btn-outline-secondary p-1"
-                        title="Xem"
-                        onClick={() => handleView(exam.id)}
-                      >
-                        <i className="bi bi-eye"></i>
-                      </button>
+                    {/* Trạng thái */}
+                    <td>{getStatusBadge(exam.status, exam.id)}</td>
 
-                      {/* Chỉnh sửa */}
-                      <button
-                        type="button"
-                        className="btn btn-sm btn-outline-primary p-1"
-                        title="Chỉnh sửa"
-                        onClick={() => handleEdit(exam.id)}
-                      >
-                        <i className="bi bi-pencil"></i>
-                      </button>
+                    {/* Thao tác */}
+                    <td>
+                      <div className="d-flex gap-2">
+                        {/* Xem */}
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-outline-secondary p-1"
+                          title="Xem"
+                          onClick={() => handleView(exam.id)}
+                        >
+                          <i className="bi bi-eye"></i>
+                        </button>
 
-                      {/* Xóa */}
-                      <button
-                        type="button"
-                        className="btn btn-sm btn-outline-danger p-1"
-                        title="Xóa"
-                        onClick={() => handleDelete(exam.id)}
-                      >
-                        <i className="bi bi-trash"></i>
-                      </button>
-                    </div>
+                        {/* Chỉnh sửa */}
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-outline-primary p-1"
+                          title="Chỉnh sửa"
+                          onClick={() => handleEdit(exam.id)}
+                        >
+                          <i className="bi bi-pencil"></i>
+                        </button>
+
+                        {/* Xóa */}
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-outline-danger p-1"
+                          title="Xóa"
+                          onClick={() => handleDelete(exam.id)}
+                        >
+                          <i className="bi bi-trash"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={8} className="text-center py-4 text-secondary">
+                    Không có đề thi nào
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
@@ -532,17 +652,14 @@ const ExamManagement = () => {
         {/* Pagination */}
         <div className="d-flex justify-content-between align-items-center mt-4">
           <div className="text-secondary small">
-            Hiển thị{" "}
-            {filteredExams.length === 0
-              ? 0
-              : startIndex + 1}
-            -
-            {Math.min(startIndex + 10, filteredExams.length)}{" "}
-            trong tổng {filteredExams.length} đề thi
+            Hiển thị {filteredExams.length === 0 ? 0 : startIndex + 1}-
+            {Math.min(startIndex + 10, filteredExams.length)} trong tổng{" "}
+            {filteredExams.length} đề thi
           </div>
 
           <nav>
             <ul className="pagination mb-0">
+              {/* Previous */}
               <li className="page-item">
                 <button
                   type="button"
@@ -554,27 +671,30 @@ const ExamManagement = () => {
                 </button>
               </li>
 
-              {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
-                <li
-                  key={page}
-                  className={`page-item ${
-                    safePage === page ? "active" : ""
-                  }`}
-                >
-                  <button
-                    type="button"
-                    className="page-link"
-                    onClick={() => setCurrentPage(page)}
+              {/* Pages */}
+              {Array.from({ length: totalPages }, (_, index) => index + 1).map(
+                (page) => (
+                  <li
+                    key={page}
+                    className={`page-item ${safePage === page ? "active" : ""}`}
                   >
-                    {page}
-                  </button>
-                </li>
-              ))}
+                    <button
+                      type="button"
+                      className="page-link"
+                      onClick={() => setCurrentPage(page)}
+                    >
+                      {page}
+                    </button>
+                  </li>
+                ),
+              )}
 
+              {/* Next */}
               <li className="page-item">
                 <button
                   type="button"
                   className="page-link"
+                  disabled={safePage === totalPages}
                   onClick={() =>
                     setCurrentPage(Math.min(totalPages, safePage + 1))
                   }
@@ -587,21 +707,26 @@ const ExamManagement = () => {
         </div>
       </div>
 
+      {/* Create Modal */}
       <CreateExamModal
         show={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onCreate={handleCreateExam}
         questions={questionBank}
+        examGroups={examGroups}
       />
 
+      {/* Edit Modal */}
       <EditExamModal
         show={showEditModal}
         exam={selectedExam}
         questions={questionBank}
         onClose={handleCloseEdit}
         onUpdate={handleUpdateExam}
+        examGroups={examGroups}
       />
 
+      {/* Delete Modal */}
       <DeleteExamModal
         show={showDeleteModal}
         onClose={handleCloseDelete}
@@ -609,6 +734,7 @@ const ExamManagement = () => {
         exam={selectedExam}
       />
 
+      {/* View Modal */}
       <ViewExams
         show={showViewModal}
         onClose={handleCloseView}
@@ -616,6 +742,7 @@ const ExamManagement = () => {
         questions={questionBank}
       />
 
+      {/* Confirm Modal */}
       <ConfirmModal
         show={showConfirmModal}
         onClose={handleCloseConfirm}

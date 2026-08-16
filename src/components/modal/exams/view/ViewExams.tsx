@@ -1,6 +1,6 @@
 "use client";
 
-import type { EditExam, ExamQuestion } from "../examTypes";
+import type { EditExam, ExamQuestion } from "@/types/exam";
 
 interface ViewExamsProps {
   show: boolean;

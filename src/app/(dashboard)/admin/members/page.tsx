@@ -188,35 +188,44 @@ const MembersPage = () => {
     setShowToggleConfirm(true);
   };
 
-  const handleConfirmToggle = () => {
+  const handleConfirmToggle = async () => {
     if (!pendingToggleMember) {
       return;
     }
 
     const member = pendingToggleMember;
-
     const newStatus = member.status === "Mở" ? "Khóa" : "Mở";
 
-    setMembers((prev) =>
-      prev.map((item) =>
-        item.id === member.id
-          ? {
-              ...item,
-              status: newStatus,
-              updatedAt: new Date().toISOString(),
-            }
-          : item,
-      ),
-    );
+    try {
+      // Gọi API cập nhật trạng thái vào db.json
+      await updateUserService(member.id, { status: newStatus });
 
-    toast.success(
-      newStatus === "Mở"
-        ? `Đã mở khóa tài khoản ${member.fullName}!`
-        : `Đã khóa tài khoản ${member.fullName}!`,
-    );
+      // Chỉ cập nhật local state khi API thành công
+      setMembers((prev) =>
+        prev.map((item) =>
+          item.id === member.id
+            ? {
+                ...item,
+                status: newStatus,
+                updatedAt: new Date().toISOString(),
+              }
+            : item,
+        ),
+      );
 
-    setShowToggleConfirm(false);
-    setPendingToggleMember(null);
+      toast.success(
+        newStatus === "Mở"
+          ? `Đã mở khóa tài khoản ${member.fullName}!`
+          : `Đã khóa tài khoản ${member.fullName}!`,
+      );
+
+      setShowToggleConfirm(false);
+      setPendingToggleMember(null);
+    } catch (error) {
+      console.error("Lỗi khi cập nhật trạng thái:", error);
+      toast.error("Không thể cập nhật trạng thái tài khoản!");
+      // Giữ modal mở để người dùng thử lại
+    }
   };
 
   // =========================

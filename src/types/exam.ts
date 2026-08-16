@@ -6,6 +6,7 @@ export interface ExamGroup {
 export interface Exam {
   id: string;
   categoryId: string;
+  examGroupId?: string; // Khóa ngoại bổ sung cho ExamGroup
   title: string;
   duration: number;
   totalQuestions: number;

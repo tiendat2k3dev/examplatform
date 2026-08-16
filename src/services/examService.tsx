@@ -1,67 +1,52 @@
+// src/services/examService.ts
+import axios from "axios";
 import { Exam } from "@/types/exam";
-import api from "../lib/apiClient.js";
+
+const API_URL = "http://localhost:4000";
 
 export interface PaginatedExamsResponse {
   data: Exam[];
   totalCount: number;
 }
 
-// 1. Lấy danh sách bài thi CÓ PHÂN TRANG
 export const getPaginatedExamsService = async (
   page: number = 1,
   limit: number = 6,
-  categoryId?: string,
+  groupId?: string
 ): Promise<PaginatedExamsResponse> => {
   try {
-    const categoryParam = categoryId ? `&categoryId=${categoryId}` : "";
+    const response = await axios.get<Exam[]>(`${API_URL}/exams`);
+    let allExams = Array.isArray(response.data)
+      ? response.data
+      : (response.data as any)?.data || [];
 
-    const response = await api.get(
-      `/exams?_page=${page}&_per_page=${limit}${categoryParam}`,
-    );
-
-    const resData = response.data;
-
-    // json-server v1.0+
-    // {
-    //   data: [...],
-    //   items: X
-    // }
-    if (resData && Array.isArray(resData.data)) {
-      return {
-        data: resData.data,
-        totalCount: resData.items ?? resData.data.length,
-      };
+    // Lọc theo examGroupId hoặc categoryId
+    if (groupId) {
+      allExams = allExams.filter(
+        (e) => e.examGroupId === groupId || e.categoryId === groupId
+      );
     }
 
-    // json-server v0.17
-    // trả về mảng [...]
-    if (Array.isArray(resData)) {
-      const totalHeader = response.headers["x-total-count"];
-
-      return {
-        data: resData,
-        totalCount: totalHeader ? parseInt(totalHeader, 10) : resData.length,
-      };
-    }
+    const totalCount = allExams.length;
+    const startIndex = (page - 1) * limit;
+    const paginatedData = allExams.slice(startIndex, startIndex + limit);
 
     return {
-      data: [],
-      totalCount: 0,
+      data: paginatedData,
+      totalCount,
     };
   } catch (error) {
-    console.error("Lỗi khi tải danh sách bài thi phân trang:", error);
+    console.error("Lỗi khi tải danh sách bài thi:", error);
     throw error;
   }
 };
 
-// 2. Lấy tất cả bài thi
 export const getExamsService = async (): Promise<Exam[]> => {
   try {
-    const response = await api.get<Exam[]>("/exams");
-
+    const response = await axios.get<Exam[]>(`${API_URL}/exams`);
     return Array.isArray(response.data) ? response.data : [];
   } catch (error) {
-    console.error("Lỗi khi tải danh sách bài thi:", error);
+    console.error("Lỗi khi tải toàn bộ bài thi:", error);
     throw error;
   }
 };

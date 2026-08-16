@@ -1,0 +1,49 @@
+// src/components/ExamGroup/ExamHeader.tsx
+import React from "react";
+import Link from "next/link";
+import { ExamGroup } from "@/types/examGroup";
+import styles from "@/app/exam-group/ExamGroup.module.css";
+
+interface ExamHeaderProps {
+  examGroup?: ExamGroup;
+  totalExams: number;
+}
+
+export const ExamHeader = ({ examGroup, totalExams }: ExamHeaderProps) => {
+  return (
+    <>
+      <div className="mb-4">
+        <Link
+          href="/exam-group"
+          className="btn btn-outline-secondary btn-sm fw-bold rounded-pill px-3 shadow-sm"
+        >
+          <i className="bi bi-arrow-left me-1"></i> Quay lại Nhóm Đề Thi
+        </Link>
+      </div>
+
+      <div className="bg-white p-4 p-md-5 rounded-4 shadow-sm border mb-5">
+        <div className="d-flex align-items-center gap-3 mb-3">
+          <div
+            className={`p-3 rounded-3 bg-${
+              examGroup?.color || "primary"
+            } bg-opacity-10 text-${examGroup?.color || "primary"}`}
+          >
+            <i className={`bi ${examGroup?.icon || "bi-journal-text"} fs-1`}></i>
+          </div>
+          <div>
+            <h2 className={`fw-bold m-0 ${styles.titleGradient}`}>
+              {examGroup?.name || "Danh Sách Đề Thi"}
+            </h2>
+            <span className="badge bg-secondary bg-opacity-10 text-secondary border px-3 py-1 rounded-pill mt-2 fw-semibold">
+              Tổng số: {totalExams} đề thi
+            </span>
+          </div>
+        </div>
+        <p className="text-secondary m-0 fs-6">
+          {examGroup?.description ||
+            "Thử sức với các đề thi trắc nghiệm được tổng hợp chuẩn hóa kiến thức."}
+        </p>
+      </div>
+    </>
+  );
+};

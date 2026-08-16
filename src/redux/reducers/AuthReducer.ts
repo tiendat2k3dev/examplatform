@@ -7,6 +7,7 @@ import {
   User,
   AuthState,
   LoginPayload,
+  RegisterPayload,
   UpdateUserPayload,
   ChangePasswordPayload,
 } from "@/types/user";
@@ -124,13 +125,7 @@ export default authReducer.reducer;
 // ===============================
 
 export const registerApiAsync =
-  (
-    userData: Omit<
-      User,
-      "id" | "role" | "avatarUrl" | "createdAt" | "updatedAt"
-    >,
-    onSuccess?: () => void,
-  ) =>
+  (userData: RegisterPayload, onSuccess?: () => void) =>
   async (dispatch: AppDispatch) => {
     try {
       const data = await registerService(userData);

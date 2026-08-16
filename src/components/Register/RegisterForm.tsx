@@ -1,6 +1,8 @@
+// src/components/Auth/RegisterForm.tsx
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useFormik } from "formik";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
@@ -11,6 +13,10 @@ import styles from "./RegisterForm.module.css";
 const RegisterForm = () => {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
+
+  // State quản lý ẩn / hiện cho mật khẩu và xác nhận mật khẩu
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const formik = useFormik({
     initialValues: {
@@ -29,9 +35,8 @@ const RegisterForm = () => {
 
       dispatch(
         registerApiAsync(userData, () => {
-          // Xóa alert(), Toastify đã được tự động bắn từ Redux Thunk
           router.push("/login");
-        }),
+        })
       );
     },
   });
@@ -72,7 +77,11 @@ const RegisterForm = () => {
                       Tên đăng nhập <span className="text-danger">*</span>
                     </label>
                     <div
-                      className={`input-group overflow-hidden rounded-3 border ${formik.errors.username ? "border-danger" : "border-secondary"} border-opacity-50 ${styles.inputGroupCustom}`}
+                      className={`input-group overflow-hidden rounded-3 border ${
+                        formik.errors.username
+                          ? "border-danger"
+                          : "border-secondary"
+                      } border-opacity-50 ${styles.inputGroupCustom}`}
                     >
                       <span className="input-group-text bg-transparent border-0 text-info py-1">
                         <i className="bi bi-person"></i>
@@ -102,18 +111,34 @@ const RegisterForm = () => {
                         Mật khẩu <span className="text-danger">*</span>
                       </label>
                       <div
-                        className={`input-group overflow-hidden rounded-3 border ${formik.errors.password ? "border-danger" : "border-secondary"} border-opacity-50 ${styles.inputGroupCustom}`}
+                        className={`input-group overflow-hidden rounded-3 border ${
+                          formik.errors.password
+                            ? "border-danger"
+                            : "border-secondary"
+                        } border-opacity-50 ${styles.inputGroupCustom}`}
                       >
                         <span className="input-group-text bg-transparent border-0 text-info py-1">
                           <i className="bi bi-lock"></i>
                         </span>
                         <input
-                          type="password"
+                          type={showPassword ? "text" : "password"}
                           className={`form-control bg-transparent border-0 text-white shadow-none fs-6 py-1 ${styles.inputCustom}`}
                           id="password"
                           placeholder="Mật khẩu..."
                           {...formik.getFieldProps("password")}
                         />
+                        <button
+                          type="button"
+                          className="btn bg-transparent border-0 text-info px-2 shadow-none"
+                          onClick={() => setShowPassword(!showPassword)}
+                          tabIndex={-1}
+                        >
+                          <i
+                            className={`bi ${
+                              showPassword ? "bi-eye-slash-fill" : "bi-eye-fill"
+                            }`}
+                          ></i>
+                        </button>
                       </div>
                       {formik.errors.password && (
                         <div className="text-danger small mt-1">
@@ -130,18 +155,38 @@ const RegisterForm = () => {
                         Xác nhận <span className="text-danger">*</span>
                       </label>
                       <div
-                        className={`input-group overflow-hidden rounded-3 border ${formik.errors.confirmPassword ? "border-danger" : "border-secondary"} border-opacity-50 ${styles.inputGroupCustom}`}
+                        className={`input-group overflow-hidden rounded-3 border ${
+                          formik.errors.confirmPassword
+                            ? "border-danger"
+                            : "border-secondary"
+                        } border-opacity-50 ${styles.inputGroupCustom}`}
                       >
                         <span className="input-group-text bg-transparent border-0 text-info py-1">
                           <i className="bi bi-shield-check"></i>
                         </span>
                         <input
-                          type="password"
+                          type={showConfirmPassword ? "text" : "password"}
                           className={`form-control bg-transparent border-0 text-white shadow-none fs-6 py-1 ${styles.inputCustom}`}
                           id="confirmPassword"
                           placeholder="Nhập lại M/K..."
                           {...formik.getFieldProps("confirmPassword")}
                         />
+                        <button
+                          type="button"
+                          className="btn bg-transparent border-0 text-info px-2 shadow-none"
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
+                          tabIndex={-1}
+                        >
+                          <i
+                            className={`bi ${
+                              showConfirmPassword
+                                ? "bi-eye-slash-fill"
+                                : "bi-eye-fill"
+                            }`}
+                          ></i>
+                        </button>
                       </div>
                       {formik.errors.confirmPassword && (
                         <div className="text-danger small mt-1">
@@ -161,7 +206,11 @@ const RegisterForm = () => {
                         Họ và tên <span className="text-danger">*</span>
                       </label>
                       <div
-                        className={`input-group overflow-hidden rounded-3 border ${formik.errors.fullName ? "border-danger" : "border-secondary"} border-opacity-50 ${styles.inputGroupCustom}`}
+                        className={`input-group overflow-hidden rounded-3 border ${
+                          formik.errors.fullName
+                            ? "border-danger"
+                            : "border-secondary"
+                        } border-opacity-50 ${styles.inputGroupCustom}`}
                       >
                         <span className="input-group-text bg-transparent border-0 text-info py-1">
                           <i className="bi bi-card-heading"></i>
@@ -189,7 +238,11 @@ const RegisterForm = () => {
                         Email <span className="text-danger">*</span>
                       </label>
                       <div
-                        className={`input-group overflow-hidden rounded-3 border ${formik.errors.email ? "border-danger" : "border-secondary"} border-opacity-50 ${styles.inputGroupCustom}`}
+                        className={`input-group overflow-hidden rounded-3 border ${
+                          formik.errors.email
+                            ? "border-danger"
+                            : "border-secondary"
+                        } border-opacity-50 ${styles.inputGroupCustom}`}
                       >
                         <span className="input-group-text bg-transparent border-0 text-info py-1">
                           <i className="bi bi-envelope"></i>
@@ -220,7 +273,11 @@ const RegisterForm = () => {
                         Số điện thoại <span className="text-danger">*</span>
                       </label>
                       <div
-                        className={`input-group overflow-hidden rounded-3 border ${formik.errors.phone ? "border-danger" : "border-secondary"} border-opacity-50 ${styles.inputGroupCustom}`}
+                        className={`input-group overflow-hidden rounded-3 border ${
+                          formik.errors.phone
+                            ? "border-danger"
+                            : "border-secondary"
+                        } border-opacity-50 ${styles.inputGroupCustom}`}
                       >
                         <span className="input-group-text bg-transparent border-0 text-info py-1">
                           <i className="bi bi-telephone"></i>
@@ -248,7 +305,11 @@ const RegisterForm = () => {
                         Địa chỉ <span className="text-danger">*</span>
                       </label>
                       <div
-                        className={`input-group overflow-hidden rounded-3 border ${formik.errors.address ? "border-danger" : "border-secondary"} border-opacity-50 ${styles.inputGroupCustom}`}
+                        className={`input-group overflow-hidden rounded-3 border ${
+                          formik.errors.address
+                            ? "border-danger"
+                            : "border-secondary"
+                        } border-opacity-50 ${styles.inputGroupCustom}`}
                       >
                         <span className="input-group-text bg-transparent border-0 text-info py-1">
                           <i className="bi bi-geo-alt"></i>

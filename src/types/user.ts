@@ -8,8 +8,9 @@ export interface User {
   email: string;
   phone: string;
   address: string;
-  role: string;
-  status: string;
+  role: "Admin" | "Member" | string;
+  status?: "Mở" | "Khóa" | string; // Optional để linh hoạt khi khởi tạo
+  avatarUrl?: string;
   createdAt: string;
   updatedAt: string | null;
 }
@@ -22,6 +23,12 @@ export interface LoginPayload {
   username: string;
   password: string;
 }
+
+// Payload dành riêng cho form Đăng Ký
+export type RegisterPayload = Omit<
+  User,
+  "id" | "role" | "avatarUrl" | "createdAt" | "updatedAt" | "status"
+>;
 
 export interface UpdateUserPayload {
   fullName?: string;

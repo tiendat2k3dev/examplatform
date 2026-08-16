@@ -15,12 +15,16 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
   }, []);
 
   useEffect(() => {
-    if (mounted && !currentUser) {
-      router.push("/login");
+    if (mounted) {
+      if (!currentUser) {
+        router.push("/login");
+      } else if (currentUser.role === "Admin") {
+        router.push("/admin");
+      }
     }
   }, [mounted, currentUser, router]);
 
-  if (!mounted || !currentUser) {
+  if (!mounted || !currentUser || currentUser.role === "Admin") {
     return (
       <div className="d-flex justify-content-center align-items-center min-vh-100">
         <div className="spinner-border text-primary" role="status">

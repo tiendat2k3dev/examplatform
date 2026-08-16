@@ -1,42 +1,40 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
-
-interface Member {
-  id: number;
-  username: string;
-  password: string;
-  fullName: string;
-  address: string;
-  phone: string;
-  email: string;
-  img: string;
-  role: string;
-  status: string;
-}
+import { User } from "@/types/user";
 
 interface CreateMembersModalProps {
   show: boolean;
   onClose: () => void;
-  onCreate: (member: Member) => void;
+  onCreate: (member: User) => Promise<void> | void;
 }
 
 const validationSchema = Yup.object({
   username: Yup.string().trim().required("Vui lòng nhập tên đăng nhập"),
+
   password: Yup.string().trim().required("Vui lòng nhập mật khẩu"),
+
   fullName: Yup.string().trim().required("Vui lòng nhập họ tên"),
+
   address: Yup.string().trim().required("Vui lòng nhập địa chỉ"),
+
   phone: Yup.string().trim().required("Vui lòng nhập số điện thoại"),
+
   email: Yup.string()
     .trim()
     .email("Email không hợp lệ")
     .required("Vui lòng nhập email"),
-  img: Yup.string().trim().required("Vui lòng chọn ảnh đại diện"),
-  role: Yup.string().oneOf(["Admin", "Member"]).required(),
-  status: Yup.string().oneOf(["Mở khóa", "Khóa"]).required(),
+
+  role: Yup.string()
+    .oneOf(["Admin", "Member"])
+    .required("Vui lòng chọn vai trò"),
+
+  status: Yup.string()
+    .oneOf(["Mở", "Khóa"])
+    .required("Vui lòng chọn trạng thái"),
 });
 
 const CreateMembersModal = ({
@@ -45,8 +43,6 @@ const CreateMembersModal = ({
   onCreate,
 }: CreateMembersModalProps) => {
   const [submitting, setSubmitting] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState<string>("");
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const formik = useFormik({
     initialValues: {
@@ -56,64 +52,97 @@ const CreateMembersModal = ({
       address: "",
       phone: "",
       email: "",
-      img: "",
       role: "Member",
-      status: "Mở khóa",
+      status: "Mở",
     },
+
     validationSchema,
+
     onSubmit: async (values, { resetForm }) => {
       try {
         setSubmitting(true);
 
-        await new Promise((resolve) => setTimeout(resolve, 300));
+        const newMember: User = {
+          id: crypto.randomUUID(),
+          username: values.username.trim(),
+          password: values.password.trim(),
+          fullName: values.fullName.trim(),
+          address: values.address.trim(),
+          phone: values.phone.trim(),
+          email: values.email.trim(),
+          role: values.role,
+          status: values.status,
+          createdAt: new Date().toISOString(),
+          updatedAt: null,
+        };
 
-        onCreate({
-          id: Date.now(),
-          ...values,
-        });
+        // Gọi API / hàm tạo thành viên
+        await onCreate(newMember);
+
+        // ==============================
+        // THÀNH CÔNG
+        // ==============================
 
         toast.success("Thêm người dùng thành công!");
+
+        // Reset form
         resetForm();
-        setPreviewUrl("");
+
+        // Đóng modal
         onClose();
       } catch (error) {
-        console.error(error);
-        toast.error("Không thể thêm người dùng!");
+        console.error("Lỗi khi thêm người dùng:", error);
+
+        // ==============================
+        // XỬ LÝ LỖI - CHỈ HIỂN THỊ 1 THÔNG BÁO
+        // ==============================
+
+        if (error instanceof Error) {
+          const errorMessage = error.message;
+
+          if (errorMessage.includes("USERNAME_EXISTS")) {
+            formik.setFieldError("username", "Tên đăng nhập đã tồn tại!");
+          }
+
+          if (errorMessage.includes("EMAIL_EXISTS")) {
+            formik.setFieldError("email", "Email đã tồn tại!");
+          }
+
+          if (errorMessage.includes("PHONE_EXISTS")) {
+            formik.setFieldError("phone", "Số điện thoại đã tồn tại!");
+          }
+
+          toast.error("Không thể thêm người dùng!");
+        } else {
+          toast.error("Không thể thêm người dùng!");
+        }
+
+        /*
+         * QUAN TRỌNG:
+         *
+         * Không resetForm()
+         * Không onClose()
+         *
+         * Modal vẫn mở để người dùng sửa dữ liệu.
+         */
       } finally {
         setSubmitting(false);
       }
     },
   });
 
+  // ==============================
+  // RESET FORM KHI MODAL ĐÓNG
+  // ==============================
+
   useEffect(() => {
     if (!show) {
       formik.resetForm();
-      setPreviewUrl("");
+      formik.setStatus(undefined);
     }
   }, [show]);
 
-  useEffect(() => {
-    return () => {
-      if (previewUrl && previewUrl.startsWith("blob:")) {
-        URL.revokeObjectURL(previewUrl);
-      }
-    };
-  }, [previewUrl]);
-
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-
-    if (file) {
-      const objectUrl = URL.createObjectURL(file);
-      setPreviewUrl(objectUrl);
-      formik.setFieldValue("img", objectUrl);
-    }
-  };
-
-  const handleImageClick = () => {
-    fileInputRef.current?.click();
-  };
-
+  // Không hiển thị modal
   if (!show) {
     return null;
   }
@@ -129,11 +158,22 @@ const CreateMembersModal = ({
     >
       <div
         className="modal-dialog modal-lg modal-dialog-centered"
-        style={{ maxWidth: "800px" }}
+        style={{
+          maxWidth: "800px",
+        }}
       >
         <div className="modal-content border-0 shadow">
+          {/* =====================================
+              HEADER
+          ====================================== */}
+
           <div className="modal-header">
-            <h5 className="modal-title fw-bold" style={{ color: "#173b69" }}>
+            <h5
+              className="modal-title fw-bold"
+              style={{
+                color: "#173b69",
+              }}
+            >
               Thêm người dùng
             </h5>
 
@@ -145,9 +185,17 @@ const CreateMembersModal = ({
             />
           </div>
 
+          {/* =====================================
+              FORM
+          ====================================== */}
+
           <form onSubmit={formik.handleSubmit}>
             <div className="modal-body">
               <div className="row g-3">
+                {/* =================================
+                    USERNAME
+                ================================== */}
+
                 <div className="col-md-6">
                   <label className="form-label small fw-semibold">
                     Tên đăng nhập <span className="text-danger">*</span>
@@ -174,13 +222,17 @@ const CreateMembersModal = ({
                   )}
                 </div>
 
+                {/* =================================
+                    PASSWORD
+                ================================== */}
+
                 <div className="col-md-6">
                   <label className="form-label small fw-semibold">
                     Mật khẩu <span className="text-danger">*</span>
                   </label>
 
                   <input
-                    type="text"
+                    type="password"
                     name="password"
                     className={`form-control form-control-sm ${
                       formik.touched.password && formik.errors.password
@@ -199,6 +251,10 @@ const CreateMembersModal = ({
                     </div>
                   )}
                 </div>
+
+                {/* =================================
+                    FULL NAME
+                ================================== */}
 
                 <div className="col-md-6">
                   <label className="form-label small fw-semibold">
@@ -226,13 +282,17 @@ const CreateMembersModal = ({
                   )}
                 </div>
 
+                {/* =================================
+                    EMAIL
+                ================================== */}
+
                 <div className="col-md-6">
                   <label className="form-label small fw-semibold">
                     Email <span className="text-danger">*</span>
                   </label>
 
                   <input
-                    type="text"
+                    type="email"
                     name="email"
                     className={`form-control form-control-sm ${
                       formik.touched.email && formik.errors.email
@@ -251,6 +311,10 @@ const CreateMembersModal = ({
                     </div>
                   )}
                 </div>
+
+                {/* =================================
+                    PHONE
+                ================================== */}
 
                 <div className="col-md-6">
                   <label className="form-label small fw-semibold">
@@ -278,6 +342,10 @@ const CreateMembersModal = ({
                   )}
                 </div>
 
+                {/* =================================
+                    ADDRESS
+                ================================== */}
+
                 <div className="col-md-6">
                   <label className="form-label small fw-semibold">
                     Địa chỉ <span className="text-danger">*</span>
@@ -304,71 +372,9 @@ const CreateMembersModal = ({
                   )}
                 </div>
 
-                <div className="col-md-6">
-                  <label className="form-label small fw-semibold">
-                    Ảnh đại diện <span className="text-danger">*</span>
-                  </label>
-
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    className="d-none"
-                    onChange={handleImageChange}
-                  />
-
-                  <div
-                    className="d-flex align-items-center gap-3"
-                    style={{ cursor: "pointer" }}
-                    onClick={handleImageClick}
-                  >
-                    <div
-                      className="border rounded d-flex align-items-center justify-content-center bg-light"
-                      style={{
-                        width: "64px",
-                        height: "64px",
-                        overflow: "hidden",
-                        flexShrink: 0,
-                      }}
-                    >
-                      {previewUrl ? (
-                        <img
-                          src={previewUrl}
-                          alt="Preview"
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                          }}
-                        />
-                      ) : (
-                        <i
-                          className="bi bi-person text-muted"
-                          style={{ fontSize: "32px" }}
-                        ></i>
-                      )}
-                    </div>
-
-                    <div>
-                      <div className="small fw-semibold text-primary">
-                        Chọn ảnh đại diện
-                      </div>
-                      <div className="small text-muted">
-                        {previewUrl
-                          ? previewUrl.startsWith("blob:")
-                            ? "Đã chọn ảnh mới"
-                            : "Đang dùng ảnh hiện tại"
-                          : "Nhấn để chọn ảnh từ máy tính"}
-                      </div>
-                    </div>
-                  </div>
-
-                  {formik.touched.img && formik.errors.img && (
-                    <div className="text-danger small mt-1">
-                      {formik.errors.img}
-                    </div>
-                  )}
-                </div>
+                {/* =================================
+                    ROLE
+                ================================== */}
 
                 <div className="col-md-3">
                   <label className="form-label small fw-semibold">
@@ -391,11 +397,13 @@ const CreateMembersModal = ({
                   </select>
 
                   {formik.touched.role && formik.errors.role && (
-                    <div className="invalid-feedback">
-                      {formik.errors.role}
-                    </div>
+                    <div className="invalid-feedback">{formik.errors.role}</div>
                   )}
                 </div>
+
+                {/* =================================
+                    STATUS
+                ================================== */}
 
                 <div className="col-md-3">
                   <label className="form-label small fw-semibold">
@@ -413,7 +421,7 @@ const CreateMembersModal = ({
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                   >
-                    <option value="Mở khóa">Mở khóa</option>
+                    <option value="Mở">Mở</option>
                     <option value="Khóa">Khóa</option>
                   </select>
 
@@ -425,6 +433,10 @@ const CreateMembersModal = ({
                 </div>
               </div>
             </div>
+
+            {/* =====================================
+                FOOTER
+            ====================================== */}
 
             <div className="modal-footer">
               <button

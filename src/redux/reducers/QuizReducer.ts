@@ -23,6 +23,42 @@ const initialState: QuizState = {
   loading: false,
 };
 
+// 1. Thuật toán Fisher-Yates xáo trộn mảng tổng quát
+const shuffleArray = <T>(array: T[]): T[] => {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+};
+
+// 2. Xáo trộn thứ tự câu hỏi và tái định vị index đáp án đúng (correctAnswer)
+const randomizeQuestions = (rawQuestions: Question[]): Question[] => {
+  // Xáo trộn thứ tự câu hỏi
+  const shuffledQuestions = shuffleArray(rawQuestions);
+
+  return shuffledQuestions.map((q) => {
+    // Lưu lại nội dung đáp án đúng ban đầu
+    const originalCorrectText = q.options[q.correctAnswer];
+
+    // Xáo trộn các lựa chọn A, B, C, D
+    const shuffledOptions = shuffleArray(q.options);
+
+    // Cập nhật lại chỉ số correctAnswer theo vị trí mới
+    const newCorrectAnswerIndex = shuffledOptions.findIndex(
+      (opt) => opt === originalCorrectText
+    );
+
+    return {
+      ...q,
+      options: shuffledOptions,
+      correctAnswer:
+        newCorrectAnswerIndex !== -1 ? newCorrectAnswerIndex : q.correctAnswer,
+    };
+  });
+};
+
 const quizReducer = createSlice({
   name: "quizReducer",
   initialState,
@@ -30,12 +66,12 @@ const quizReducer = createSlice({
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
     },
-    // Khởi tạo bài thi với danh sách câu hỏi và thời gian quy đổi ra giây
+    // Khởi tạo bài thi với bộ câu hỏi đã xáo trộn
     initQuizData: (
       state,
       action: PayloadAction<{ questions: Question[]; durationMinutes: number }>
     ) => {
-      state.questions = action.payload.questions;
+      state.questions = randomizeQuestions(action.payload.questions);
       state.currentQuestionIndex = 0;
       state.userAnswers = {};
       state.timeLeft = action.payload.durationMinutes * 60;

@@ -19,6 +19,7 @@ import { toast } from "react-toastify";
 import { QuizQuestionBox } from "@/components/Quiz/QuizQuestionBox";
 import { QuizSidebar } from "@/components/Quiz/QuizSidebar";
 import { QuizResultModal } from "@/components/Quiz/QuizResultModal";
+import { ConfirmSubmitModal } from "@/components/Quiz/ConfirmSubmitModal";
 
 const ExamPage = () => {
   const params = useParams();
@@ -43,6 +44,7 @@ const ExamPage = () => {
   const [publicUserId] = useState(() => generatePublicUserId());
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showResultModal, setShowResultModal] = useState(false);
   const [quizResult, setQuizResult] = useState<{
     score: number;
@@ -67,84 +69,65 @@ const ExamPage = () => {
     };
   }, [dispatch, examId, currentExam]);
 
-  // 2. Logic nộp bài thi cho cả Member lẫn Public
-  const handleSubmitExam = useCallback(
-    (isAutoSubmit = false) => {
-      if (isSubmitting || questions.length === 0) return;
+  // 2. Logic nộp bài thi
+  const executeSubmit = useCallback(() => {
+    if (isSubmitting || questions.length === 0) return;
+    setIsSubmitting(true);
+    setShowConfirmModal(false);
 
-      // Xác nhận nếu bấm nộp thủ công
-      if (!isAutoSubmit) {
-        const answered = Object.keys(userAnswers).length;
-        const total = questions.length;
-        const confirmMsg =
-          answered < total
-            ? `Bạn mới hoàn thành ${answered}/${total} câu hỏi. Bạn có chắc chắn muốn nộp bài sớm không?`
-            : "Bạn có chắc chắn muốn nộp bài thi ngay bây giờ không?";
-
-        if (!window.confirm(confirmMsg)) {
-          return;
-        }
+    // Chấm điểm
+    let correctCount = 0;
+    questions.forEach((q) => {
+      if (userAnswers[q.id] === q.correctAnswer) {
+        correctCount += 1;
       }
+    });
 
-      setIsSubmitting(true);
+    const total = questions.length;
+    const score = total > 0 ? Math.round((correctCount / total) * 100) : 0;
+    const totalDuration = (currentExam?.duration || 30) * 60;
+    const timeTaken = Math.max(1, totalDuration - timeLeft);
 
-      // Chấm điểm bài thi
-      let correctCount = 0;
-      questions.forEach((q) => {
-        if (userAnswers[q.id] === q.correctAnswer) {
-          correctCount += 1;
-        }
-      });
+    const finalUserId = currentUser ? String(currentUser.id) : publicUserId;
+    const finalUserName = currentUser ? currentUser.fullName : "ANONYMOUS";
 
-      const total = questions.length;
-      const score = total > 0 ? Math.round((correctCount / total) * 100) : 0;
-      const totalDuration = (currentExam?.duration || 30) * 60;
-      const timeTaken = Math.max(1, totalDuration - timeLeft);
-
-      // Gán định danh cho Public hoặc Member
-      const finalUserId = currentUser ? String(currentUser.id) : publicUserId;
-      const finalUserName = currentUser ? currentUser.fullName : "ANONYMOUS";
-
-      const payload = {
-        userId: finalUserId,
-        userName: finalUserName,
-        examId,
-        examTitle: currentExam?.title || "Bài Thi Chuẩn",
-        score,
-        totalQuestions: total,
-        correctAnswersCount: correctCount,
-        timeTaken,
-        userAnswers,
-      };
-
-      const openResultModal = () => {
-        setQuizResult({
-          score,
-          correctCount,
-          total,
-          timeTaken,
-        });
-        setShowResultModal(true);
-        setIsSubmitting(false);
-      };
-
-      // Gọi Redux Thunk lưu kết quả vào db.json và mở Modal
-      dispatch(submitExamApiAsync(payload, openResultModal));
-    },
-    [
-      isSubmitting,
-      questions,
-      userAnswers,
-      currentExam,
-      timeLeft,
-      currentUser,
-      publicUserId,
+    const payload = {
+      userId: finalUserId,
+      userName: finalUserName,
       examId,
-      dispatch,
-    ]
-  );
+      examTitle: currentExam?.title || "Bài Thi Chuẩn",
+      score,
+      totalQuestions: total,
+      correctAnswersCount: correctCount,
+      timeTaken,
+      userAnswers,
+    };
 
-  // 3. Đếm ngược thời gian
+    const openResult = () => {
+      setQuizResult({
+        score,
+        correctCount,
+        total,
+        timeTaken,
+      });
+      setShowResultModal(true);
+      setIsSubmitting(false);
+    };
+
+    dispatch(submitExamApiAsync(payload, openResult));
+  }, [
+    isSubmitting,
+    questions,
+    userAnswers,
+    currentExam,
+    timeLeft,
+    currentUser,
+    publicUserId,
+    examId,
+    dispatch,
+  ]);
+
+  // 3. Đếm ngược thời gian (Tự động nộp khi hết giờ)
   useEffect(() => {
     if (
       timeLeft <= 0 &&
@@ -153,7 +136,7 @@ const ExamPage = () => {
       !isSubmitting
     ) {
       toast.info("Đã hết giờ làm bài! Hệ thống tự động nộp bài.");
-      handleSubmitExam(true);
+      executeSubmit();
       return;
     }
 
@@ -169,7 +152,7 @@ const ExamPage = () => {
     questions.length,
     showResultModal,
     isSubmitting,
-    handleSubmitExam,
+    executeSubmit,
     dispatch,
   ]);
 
@@ -209,7 +192,7 @@ const ExamPage = () => {
       )}
 
       <div className="row g-4">
-        {/* Khung câu hỏi */}
+        {/* Cột Trái: Khung câu hỏi */}
         <div className="col-lg-8 col-xl-9">
           <QuizQuestionBox
             examTitle={currentExam?.title}
@@ -220,7 +203,7 @@ const ExamPage = () => {
             selectedOptionIndex={userAnswers[currentQ.id]}
             onSelectOption={(index) =>
               dispatch(
-                selectOption({ questionId: currentQ.id, optionIndex: index })
+                selectOption({ questionId: currentQ.id, optionIndex: index }),
               )
             }
             onPrev={() =>
@@ -232,7 +215,7 @@ const ExamPage = () => {
           />
         </div>
 
-        {/* Sidebar điều khiển */}
+        {/* Cột Phải: Timer & Palette */}
         <div className="col-lg-4 col-xl-3">
           <QuizSidebar
             timeLeft={timeLeft}
@@ -240,12 +223,21 @@ const ExamPage = () => {
             currentQuestionIndex={currentQuestionIndex}
             userAnswers={userAnswers}
             onJumpQuestion={(index) => dispatch(setCurrentQuestionIndex(index))}
-            onSubmitExam={() => handleSubmitExam(false)}
+            onSubmitExam={() => setShowConfirmModal(true)}
           />
         </div>
       </div>
 
-      {/* Modal kết quả */}
+      {/* Modal Xác Nhận Nộp Bài (Thay thế window.confirm) */}
+      <ConfirmSubmitModal
+        show={showConfirmModal}
+        answeredCount={Object.keys(userAnswers).length}
+        totalQuestions={questions.length}
+        onConfirm={executeSubmit}
+        onCancel={() => setShowConfirmModal(false)}
+      />
+
+      {/* Modal Kết Quả */}
       {showResultModal && quizResult && (
         <QuizResultModal
           score={quizResult.score}

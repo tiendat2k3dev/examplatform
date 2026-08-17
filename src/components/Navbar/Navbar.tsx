@@ -12,7 +12,6 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const router = useRouter();
 
-  // State kiểm tra xem component đã mount trên client chưa (tránh Hydration Mismatch)
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -70,20 +69,38 @@ const Navbar = () => {
             ) : currentUser ? (
               // HIỂN THỊ KHI ĐÃ ĐĂNG NHẬP (USER THƯỜNG)
               <div className="d-flex align-items-center gap-3">
-                <span className="fw-semibold text-dark small">
-                  {currentUser.role}:{" "}
-                  <span className="text-primary">
-                    {currentUser.fullName || currentUser.username}
-                  </span>
-                </span>
-
+                {/* Bấm vào Avatar + Tên để vào trang Profile */}
                 <Link
                   href="/user"
-                  className="btn btn-outline-primary btn-sm px-3 py-1.5 fw-semibold rounded-pill text-decoration-none d-flex align-items-center gap-1"
+                  className="d-flex align-items-center gap-2 text-decoration-none text-dark"
+                  title="Xem hồ sơ cá nhân"
                 >
-                  <i className="bi bi-person-circle"></i> Profile
+                  <div
+                    className={`rounded-circle border border-primary border-opacity-50 overflow-hidden d-flex align-items-center justify-content-center flex-shrink-0 ${styles.navAvatarBox}`}
+                  >
+                    {currentUser?.avatarUrl ? (
+                      <img
+                        src={currentUser.avatarUrl}
+                        alt="Avatar"
+                        className="w-100 h-100 object-fit-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src =
+                            "https://placehold.co/100x100/1e293b/white?text=Avatar";
+                        }}
+                      />
+                    ) : (
+                      <i className="bi bi-person-fill text-primary fs-5"></i>
+                    )}
+                  </div>
+                  <span className="fw-semibold small">
+                    {currentUser.role}:{" "}
+                    <span className="text-primary">
+                      {currentUser.fullName || currentUser.username}
+                    </span>
+                  </span>
                 </Link>
 
+                {/* Nút Đăng xuất */}
                 <button
                   onClick={handleLogout}
                   className="btn btn-outline-danger btn-sm px-3 py-1.5 fw-semibold rounded-pill d-flex align-items-center gap-1"

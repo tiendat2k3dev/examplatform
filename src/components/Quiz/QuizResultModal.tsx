@@ -10,6 +10,9 @@ interface QuizResultModalProps {
   timeTaken: number;
   examTitle?: string;
   examId: string;
+  isPublic?: boolean;
+  userId?: string;
+  userName?: string;
   onRetryExam?: () => void;
 }
 
@@ -20,6 +23,9 @@ export const QuizResultModal = ({
   timeTaken,
   examTitle,
   examId,
+  isPublic = false,
+  userId,
+  userName = "ANONYMOUS",
   onRetryExam,
 }: QuizResultModalProps) => {
   const router = useRouter();
@@ -73,10 +79,34 @@ export const QuizResultModal = ({
             <p className="text-light opacity-75 small m-0">
               Môn thi: {examTitle || "Bài Thi Trắc Nghiệm"} ({examId})
             </p>
+
+            {/* Thông tin thí sinh (Public hoặc User) */}
+            <div className="mt-2 pt-2 border-top border-secondary border-opacity-25 d-flex justify-content-center gap-3 text-light opacity-75 small">
+              <span>
+                <i className="bi bi-person-badge me-1 text-info"></i>
+                Thí sinh: <strong>{userName}</strong>
+              </span>
+              {userId && (
+                <span>
+                  <i className="bi bi-fingerprint me-1 text-info"></i>
+                  Mã ID: <code>{userId}</code>
+                </span>
+              )}
+            </div>
           </div>
 
           {/* Body Điểm số & Thống kê */}
           <div className="card-body p-4 p-md-5">
+            {/* Cảnh báo duy nhất 1 lần dành cho Public */}
+            {isPublic && (
+              <div className="alert alert-warning border border-warning py-2 px-3 mb-4 rounded-3 text-dark small d-flex align-items-center gap-2">
+                <i className="bi bi-exclamation-triangle-fill fs-5 text-warning"></i>
+                <div>
+                  <strong>Lưu ý chế độ Public:</strong> Kết quả này chỉ hiển thị <strong>duy nhất 1 lần</strong> và không thể tra cứu lại trong Lịch Sử cá nhân sau khi đóng cửa sổ này.
+                </div>
+              </div>
+            )}
+
             {/* Khối hiển thị Điểm */}
             <div
               className={`text-center p-4 rounded-4 border mb-4 ${styles.scoreBox} ${
@@ -148,13 +178,23 @@ export const QuizResultModal = ({
 
             {/* Nút Thao Tác */}
             <div className="d-flex flex-column flex-sm-row gap-3 pt-2">
-              <button
-                type="button"
-                onClick={() => router.push("/history")}
-                className="btn btn-outline-info fw-bold py-2 px-4 rounded-3 flex-fill"
-              >
-                <i className="bi bi-eye me-1"></i> Xem Lịch Sử Bài Làm
-              </button>
+              {!isPublic ? (
+                <button
+                  type="button"
+                  onClick={() => router.push("/history")}
+                  className="btn btn-outline-info fw-bold py-2 px-4 rounded-3 flex-fill"
+                >
+                  <i className="bi bi-eye me-1"></i> Xem Lịch Sử Bài Làm
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => router.push("/exam-group")}
+                  className="btn btn-outline-secondary fw-bold py-2 px-4 rounded-3 flex-fill"
+                >
+                  <i className="bi bi-grid me-1"></i> Danh Sách Nhóm Đề
+                </button>
+              )}
 
               <button
                 type="button"

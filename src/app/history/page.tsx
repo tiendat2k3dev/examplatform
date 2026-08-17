@@ -142,7 +142,7 @@ const HistoryPage = () => {
 
           <div className="d-flex gap-2">
             <Link
-              href="/exam-category"
+              href="/exam-group"
               className="btn btn-outline-primary fw-bold rounded-pill px-4"
             >
               <i className="bi bi-plus-circle me-1"></i> Thi Bài Mới

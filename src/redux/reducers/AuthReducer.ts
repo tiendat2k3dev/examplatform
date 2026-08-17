@@ -17,6 +17,7 @@ import {
   loginService,
   updateUserService,
   changePasswordService,
+  updateAvatarService,
 } from "@/services/authService";
 
 import { AppDispatch } from "../store";
@@ -108,6 +109,16 @@ const authReducer = createSlice({
 
       toast.info("Đã đăng xuất tài khoản!");
     },
+
+    // Reducer updateAvatar
+    updateAvatar: (state, action: PayloadAction<string>) => {
+      if (state.currentUser) {
+        state.currentUser.avatarUrl = action.payload;
+        if (typeof window !== "undefined") {
+          localStorage.setItem("user", JSON.stringify(state.currentUser));
+        }
+      }
+    },
   },
 });
 
@@ -115,8 +126,14 @@ const authReducer = createSlice({
 // Export Actions
 // ===============================
 
-export const { initCurrentUser, register, login, updateUser, logout } =
-  authReducer.actions;
+export const {
+  initCurrentUser,
+  register,
+  login,
+  updateUser,
+  logout,
+  updateAvatar,
+} = authReducer.actions;
 
 export default authReducer.reducer;
 
@@ -242,6 +259,33 @@ export const changePasswordApiAsync =
 
       toast.error(errorMsg);
 
+      throw error;
+    }
+  };
+
+// 4. Thunk Async Action gọi API
+export const updateAvatarApiAsync =
+  (userId: string | number, avatarUrl: string, onSuccess?: () => void) =>
+  async (dispatch: AppDispatch) => {
+    try {
+      const updatedUser = await updateAvatarService(userId, avatarUrl);
+
+      const { password: _password, ...userWithoutPassword } = updatedUser;
+
+      if (typeof window !== "undefined") {
+        localStorage.setItem("user", JSON.stringify(userWithoutPassword));
+      }
+
+      dispatch(updateAvatar(avatarUrl));
+      toast.success("Cập nhật ảnh đại diện thành công!");
+
+      if (onSuccess) {
+        onSuccess();
+      }
+    } catch (error: unknown) {
+      const errorMsg = getErrorMessage(error, "Cập nhật avatar thất bại!");
+      console.error("Update avatar error:", error);
+      toast.error(errorMsg);
       throw error;
     }
   };

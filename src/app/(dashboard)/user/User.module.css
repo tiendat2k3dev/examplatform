@@ -1,40 +1,55 @@
 /* src/app/(dashboard)/user/User.module.css */
+
 .mainContainer {
   min-height: calc(100vh - 140px);
+  width: 100%;
 }
 
+/* ==========================================
+   1. HIỆU ỨNG PHÁT SÁNG NỀN (GLOW CIRCLES)
+   ========================================== */
 .glowCircle1 {
-  width: 450px;
-  height: 400px;
-  background: radial-gradient(circle, rgba(13, 110, 253, 0.3) 0%, rgba(0, 0, 0, 0) 70%);
+  width: 550px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(13, 110, 253, 0.25) 0%, rgba(0, 0, 0, 0) 70%);
   top: -50px;
-  left: 10%;
+  left: 5%;
   pointer-events: none;
 }
 
 .glowCircle2 {
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(217, 70, 239, 0.25) 0%, rgba(0, 0, 0, 0) 70%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(217, 70, 239, 0.2) 0%, rgba(0, 0, 0, 0) 70%);
   bottom: -100px;
-  right: 10%;
+  right: 5%;
   pointer-events: none;
 }
 
+/* ==========================================
+   2. CARD PROFILE CONTAINER
+   ========================================== */
 .profileCard {
   background: linear-gradient(145deg, #0f172a 0%, #1e1b4b 100%);
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
+  width: 100%;
 }
 
 .profileHeader {
-  background-color: rgba(13, 110, 253, 0.1);
+  background-color: rgba(13, 110, 253, 0.08);
 }
 
 .avatarBox {
-  width: 100px;
-  height: 110px;
+  width: 120px;
+  height: 120px;
   background: rgba(13, 202, 240, 0.15);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.avatarBox:hover {
+  transform: scale(1.03);
+  border-color: #0dcaf0 !important;
 }
 
 .titleGradient {
@@ -45,9 +60,50 @@
 
 .infoBox {
   background-color: rgba(15, 23, 42, 0.6);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.infoBox:hover {
+  transform: translateY(-2px);
+  border-color: rgba(13, 202, 240, 0.4) !important;
 }
 
 .updateBtn {
   background: linear-gradient(135deg, #0d6efd 0%, #8b5cf6 100%);
   border: none;
+}
+
+/* ==========================================
+   3. FIX PLACEHOLDER & INPUT CHO TOÀN BỘ MODAL
+   ========================================== */
+:global(.modal input.form-control) {
+  color: #ffffff !important;
+  background-color: rgba(15, 23, 42, 0.85) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+:global(.modal input.form-control::placeholder) {
+  color: rgba(255, 255, 255, 0.55) !important;
+  opacity: 1 !important;
+}
+
+:global(.modal input.form-control:focus) {
+  background-color: rgba(15, 23, 42, 0.95) !important;
+  border-color: #0dcaf0 !important;
+  box-shadow: 0 0 0 0.25rem rgba(13, 202, 240, 0.25) !important;
+  color: #ffffff !important;
+}
+
+:global(.modal input.form-control:disabled) {
+  background-color: rgba(30, 41, 59, 0.5) !important;
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* ==========================================
+   4. RESPONSIVE BORDER
+   ========================================== */
+@media (min-width: 992px) {
+  .profileHeader {
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+  }
 }

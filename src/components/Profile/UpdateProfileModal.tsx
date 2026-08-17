@@ -1,23 +1,22 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState, AppDispatch } from "@/redux/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/redux/store";
 import { updateUserApiAsync } from "@/redux/reducers/AuthReducer";
-import styles from "./UpdateProfileModal.module.css";
+import { toast } from "react-toastify";
 
 interface UpdateProfileModalProps {
   show: boolean;
   onClose: () => void;
 }
 
-const UpdateProfileModal: React.FC<UpdateProfileModalProps> = ({
+export default function UpdateProfileModal({
   show,
   onClose,
-}) => {
+}: UpdateProfileModalProps) {
   const dispatch = useDispatch<AppDispatch>();
   const { currentUser } = useSelector((state: RootState) => state.authReducer);
 
-  // State form lưu thông tin cập nhật
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -25,7 +24,8 @@ const UpdateProfileModal: React.FC<UpdateProfileModalProps> = ({
     address: "",
   });
 
-  // Đồng bộ dữ liệu của currentUser vào form khi mở modal hoặc khi currentUser thay đổi
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     if (currentUser) {
       setFormData({
@@ -35,226 +35,166 @@ const UpdateProfileModal: React.FC<UpdateProfileModalProps> = ({
         address: currentUser.address || "",
       });
     }
-  }, [currentUser]);
+  }, [currentUser, show]);
 
   if (!show) return null;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!currentUser) return;
 
-    dispatch(
-      updateUserApiAsync(currentUser.id, formData, () => {
-        onClose(); // Đóng modal sau khi cập nhật thành công
-      }),
-    );
+    if (!formData.fullName.trim()) {
+      toast.warning("Họ và tên không được để trống!");
+      return;
+    }
+
+    if (!currentUser?.id) return;
+
+    try {
+      setLoading(true);
+      await dispatch(
+        updateUserApiAsync(currentUser.id, formData, () => {
+          toast.success("Cập nhật thông tin hồ sơ thành công!");
+          onClose();
+        })
+      );
+    } catch {
+      // Error handled by redux thunk
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className={styles.modalOverlay}>
-      {/* Vòng tròn phát sáng trang trí nền */}
-      <div
-        className={`position-absolute rounded-circle opacity-30 ${styles.glowCircle}`}
-      ></div>
+    <div
+      className="modal fade show d-block"
+      tabIndex={-1}
+      style={{ backgroundColor: "rgba(0, 0, 0, 0.75)", zIndex: 1055 }}
+    >
+      <div className="modal-dialog modal-dialog-centered modal-lg">
+        <div
+          className="modal-content text-white rounded-4 border border-primary border-opacity-50 shadow-lg"
+          style={{
+            background: "linear-gradient(145deg, #0f172a 0%, #1e1b4b 100%)",
+            backdropFilter: "blur(15px)",
+          }}
+        >
+          <div className="modal-header border-secondary border-opacity-25 pb-2">
+            <h5 className="modal-title fw-bold text-primary d-flex align-items-center gap-2">
+              <i className="bi bi-pencil-square"></i> Cập Nhật Hồ Sơ Cá Nhân
+            </h5>
+            <button
+              type="button"
+              className="btn-close btn-close-white"
+              onClick={onClose}
+              disabled={loading}
+            ></button>
+          </div>
 
-      <div className="container position-relative z-1">
-        <div className="row justify-content-center">
-          <div className="col-12 col-md-10 col-lg-8">
-            <div
-              className={`modal-content border border-primary border-opacity-50 text-white rounded-4 overflow-hidden shadow-lg ${styles.modalContentCard}`}
-            >
-              {/* Modal Header */}
-              <div className="modal-header border-bottom border-secondary border-opacity-25 p-4">
-                <div className="d-flex align-items-center gap-3">
-                  <div
-                    className={`p-2 px-3 rounded-circle text-info border border-info border-opacity-50 ${styles.iconHeaderBox}`}
-                  >
-                    <i className="bi bi-person-gear fs-4"></i>
-                  </div>
-                  <div>
-                    <h5
-                      className={`modal-title fw-bold m-0 ${styles.titleGradient}`}
-                    >
-                      Cập Nhật Thông Tin Cá Nhân
-                    </h5>
-                    <small className="text-light opacity-75">
-                      Thay đổi thông tin chi tiết hồ sơ tài khoản
-                    </small>
-                  </div>
+          <form onSubmit={handleSubmit}>
+            <div className="modal-body p-4">
+              <div className="row g-3">
+                {/* 1. Họ và tên */}
+                <div className="col-md-6">
+                  <label className="form-label text-light opacity-75 small">
+                    Họ và tên <span className="text-danger">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="fullName"
+                    className="form-control bg-dark text-white border-secondary border-opacity-50"
+                    placeholder="Nhập họ và tên đầy đủ..."
+                    value={formData.fullName}
+                    onChange={handleChange}
+                    disabled={loading}
+                    required
+                  />
                 </div>
-                <button
-                  type="button"
-                  className="btn-close btn-close-white"
-                  aria-label="Close"
-                  onClick={onClose}
-                ></button>
-              </div>
 
-              {/* Modal Body */}
-              <div className="modal-body p-4 p-md-5">
-                <form id="editProfileForm" onSubmit={handleSubmit}>
-                  <div className="row g-3">
-                    {/* Username (Read-only) */}
-                    <div className="col-md-6">
-                      <label className="form-label small fw-bold text-light opacity-90">
-                        Tên đăng nhập (Cố định)
-                      </label>
-                      <div
-                        className={`input-group overflow-hidden rounded-3 border border-secondary border-opacity-25 ${styles.readOnlyInputBox}`}
-                      >
-                        <span className="input-group-text bg-transparent border-0 text-secondary">
-                          <i className="bi bi-lock-fill"></i>
-                        </span>
-                        <input
-                          type="text"
-                          className="form-control bg-transparent border-0 text-secondary shadow-none fs-6"
-                          value={currentUser?.username || ""}
-                          readOnly
-                        />
-                      </div>
-                    </div>
+                {/* 2. Email */}
+                <div className="col-md-6">
+                  <label className="form-label text-light opacity-75 small">
+                    Địa chỉ Email
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    className="form-control bg-dark text-white border-secondary border-opacity-50"
+                    placeholder="example@domain.com"
+                    value={formData.email}
+                    onChange={handleChange}
+                    disabled={loading}
+                  />
+                </div>
 
-                    {/* Full Name */}
-                    <div className="col-md-6">
-                      <label
-                        htmlFor="fullName"
-                        className="form-label small fw-bold text-light opacity-90"
-                      >
-                        Họ và tên <span className="text-danger">*</span>
-                      </label>
-                      <div
-                        className={`input-group overflow-hidden rounded-3 border border-secondary border-opacity-50 ${styles.inputGroupCustom}`}
-                      >
-                        <span className="input-group-text bg-transparent border-0 text-info">
-                          <i className="bi bi-card-heading"></i>
-                        </span>
-                        <input
-                          type="text"
-                          className="form-control bg-transparent border-0 text-white shadow-none fs-6"
-                          id="fullName"
-                          name="fullName"
-                          value={formData.fullName}
-                          onChange={handleChange}
-                          placeholder="Nhập họ và tên..."
-                          required
-                        />
-                      </div>
-                    </div>
+                {/* 3. Số điện thoại */}
+                <div className="col-md-6">
+                  <label className="form-label text-light opacity-75 small">
+                    Số điện thoại
+                  </label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    className="form-control bg-dark text-white border-secondary border-opacity-50"
+                    placeholder="VD: 0901234567"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    disabled={loading}
+                  />
+                </div>
 
-                    {/* Email */}
-                    <div className="col-md-6">
-                      <label
-                        htmlFor="email"
-                        className="form-label small fw-bold text-light opacity-90"
-                      >
-                        Địa chỉ Email <span className="text-danger">*</span>
-                      </label>
-                      <div
-                        className={`input-group overflow-hidden rounded-3 border border-secondary border-opacity-50 ${styles.inputGroupCustom}`}
-                      >
-                        <span className="input-group-text bg-transparent border-0 text-info">
-                          <i className="bi bi-envelope"></i>
-                        </span>
-                        <input
-                          type="email"
-                          className="form-control bg-transparent border-0 text-white shadow-none fs-6"
-                          id="email"
-                          name="email"
-                          value={formData.email}
-                          onChange={handleChange}
-                          placeholder="Nhập email..."
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    {/* Phone */}
-                    <div className="col-md-6">
-                      <label
-                        htmlFor="phone"
-                        className="form-label small fw-bold text-light opacity-90"
-                      >
-                        Số điện thoại <span className="text-danger">*</span>
-                      </label>
-                      <div
-                        className={`input-group overflow-hidden rounded-3 border border-secondary border-opacity-50 ${styles.inputGroupCustom}`}
-                      >
-                        <span className="input-group-text bg-transparent border-0 text-info">
-                          <i className="bi bi-telephone"></i>
-                        </span>
-                        <input
-                          type="tel"
-                          className="form-control bg-transparent border-0 text-white shadow-none fs-6"
-                          id="phone"
-                          name="phone"
-                          value={formData.phone}
-                          onChange={handleChange}
-                          placeholder="Nhập số điện thoại..."
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    {/* Address */}
-                    <div className="col-12">
-                      <label
-                        htmlFor="address"
-                        className="form-label small fw-bold text-light opacity-90"
-                      >
-                        Địa chỉ liên hệ <span className="text-danger">*</span>
-                      </label>
-                      <div
-                        className={`input-group overflow-hidden rounded-3 border border-secondary border-opacity-50 ${styles.inputGroupCustom}`}
-                      >
-                        <span className="input-group-text bg-transparent border-0 text-info">
-                          <i className="bi bi-geo-alt"></i>
-                        </span>
-                        <input
-                          type="text"
-                          className="form-control bg-transparent border-0 text-white shadow-none fs-6"
-                          id="address"
-                          name="address"
-                          value={formData.address}
-                          onChange={handleChange}
-                          placeholder="Nhập địa chỉ..."
-                          required
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </form>
-              </div>
-
-              {/* Modal Footer */}
-              <div className="modal-footer border-top border-secondary border-opacity-25 p-3 px-4">
-                <button
-                  type="button"
-                  className="btn btn-outline-light rounded-3 px-4"
-                  onClick={onClose}
-                >
-                  Hủy
-                </button>
-                <button
-                  type="submit"
-                  form="editProfileForm"
-                  className={`btn btn-primary fw-bold px-4 rounded-3 shadow ${styles.submitBtn}`}
-                >
-                  <i className="bi bi-check-circle-fill me-1"></i>Lưu Thay Đổi
-                </button>
+                {/* 4. Địa chỉ */}
+                <div className="col-md-6">
+                  <label className="form-label text-light opacity-75 small">
+                    Địa chỉ liên hệ
+                  </label>
+                  <input
+                    type="text"
+                    name="address"
+                    className="form-control bg-dark text-white border-secondary border-opacity-50"
+                    placeholder="VD: 123 Nguyễn Huệ, Quận 1, TP.HCM"
+                    value={formData.address}
+                    onChange={handleChange}
+                    disabled={loading}
+                  />
+                </div>
               </div>
             </div>
-          </div>
+
+            <div className="modal-footer border-secondary border-opacity-25 pt-2">
+              <button
+                type="button"
+                className="btn btn-outline-secondary text-white"
+                onClick={onClose}
+                disabled={loading}
+              >
+                Hủy bỏ
+              </button>
+              <button
+                type="submit"
+                className="btn btn-primary fw-bold px-4"
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <span
+                      className="spinner-border spinner-border-sm me-2"
+                      role="status"
+                    ></span>
+                    Đang lưu...
+                  </>
+                ) : (
+                  "Lưu thay đổi"
+                )}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
   );
-};
-
-export default UpdateProfileModal;
+}

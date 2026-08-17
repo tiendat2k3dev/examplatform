@@ -53,11 +53,6 @@ const CategoryExamsPage = () => {
   };
 
   const handleStartExam = (examId: string) => {
-    if (!currentUser) {
-      toast.warning("Vui lòng đăng nhập để bắt đầu làm bài thi!");
-      router.push("/login");
-      return;
-    }
     router.push(`/exam/${examId}`);
   };
 

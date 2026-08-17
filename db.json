@@ -210,12 +210,7 @@
       "id": "q-j1-2",
       "examId": "ex-java-1",
       "questionText": "Từ khóa nào trong Java được sử dụng để ngăn một class không cho phép kế thừa?",
-      "options": [
-        "abstract",
-        "static",
-        "final",
-        "super"
-      ],
+      "options": ["abstract", "static", "final", "super"],
       "correctAnswer": 2,
       "explanation": "Từ khóa 'final' khi đặt trước một class sẽ biến class đó thành Final Class, khiến cho không class nào khác có thể extends nó."
     },
@@ -236,12 +231,7 @@
       "id": "q-j2-1",
       "examId": "ex-java-2",
       "questionText": "Interface nào trong Java Collection Framework lưu trữ các phần tử duy nhất (không trùng lặp)?",
-      "options": [
-        "List",
-        "Set",
-        "Queue",
-        "Map"
-      ],
+      "options": ["List", "Set", "Queue", "Map"],
       "correctAnswer": 1,
       "explanation": "Set interface đảm bảo tất cả các phần tử chứa trong nó là duy nhất (Unique)."
     },
@@ -249,12 +239,7 @@
       "id": "q-j2-2",
       "examId": "ex-java-2",
       "questionText": "Khối lệnh nào trong try-catch luôn luôn được thực thi dù có ngoại lệ (Exception) xảy ra hay không?",
-      "options": [
-        "try",
-        "catch",
-        "finally",
-        "throw"
-      ],
+      "options": ["try", "catch", "finally", "throw"],
       "correctAnswer": 2,
       "explanation": "Khối 'finally' luôn chạy kể cả khi xảy ra Exception hay không, dùng để giải phóng tài nguyên (Close file, connection...)."
     },
@@ -275,12 +260,7 @@
       "id": "q-j3-1",
       "examId": "ex-java-3",
       "questionText": "Annotation nào trong Spring Boot dùng để định nghĩa một RESTful Controller trả về JSON?",
-      "options": [
-        "@Controller",
-        "@RestController",
-        "@Service",
-        "@Component"
-      ],
+      "options": ["@Controller", "@RestController", "@Service", "@Component"],
       "correctAnswer": 1,
       "explanation": "@RestController = @Controller + @ResponseBody, giúp tự động serialize kết quả trả về thành định dạng JSON/XML."
     },
@@ -288,12 +268,7 @@
       "id": "q-j3-2",
       "examId": "ex-java-3",
       "questionText": "Annotation nào được sử dụng để tự động inject (tiêm) một Dependency Bean trong Spring?",
-      "options": [
-        "@Autowired",
-        "@InjectBean",
-        "@Bean",
-        "@Value"
-      ],
+      "options": ["@Autowired", "@InjectBean", "@Bean", "@Value"],
       "correctAnswer": 0,
       "explanation": "@Autowired được Spring IoC Container dùng để inject Dependency vào Field, Constructor hoặc Setter."
     },
@@ -366,12 +341,7 @@
       "id": "q-cs2-2",
       "examId": "ex-csharp-2",
       "questionText": "HTTP Method nào phù hợp nhất cho hành động Cập nhật toàn bộ tài nguyên trong Web API?",
-      "options": [
-        "GET",
-        "POST",
-        "PUT",
-        "DELETE"
-      ],
+      "options": ["GET", "POST", "PUT", "DELETE"],
       "correctAnswer": 2,
       "explanation": "HTTP PUT được dùng để cập nhật đè (Replace/Update full) một tài nguyên."
     },
@@ -392,12 +362,7 @@
       "id": "q-fe1-1",
       "examId": "ex-frontend-1",
       "questionText": "Thẻ HTML5 nào được dùng để khai báo thanh điều hướng của trang web?",
-      "options": [
-        "<header>",
-        "<nav>",
-        "<section>",
-        "<aside>"
-      ],
+      "options": ["<header>", "<nav>", "<section>", "<aside>"],
       "correctAnswer": 1,
       "explanation": "Thẻ `<nav>` được định nghĩa trong HTML5 chuẩn ngữ nghĩa (Semantic HTML) dành riêng cho thanh điều hướng Navigation."
     },
@@ -444,12 +409,7 @@
       "id": "q-fe2-2",
       "examId": "ex-frontend-2",
       "questionText": "Phương thức mảng nào trả về một mảng MỚI sau khi biến đổi từng phần tử?",
-      "options": [
-        "forEach()",
-        "map()",
-        "filter()",
-        "reduce()"
-      ],
+      "options": ["forEach()", "map()", "filter()", "reduce()"],
       "correctAnswer": 1,
       "explanation": "map() duyệt qua các phần tử và trả về mảng mới dựa trên kết quả của callback function."
     },
@@ -457,12 +417,7 @@
       "id": "q-fe2-3",
       "examId": "ex-frontend-2",
       "questionText": "Kết quả của biểu thức: typeof null trong JavaScript là gì?",
-      "options": [
-        "'null'",
-        "'undefined'",
-        "'object'",
-        "'boolean'"
-      ],
+      "options": ["'null'", "'undefined'", "'object'", "'boolean'"],
       "correctAnswer": 2,
       "explanation": "Đây là một bug huyền thoại từ phiên bản đầu tiên của JavaScript: typeof null trả về 'object'."
     },
@@ -470,12 +425,7 @@
       "id": "q-fe3-1",
       "examId": "ex-frontend-3",
       "questionText": "Hook nào trong ReactJS được sử dụng để quản lý Side Effect (gọi API, subscription, DOM manipulation)?",
-      "options": [
-        "useState",
-        "useContext",
-        "useEffect",
-        "useReducer"
-      ],
+      "options": ["useState", "useContext", "useEffect", "useReducer"],
       "correctAnswer": 2,
       "explanation": "useEffect cho phép thực thi side-effects sau mỗi lần component render hoặc khi dependency array thay đổi."
     },
@@ -522,12 +472,7 @@
       "id": "q-fe4-2",
       "examId": "ex-frontend-4",
       "questionText": "Thư viện nào được Redux Toolkit tích hợp sẵn bên trong createSlice để xử lý Mutable Code an toàn?",
-      "options": [
-        "Lodash",
-        "Immer.js",
-        "Axios",
-        "RxJS"
-      ],
+      "options": ["Lodash", "Immer.js", "Axios", "RxJS"],
       "correctAnswer": 1,
       "explanation": "Immer.js giúp chúng ta viết code biến đổi state dạng mutable (như state.value = 10) nhưng bên dưới tự chuyển thành Immutable State."
     },
@@ -535,12 +480,7 @@
       "id": "q-fe4-3",
       "examId": "ex-frontend-4",
       "questionText": "Hook nào dùng để lấy State từ Redux Store xuống Functional Component?",
-      "options": [
-        "useDispatch",
-        "useSelector",
-        "useStore",
-        "useContextState"
-      ],
+      "options": ["useDispatch", "useSelector", "useStore", "useContextState"],
       "correctAnswer": 1,
       "explanation": "useSelector() cho phép trích xuất dữ liệu từ Redux Store State bằng một Selector function."
     },
@@ -561,12 +501,7 @@
       "id": "q-db1-2",
       "examId": "ex-db-1",
       "questionText": "Mệnh đề nào dùng để lọc kết quả dựa trên hàm gom nhóm (Aggregate Function như COUNT, SUM)?",
-      "options": [
-        "WHERE",
-        "ORDER BY",
-        "HAVING",
-        "GROUP BY"
-      ],
+      "options": ["WHERE", "ORDER BY", "HAVING", "GROUP BY"],
       "correctAnswer": 2,
       "explanation": "WHERE lọc dòng trước khi gom nhóm, còn HAVING lọc các nhóm sau khi đã GROUP BY."
     },
@@ -574,12 +509,7 @@
       "id": "q-db1-3",
       "examId": "ex-db-1",
       "questionText": "Toán tử SQL nào dùng để tìm kiếm các giá trị theo mẫu chuỗi (Pattern Matching)?",
-      "options": [
-        "IN",
-        "LIKE",
-        "BETWEEN",
-        "EXISTS"
-      ],
+      "options": ["IN", "LIKE", "BETWEEN", "EXISTS"],
       "correctAnswer": 1,
       "explanation": "LIKE kết hợp với ký tự đại diện % và _ được dùng để tìm kiếm chuỗi mẫu."
     },
@@ -587,12 +517,7 @@
       "id": "q-db2-1",
       "examId": "ex-db-2",
       "questionText": "Loại JOIN nào trả về tất cả các dòng ở Bảng Trái và các dòng khớp ở Bảng Phải?",
-      "options": [
-        "INNER JOIN",
-        "LEFT JOIN",
-        "RIGHT JOIN",
-        "FULL OUTER JOIN"
-      ],
+      "options": ["INNER JOIN", "LEFT JOIN", "RIGHT JOIN", "FULL OUTER JOIN"],
       "correctAnswer": 1,
       "explanation": "LEFT JOIN (hoặc LEFT OUTER JOIN) giữ lại toàn bộ dữ liệu bảng bên trái, dòng bảng phải không khớp sẽ mang giá trị NULL."
     },
@@ -613,12 +538,7 @@
       "id": "q-db2-3",
       "examId": "ex-db-2",
       "questionText": "Đặc tính 'A' trong chuẩn ACID của giao dịch CSDL (Transaction) là viết tắt của từ gì?",
-      "options": [
-        "Accuracy",
-        "Atomicity",
-        "Availability",
-        "Authentication"
-      ],
+      "options": ["Accuracy", "Atomicity", "Availability", "Authentication"],
       "correctAnswer": 1,
       "explanation": "Atomicity (Tính nguyên tố): Tất cả các thao tác trong transaction phải thành công hết hoặc thất bại hết (All or Nothing)."
     },
@@ -626,12 +546,7 @@
       "id": "q-cpp1-1",
       "examId": "ex-cpp-1",
       "questionText": "Toán tử nào trong C++ dùng để giải phóng bộ nhớ được cấp phát động bằng 'new'?",
-      "options": [
-        "free()",
-        "delete / delete[]",
-        "remove()",
-        "clear()"
-      ],
+      "options": ["free()", "delete / delete[]", "remove()", "clear()"],
       "correctAnswer": 1,
       "explanation": "Trong C++, biến cấp phát bằng new/new[] bắt buộc phải hủy tương ứng bằng delete/delete[] để tránh rò rỉ bộ nhớ (Memory Leak)."
     },
@@ -665,12 +580,7 @@
       "id": "q-cpp2-1",
       "examId": "ex-cpp-2",
       "questionText": "Độ phức tạp thời gian trung bình của thuật toán Sắp xếp nhanh (Quick Sort) là bao nhiêu?",
-      "options": [
-        "O(N)",
-        "O(N log N)",
-        "O(N^2)",
-        "O(1)"
-      ],
+      "options": ["O(N)", "O(N log N)", "O(N^2)", "O(1)"],
       "correctAnswer": 1,
       "explanation": "Quick Sort đạt hiệu năng O(N log N) trung bình nhờ phương pháp Chia để trị (Divide and Conquer)."
     },
@@ -704,12 +614,7 @@
       "id": "q-py1-1",
       "examId": "ex-python-1",
       "questionText": "Kiểu dữ liệu nào trong Python là Immutable (không thể chỉnh sửa sau khi khởi tạo)?",
-      "options": [
-        "List",
-        "Dictionary",
-        "Tuple",
-        "Set"
-      ],
+      "options": ["List", "Dictionary", "Tuple", "Set"],
       "correctAnswer": 2,
       "explanation": "Tuple được bao bởi dấu ngoặc đơn () và là Immutable, không thể thêm/sửa/xóa phần tử."
     },
@@ -730,12 +635,7 @@
       "id": "q-py1-3",
       "examId": "ex-python-1",
       "questionText": "Hàm built-in nào trả về độ dài (số lượng phần tử) của một Sequence trong Python?",
-      "options": [
-        "count()",
-        "size()",
-        "len()",
-        "length()"
-      ],
+      "options": ["count()", "size()", "len()", "length()"],
       "correctAnswer": 2,
       "explanation": "Hàm len() được dùng phổ biến để lấy độ dài của string, list, tuple, dictionary..."
     },
@@ -743,12 +643,7 @@
       "id": "q-py2-1",
       "examId": "ex-python-2",
       "questionText": "Từ khóa nào được sử dụng để khai báo một hàm (Function) trong Python?",
-      "options": [
-        "func",
-        "def",
-        "function",
-        "lambda"
-      ],
+      "options": ["func", "def", "function", "lambda"],
       "correctAnswer": 1,
       "explanation": "Từ khóa 'def' (define) được Python sử dụng để bắt đầu định nghĩa một hàm."
     },
@@ -779,139 +674,6 @@
       "explanation": "Lambda là một Anonymous Function nhỏ gọn có thể nhận nhiều tham số nhưng chỉ có 1 biểu thức trả về."
     }
   ],
-  "histories": [
-    {
-      "userId": null,
-      "examId": "ex-java-1",
-      "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
-      "score": 0,
-      "totalQuestions": 3,
-      "correctAnswersCount": 0,
-      "timeTaken": 96,
-      "userAnswers": {
-        "q-j1-1": 0,
-        "q-j1-2": 1,
-        "q-j1-3": 0
-      },
-      "completedAt": "2026-08-14T04:49:13.455Z",
-      "id": "OJasRinKy-4"
-    },
-    {
-      "userId": null,
-      "examId": "ex-java-1",
-      "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
-      "score": 100,
-      "totalQuestions": 3,
-      "correctAnswersCount": 3,
-      "timeTaken": 38,
-      "userAnswers": {
-        "q-j1-1": 1,
-        "q-j1-2": 2,
-        "q-j1-3": 1
-      },
-      "completedAt": "2026-08-14T04:52:51.735Z",
-      "id": "s7YzONDVtnI"
-    },
-    {
-      "userId": null,
-      "examId": "ex-db-1",
-      "examTitle": "SQL Basics: SELECT, WHERE & Aggregates",
-      "score": 0,
-      "totalQuestions": 3,
-      "correctAnswersCount": 0,
-      "timeTaken": 5,
-      "userAnswers": {},
-      "completedAt": "2026-08-14T06:25:37.990Z",
-      "id": "jO8czO2LHRw"
-    },
-    {
-      "userId": null,
-      "examId": "ex-java-1",
-      "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
-      "score": 33,
-      "totalQuestions": 3,
-      "correctAnswersCount": 1,
-      "timeTaken": 7,
-      "userAnswers": {
-        "q-j1-1": 2,
-        "q-j1-2": 2,
-        "q-j1-3": 2
-      },
-      "completedAt": "2026-08-14T06:50:53.430Z",
-      "id": "lVfyFDP07oY"
-    },
-    {
-      "userId": null,
-      "examId": "ex-java-1",
-      "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
-      "score": 33,
-      "totalQuestions": 3,
-      "correctAnswersCount": 1,
-      "timeTaken": 15,
-      "userAnswers": {
-        "q-j1-1": 0,
-        "q-j1-2": 2,
-        "q-j1-3": 2
-      },
-      "completedAt": "2026-08-14T07:06:52.261Z",
-      "id": "OGB5Qzkk4Xo"
-    },
-    {
-      "userId": null,
-      "examId": "ex-java-1",
-      "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
-      "score": 33,
-      "totalQuestions": 3,
-      "correctAnswersCount": 1,
-      "timeTaken": 7,
-      "userAnswers": {
-        "q-j1-1": 0,
-        "q-j1-2": 1,
-        "q-j1-3": 1
-      },
-      "completedAt": "2026-08-14T15:30:55.244Z",
-      "id": "SnR9mOw9WQQ"
-    },
-    {
-      "userId": null,
-      "examId": "ex-java-1",
-      "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
-      "score": 0,
-      "totalQuestions": 3,
-      "correctAnswersCount": 0,
-      "timeTaken": 12,
-      "userAnswers": {},
-      "completedAt": "2026-08-14T15:31:54.276Z",
-      "id": "ClEAGBavVgk"
-    },
-    {
-      "userId": null,
-      "examId": "ex-java-1",
-      "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
-      "score": 67,
-      "totalQuestions": 3,
-      "correctAnswersCount": 2,
-      "timeTaken": 7,
-      "userAnswers": {
-        "q-j1-1": 1,
-        "q-j1-2": 1,
-        "q-j1-3": 1
-      },
-      "completedAt": "2026-08-15T00:54:59.479Z",
-      "id": "bahMkfDG8Iw"
-    },
-    {
-      "userId": null,
-      "examId": "ex-java-1",
-      "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
-      "score": 0,
-      "totalQuestions": 3,
-      "correctAnswersCount": 0,
-      "timeTaken": 22,
-      "userAnswers": {},
-      "completedAt": "2026-08-16T01:50:58.605Z",
-      "id": "5LChoemlEhk"
-    }
-  ],
+  "histories": [],
   "$schema": "./node_modules/json-server/schema.json"
 }

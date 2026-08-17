@@ -13,6 +13,7 @@ import {
   resetQuiz,
 } from "@/redux/reducers/QuizReducer";
 import { submitExamApiAsync } from "@/redux/reducers/HistoryReducer";
+import { generatePublicUserId } from "@/services/historyService";
 import { toast } from "react-toastify";
 
 import { QuizQuestionBox } from "@/components/Quiz/QuizQuestionBox";
@@ -36,6 +37,11 @@ const ExamPage = () => {
     loading: quizLoading,
   } = useSelector((state: RootState) => state.quizReducer);
 
+  const isPublicUser = !currentUser;
+
+  // Giữ cố định 1 mã Public ID trong suốt phiên làm bài
+  const [publicUserId] = useState(() => generatePublicUserId());
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showResultModal, setShowResultModal] = useState(false);
   const [quizResult, setQuizResult] = useState<{
@@ -49,12 +55,6 @@ const ExamPage = () => {
 
   // 1. Tải đề thi và câu hỏi
   useEffect(() => {
-    if (!currentUser) {
-      toast.warning("Vui lòng đăng nhập để làm bài thi!");
-      router.push("/login");
-      return;
-    }
-
     if (exams.length === 0) {
       dispatch(fetchExamsApiAsync());
     }
@@ -65,38 +65,59 @@ const ExamPage = () => {
     return () => {
       dispatch(resetQuiz());
     };
-  }, [dispatch, examId, currentUser, currentExam, router]);
+  }, [dispatch, examId, currentExam]);
 
-  // 2. Định nghĩa hàm handleSubmitExam LÊN TRƯỚC useEffect đếm giờ
-  const handleSubmitExam = useCallback(() => {
-    if (isSubmitting || questions.length === 0) return;
-    setIsSubmitting(true);
+  // 2. Logic nộp bài thi cho cả Member lẫn Public
+  const handleSubmitExam = useCallback(
+    (isAutoSubmit = false) => {
+      if (isSubmitting || questions.length === 0) return;
 
-    let correctCount = 0;
-    questions.forEach((q) => {
-      if (userAnswers[q.id] === q.correctAnswer) {
-        correctCount += 1;
+      // Xác nhận nếu bấm nộp thủ công
+      if (!isAutoSubmit) {
+        const answered = Object.keys(userAnswers).length;
+        const total = questions.length;
+        const confirmMsg =
+          answered < total
+            ? `Bạn mới hoàn thành ${answered}/${total} câu hỏi. Bạn có chắc chắn muốn nộp bài sớm không?`
+            : "Bạn có chắc chắn muốn nộp bài thi ngay bây giờ không?";
+
+        if (!window.confirm(confirmMsg)) {
+          return;
+        }
       }
-    });
 
-    const total = questions.length;
-    const score = total > 0 ? Math.round((correctCount / total) * 100) : 0;
-    const totalDuration = (currentExam?.duration || 30) * 60;
-    const timeTaken = totalDuration - timeLeft;
+      setIsSubmitting(true);
 
-    const payload = {
-      userId: currentUser?.id as string,
-      examId,
-      examTitle: currentExam?.title || "Bài Thi Chuẩn",
-      score,
-      totalQuestions: total,
-      correctAnswersCount: correctCount,
-      timeTaken: timeTaken > 0 ? timeTaken : 1,
-      userAnswers,
-    };
+      // Chấm điểm bài thi
+      let correctCount = 0;
+      questions.forEach((q) => {
+        if (userAnswers[q.id] === q.correctAnswer) {
+          correctCount += 1;
+        }
+      });
 
-    dispatch(
-      submitExamApiAsync(payload, () => {
+      const total = questions.length;
+      const score = total > 0 ? Math.round((correctCount / total) * 100) : 0;
+      const totalDuration = (currentExam?.duration || 30) * 60;
+      const timeTaken = Math.max(1, totalDuration - timeLeft);
+
+      // Gán định danh cho Public hoặc Member
+      const finalUserId = currentUser ? String(currentUser.id) : publicUserId;
+      const finalUserName = currentUser ? currentUser.fullName : "ANONYMOUS";
+
+      const payload = {
+        userId: finalUserId,
+        userName: finalUserName,
+        examId,
+        examTitle: currentExam?.title || "Bài Thi Chuẩn",
+        score,
+        totalQuestions: total,
+        correctAnswersCount: correctCount,
+        timeTaken,
+        userAnswers,
+      };
+
+      const openResultModal = () => {
         setQuizResult({
           score,
           correctCount,
@@ -105,20 +126,25 @@ const ExamPage = () => {
         });
         setShowResultModal(true);
         setIsSubmitting(false);
-      }),
-    );
-  }, [
-    isSubmitting,
-    questions,
-    userAnswers,
-    currentExam,
-    timeLeft,
-    currentUser,
-    examId,
-    dispatch,
-  ]);
+      };
 
-  // 3. Đồng hồ đếm ngược (Gọi handleSubmitExam an toàn)
+      // Gọi Redux Thunk lưu kết quả vào db.json và mở Modal
+      dispatch(submitExamApiAsync(payload, openResultModal));
+    },
+    [
+      isSubmitting,
+      questions,
+      userAnswers,
+      currentExam,
+      timeLeft,
+      currentUser,
+      publicUserId,
+      examId,
+      dispatch,
+    ]
+  );
+
+  // 3. Đếm ngược thời gian
   useEffect(() => {
     if (
       timeLeft <= 0 &&
@@ -126,8 +152,8 @@ const ExamPage = () => {
       !showResultModal &&
       !isSubmitting
     ) {
-      toast.info("Đã hết giờ làm bài! Tự động nộp bài.");
-      handleSubmitExam();
+      toast.info("Đã hết giờ làm bài! Hệ thống tự động nộp bài.");
+      handleSubmitExam(true);
       return;
     }
 
@@ -161,8 +187,29 @@ const ExamPage = () => {
 
   return (
     <main className="container-fluid px-3 px-md-5 my-auto py-4 position-relative">
+      {/* Banner chế độ Public */}
+      {isPublicUser && (
+        <div className="alert alert-warning border border-warning d-flex align-items-center justify-content-between mb-4 rounded-3 shadow-sm">
+          <div className="d-flex align-items-center gap-2">
+            <i className="bi bi-person-bounding-box fs-4 text-warning"></i>
+            <div>
+              <strong>Chế độ Public:</strong> Bạn đang thi với mã định danh{" "}
+              <code>{publicUserId}</code> (Tên: <strong>ANONYMOUS</strong>). Kết
+              quả chỉ hiển thị <strong>1 lần duy nhất</strong> khi nộp bài và
+              không thể tra cứu lại trong Lịch Sử cá nhân.
+            </div>
+          </div>
+          <button
+            onClick={() => router.push("/login")}
+            className="btn btn-sm btn-outline-dark fw-bold rounded-pill text-nowrap ms-3"
+          >
+            Đăng nhập
+          </button>
+        </div>
+      )}
+
       <div className="row g-4">
-        {/* Cột Trái: Nội dung câu hỏi */}
+        {/* Khung câu hỏi */}
         <div className="col-lg-8 col-xl-9">
           <QuizQuestionBox
             examTitle={currentExam?.title}
@@ -173,7 +220,7 @@ const ExamPage = () => {
             selectedOptionIndex={userAnswers[currentQ.id]}
             onSelectOption={(index) =>
               dispatch(
-                selectOption({ questionId: currentQ.id, optionIndex: index }),
+                selectOption({ questionId: currentQ.id, optionIndex: index })
               )
             }
             onPrev={() =>
@@ -185,7 +232,7 @@ const ExamPage = () => {
           />
         </div>
 
-        {/* Cột Phải: Timer & Palette */}
+        {/* Sidebar điều khiển */}
         <div className="col-lg-4 col-xl-3">
           <QuizSidebar
             timeLeft={timeLeft}
@@ -193,12 +240,12 @@ const ExamPage = () => {
             currentQuestionIndex={currentQuestionIndex}
             userAnswers={userAnswers}
             onJumpQuestion={(index) => dispatch(setCurrentQuestionIndex(index))}
-            onSubmitExam={handleSubmitExam}
+            onSubmitExam={() => handleSubmitExam(false)}
           />
         </div>
       </div>
 
-      {/* Modal Kết Quả Mới */}
+      {/* Modal kết quả */}
       {showResultModal && quizResult && (
         <QuizResultModal
           score={quizResult.score}
@@ -207,6 +254,9 @@ const ExamPage = () => {
           timeTaken={quizResult.timeTaken}
           examTitle={currentExam?.title}
           examId={examId}
+          isPublic={isPublicUser}
+          userId={currentUser ? String(currentUser.id) : publicUserId}
+          userName={currentUser ? currentUser.fullName : "ANONYMOUS"}
           onRetryExam={() => {
             setShowResultModal(false);
             const duration = currentExam ? currentExam.duration : 30;

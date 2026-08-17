@@ -1,18 +1,34 @@
 // src/services/historyService.ts
+import axios from "axios";
 import { History, SubmitExamPayload } from "@/types/history";
-import api from "../lib/apiClient.js";
+
+const API_URL = "http://localhost:4000";
+
+// Helper tạo mã số ngẫu nhiên cho Public User (ví dụ: Public-849201)
+export const generatePublicUserId = (): string => {
+  const randomNum = Math.floor(100000 + Math.random() * 900000);
+  return `Public-${randomNum}`;
+};
 
 // 1. Lưu kết quả làm bài vào db.json
 export const submitExamResultService = async (
-  payload: SubmitExamPayload,
+  payload: SubmitExamPayload
 ): Promise<History> => {
   try {
+    const isPublic = !payload.userId || payload.userId.startsWith("Public-");
+    const finalUserId = isPublic
+      ? payload.userId || generatePublicUserId()
+      : payload.userId;
+    const finalUserName = isPublic ? "ANONYMOUS" : (payload as any).userName;
+
     const newRecord = {
       ...payload,
+      userId: finalUserId,
+      userName: finalUserName,
       completedAt: new Date().toISOString(),
     };
 
-    const response = await api.post<History>("/histories", newRecord);
+    const response = await axios.post<History>(`${API_URL}/histories`, newRecord);
 
     return response.data;
   } catch (error) {
@@ -23,10 +39,10 @@ export const submitExamResultService = async (
 
 // 2. Lấy chi tiết 1 lượt thi theo ID
 export const getHistoryByIdService = async (
-  historyId: string,
+  historyId: string
 ): Promise<History> => {
   try {
-    const response = await api.get<History>(`/histories/${historyId}`);
+    const response = await axios.get<History>(`${API_URL}/histories/${historyId}`);
 
     return response.data;
   } catch (error) {
@@ -37,24 +53,23 @@ export const getHistoryByIdService = async (
 
 // 3. Lấy danh sách lịch sử làm bài của User
 export const getUserHistoriesService = async (
-  userId: string,
+  userId: string
 ): Promise<History[]> => {
   try {
-    const response = await api.get<History[] | { data: History[] }>(
-      `/histories?userId=${userId}`,
+    if (!userId || userId.startsWith("Public-")) {
+      return [];
+    }
+
+    const response = await axios.get<History[] | { data: History[] }>(
+      `${API_URL}/histories?userId=${userId}`
     );
 
     const resData = response.data;
-
     let list: History[] = [];
 
-    // json-server trả về mảng
     if (Array.isArray(resData)) {
       list = resData;
-    }
-
-    // Trường hợp API trả về object { data: [...] }
-    else if (
+    } else if (
       resData &&
       typeof resData === "object" &&
       "data" in resData &&
@@ -63,14 +78,12 @@ export const getUserHistoriesService = async (
       list = resData.data;
     }
 
-    // Sắp xếp lượt thi mới nhất lên đầu
     return list.sort(
       (a, b) =>
-        new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime(),
+        new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime()
     );
   } catch (error) {
     console.error("Lỗi khi tải lịch sử bài thi của người dùng:", error);
-
     throw error;
   }
 };

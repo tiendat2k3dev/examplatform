@@ -170,3 +170,23 @@ export const changePasswordService = async (
     throw error;
   }
 };
+
+/**
+ * CẬP NHẬT AVATAR (STRING URL)
+ */
+export const updateAvatarService = async (
+  userId: string | number,
+  avatarUrl: string
+): Promise<User> => {
+  try {
+    const response = await api.patch<User>(`/users/${userId}`, {
+      avatarUrl: avatarUrl, // Đồng bộ đúng camelCase theo interface User
+      updatedAt: new Date().toISOString(),
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Update avatar failed:", error);
+    throw error;
+  }
+};

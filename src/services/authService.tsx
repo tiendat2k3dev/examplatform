@@ -1,48 +1,47 @@
 // src/services/authService.ts
-
+import axios from "axios";
 import bcrypt from "bcryptjs";
-import api from "../lib/apiClient.js";
-
 import {
   User,
   LoginPayload,
+  RegisterPayload,
   UpdateUserPayload,
   ChangePasswordPayload,
 } from "@/types/user";
+
+const API_URL = "http://localhost:4000";
 
 /**
  * ĐĂNG KÝ
  */
 export const registerService = async (
-  userData: Omit<
-    User,
-    "id" | "role" | "avatarUrl" | "createdAt" | "updatedAt" | "status"
-  >,
+  userData: RegisterPayload
 ): Promise<User> => {
   try {
     // 1. Kiểm tra username đã tồn tại
-    const check = await api.get<User[]>(
-      `/users?username=${encodeURIComponent(userData.username)}`,
+    const check = await axios.get<User[]>(
+      `${API_URL}/users?username=${encodeURIComponent(userData.username)}`
     );
 
-    if (check.data.length > 0) {
+    const existingUsers = Array.isArray(check.data)
+      ? check.data
+      : (check.data as any)?.data || [];
+
+    if (existingUsers.length > 0) {
       throw new Error("Tên đăng nhập đã tồn tại trong hệ thống!");
     }
 
     // 2. Tạo User ID
     const now = new Date();
-
     const pad = (n: number) => String(n).padStart(2, "0");
-
     const userId = `USER-${now.getFullYear()}${pad(
-      now.getMonth() + 1,
-    )}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(
-      now.getSeconds(),
-    )}`;
+      now.getMonth() + 1
+    )}${pad(now.getDate())}-${pad(now.getHours())}${pad(
+      now.getMinutes()
+    )}${pad(now.getSeconds())}`;
 
     // 3. Mã hóa mật khẩu
     const salt = await bcrypt.genSalt(10);
-
     const hashedPassword = await bcrypt.hash(userData.password, salt);
 
     // 4. Tạo user
@@ -57,8 +56,7 @@ export const registerService = async (
     };
 
     // 5. POST lên json-server
-    const response = await api.post<User>("/users", newUser);
-
+    const response = await axios.post<User>(`${API_URL}/users`, newUser);
     return response.data;
   } catch (error) {
     console.error("Register failed:", error);
@@ -72,11 +70,13 @@ export const registerService = async (
 export const loginService = async (payload: LoginPayload): Promise<User> => {
   try {
     // 1. Tìm user theo username
-    const response = await api.get<User[]>(
-      `/users?username=${encodeURIComponent(payload.username)}`,
+    const response = await axios.get<User[]>(
+      `${API_URL}/users?username=${encodeURIComponent(payload.username)}`
     );
 
-    const users = response.data;
+    const users = Array.isArray(response.data)
+      ? response.data
+      : (response.data as any)?.data || [];
 
     if (users.length === 0) {
       throw new Error("Tên đăng nhập không tồn tại trong hệ thống!");
@@ -87,7 +87,7 @@ export const loginService = async (payload: LoginPayload): Promise<User> => {
     // 2. Kiểm tra mật khẩu
     const isPasswordValid = await bcrypt.compare(
       payload.password,
-      user.password,
+      user.password
     );
 
     if (!isPasswordValid) {
@@ -112,10 +112,10 @@ export const loginService = async (payload: LoginPayload): Promise<User> => {
  */
 export const updateUserService = async (
   userId: string | number,
-  payload: UpdateUserPayload,
+  payload: UpdateUserPayload
 ): Promise<User> => {
   try {
-    const response = await api.patch<User>(`/users/${userId}`, {
+    const response = await axios.patch<User>(`${API_URL}/users/${userId}`, {
       ...payload,
       updatedAt: new Date().toISOString(),
     });
@@ -123,7 +123,6 @@ export const updateUserService = async (
     return response.data;
   } catch (error) {
     console.error("Update user failed:", error);
-
     throw error;
   }
 };
@@ -133,7 +132,7 @@ export const updateUserService = async (
  */
 export const changePasswordService = async (
   userId: string | number,
-  payload: ChangePasswordPayload,
+  payload: ChangePasswordPayload
 ): Promise<void> => {
   try {
     // 1. Kiểm tra mật khẩu mới
@@ -142,14 +141,13 @@ export const changePasswordService = async (
     }
 
     // 2. Lấy user hiện tại
-    const response = await api.get<User>(`/users/${userId}`);
-
+    const response = await axios.get<User>(`${API_URL}/users/${userId}`);
     const user = response.data;
 
     // 3. Kiểm tra mật khẩu cũ
     const isPasswordValid = await bcrypt.compare(
       payload.oldPassword,
-      user.password,
+      user.password
     );
 
     if (!isPasswordValid) {
@@ -158,17 +156,15 @@ export const changePasswordService = async (
 
     // 4. Mã hóa mật khẩu mới
     const salt = await bcrypt.genSalt(10);
-
     const hashedNewPassword = await bcrypt.hash(payload.newPassword, salt);
 
     // 5. Cập nhật mật khẩu
-    await api.patch(`/users/${userId}`, {
+    await axios.patch(`${API_URL}/users/${userId}`, {
       password: hashedNewPassword,
       updatedAt: new Date().toISOString(),
     });
   } catch (error) {
     console.error("Change password failed:", error);
-
     throw error;
   }
 };

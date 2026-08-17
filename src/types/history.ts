@@ -1,6 +1,7 @@
 export interface History {
   id: string;
   userId: string;
+  userName?: string;               // Tên người thi (Anonymous nếu chưa đăng nhập)
   examId: string;
   examTitle?: string;            // Tên đề thi (để hiển thị nhanh ở trang Lịch sử)
   score: number;                 // Điểm số (thang điểm 100)

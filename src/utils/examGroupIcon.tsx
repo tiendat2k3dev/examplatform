@@ -1,7 +1,8 @@
-import type { ExamGroup } from "./examGroup";
-
 /**
  * Helper để hiển thị icon Bootstrap hoặc text thuần
+ * @param icon - Tên icon (class Bootstrap icon) hoặc text thuần
+ * @param className - Lớp CSS tùy chọn áp dụng cho phần tử render
+ * @returns Phần tử React chứa icon hoặc text
  */
 export const renderExamGroupIcon = (icon: string, className?: string) => {
   const trimmed = icon.trim();

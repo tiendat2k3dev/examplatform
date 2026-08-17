@@ -7,6 +7,7 @@ import {
   getHistoryByIdService,
   getUserHistoriesService,
 } from "@/services/historyService";
+import { getErrorMessage } from "@/utils/errorHandler";
 import { AppDispatch } from "../store";
 
 export interface HistoryState {
@@ -56,12 +57,12 @@ export const submitExamApiAsync =
       if (onSuccess) {
         onSuccess(result);
       }
-    } catch (error: any) {
+    } catch (error) {
       dispatch(setLoading(false));
-      const errorMsg =
-        error.response?.data?.message ||
-        error.message ||
-        "Lỗi khi gửi kết quả bài thi!";
+      const errorMsg = getErrorMessage(
+        error,
+        "Lỗi khi gửi kết quả bài thi!"
+      );
       console.error("Submit exam error:", error);
       toast.error(errorMsg);
       throw error;
@@ -75,12 +76,12 @@ export const fetchHistoryByIdApiAsync =
       dispatch(setLoading(true));
       const data = await getHistoryByIdService(historyId);
       dispatch(setCurrentHistory(data));
-    } catch (error: any) {
+    } catch (error) {
       dispatch(setLoading(false));
-      const errorMsg =
-        error.response?.data?.message ||
-        error.message ||
-        "Lỗi khi tải kết quả bài thi!";
+      const errorMsg = getErrorMessage(
+        error,
+        "Lỗi khi tải kết quả bài thi!"
+      );
       console.error("Fetch history error:", error);
       toast.error(errorMsg);
     }
@@ -93,12 +94,12 @@ export const fetchUserHistoriesApiAsync =
       dispatch(setLoading(true));
       const list = await getUserHistoriesService(userId);
       dispatch(setUserHistories(list));
-    } catch (error: any) {
+    } catch (error) {
       dispatch(setLoading(false));
-      const errorMsg =
-        error.response?.data?.message ||
-        error.message ||
-        "Lỗi khi tải lịch sử thi!";
+      const errorMsg = getErrorMessage(
+        error,
+        "Lỗi khi tải lịch sử thi!"
+      );
       console.error("Fetch user histories error:", error);
       toast.error(errorMsg);
     }

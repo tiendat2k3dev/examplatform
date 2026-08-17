@@ -1,6 +1,6 @@
 "use client";
 
-import type { ExamGroup } from "@/components/modal/exam-groups/add/exam-groupsAdd";
+import type { ExamGroup } from "@/types/examGroup";
 
 interface DeleteProps {
   show: boolean;
@@ -37,12 +37,11 @@ const Delete = ({ show, group, onClose, onConfirm }: DeleteProps) => {
             </div>
 
             <div className="modal-body">
-              <p className="mb-0">
-                Bạn có chắc chắn muốn xóa nhóm đề thi này không?
-              </p>
+              <p>Bạn có chắc chắn muốn xóa nhóm đề thi này không?</p>
 
               <div className="mt-3 p-3 border rounded bg-light">
                 <strong>{group.name}</strong>
+
                 <div className="text-secondary small mt-1">
                   {group.description}
                 </div>
@@ -61,10 +60,7 @@ const Delete = ({ show, group, onClose, onConfirm }: DeleteProps) => {
               <button
                 type="button"
                 className="btn btn-danger"
-                onClick={() => {
-                  onConfirm();
-                  onClose();
-                }}
+                onClick={onConfirm}
               >
                 Xóa
               </button>

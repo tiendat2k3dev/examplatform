@@ -38,7 +38,96 @@
       "role": "Member",
       "status": "Mở",
       "createdAt": "2026-08-16T14:18:16.406Z",
-      "updatedAt": "2026-08-16T14:19:10.112Z"
+      "updatedAt": "2026-08-16T14:47:29.258Z"
+    },
+    {
+      "id": "_dx7gSFwFDQ",
+      "username": "admin",
+      "password": "$2b$10$UvP3Sk81AiuTIuUwqPZ/yerV1/EZq3YWebRFZdQNEs/WiOeEL8RMu",
+      "fullName": "Hai Dong",
+      "address": "Quận Cầu Giấy, Hà Nội",
+      "phone": "0367797348",
+      "email": "tiendat2k3.dev@gmail.com",
+      "role": "Member",
+      "status": "Mở",
+      "createdAt": "2026-08-17T01:02:57.373Z",
+      "updatedAt": null
+    },
+    {
+      "id": "KFmXkXxHps0",
+      "username": "admin",
+      "password": "$2b$10$aE.nOWZ1qtIeSGFkIOzy9OXjv0nF3an2NJT6SgYJiJ3Z93Or8IIxS",
+      "fullName": "Hai Dong",
+      "address": "Quận Cầu Giấy, Hà Nội",
+      "phone": "0367797348",
+      "email": "tiendat2k3.dev@gmail.com",
+      "role": "Member",
+      "status": "Mở",
+      "createdAt": "2026-08-17T01:03:13.197Z",
+      "updatedAt": null
+    },
+    {
+      "id": "FJOqojuisEM",
+      "username": "admin",
+      "password": "$2b$10$ewveqrH9QIPImtzTIIuXGeaByg.GsTsSg7DzjI1PXX7ZMagTxd9Sm",
+      "fullName": "Hai Dong",
+      "address": "Quận Cầu Giấy, Hà Nội",
+      "phone": "0367797348",
+      "email": "tiendat2k3.dev@gmail.com",
+      "role": "Member",
+      "status": "Mở",
+      "createdAt": "2026-08-17T01:03:26.642Z",
+      "updatedAt": null
+    },
+    {
+      "id": "fGWm5vPMYZ8",
+      "username": "admin",
+      "password": "$2b$10$xN/Zs5kGiGLSedTBc7Z.2OSpt5J3/haeFRLFEraVm6DM1GJMHpiAu",
+      "fullName": "111",
+      "address": "11",
+      "phone": "111",
+      "email": "tiendat2k3.dev@gmail.com",
+      "role": "Member",
+      "status": "Mở",
+      "createdAt": "2026-08-17T01:03:46.358Z",
+      "updatedAt": null
+    }
+  ],
+  "categories": [
+    {
+      "id": "1",
+      "name": "Toán học",
+      "icon": "book",
+      "createdAt": "2026-08-17T08:00:00.000Z",
+      "updatedAt": "2026-08-17T08:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "name": "Tiếng Anh",
+      "icon": "book",
+      "createdAt": "2026-08-17T08:10:00.000Z",
+      "updatedAt": "2026-08-17T08:10:00.000Z"
+    },
+    {
+      "id": "3",
+      "name": "Vật lý",
+      "icon": "book",
+      "createdAt": "2026-08-17T08:20:00.000Z",
+      "updatedAt": "2026-08-17T08:20:00.000Z"
+    },
+    {
+      "id": "4",
+      "name": "Hóa học",
+      "icon": "book",
+      "createdAt": "2026-08-17T08:30:00.000Z",
+      "updatedAt": "2026-08-17T08:30:00.000Z"
+    },
+    {
+      "id": "5",
+      "name": "Lịch sử",
+      "icon": "book",
+      "createdAt": "2026-08-17T08:40:00.000Z",
+      "updatedAt": "2026-08-17T01:58:54.140Z"
     }
   ],
   "ExamGroup": [
@@ -74,15 +163,71 @@
       "id": "cat-cpp",
       "name": "C / C++ Base",
       "description": "Cấu trúc dữ liệu & Giải thuật, Con trỏ, Mảng, Struct & Quản lý bộ nhớ.",
-      "icon": "bi-cpu-fill",
+      "icon": "html",
       "color": "info"
     },
     {
-      "id": "cat-python",
-      "name": "Python Lập Trình",
-      "description": "Cú pháp cơ bản, String/List/Dict, Function, Module & Xử lý File trong Python.",
-      "icon": "bi-filetype-py",
-      "color": "secondary"
+      "name": "Frontend Intern",
+      "description": "html",
+      "icon": "html",
+      "color": "bg-primary-subtle text-primary",
+      "id": "9_akznJUoa8"
+    },
+    {
+      "name": "Frontend Intern",
+      "description": "h",
+      "icon": "bi bi-cup-hot-fill",
+      "color": "bg-primary-subtle text-primary",
+      "id": "-jpE_495ysw"
+    },
+    {
+      "name": "Frontend Intern",
+      "description": "hhh",
+      "icon": "bi bi-cup-hot-fill",
+      "color": "bg-danger-subtle text-danger",
+      "id": "TO4Wxvs0tBQ"
+    },
+    {
+      "name": "Frontend Intern",
+      "description": "kkk",
+      "icon": "bi bi-cup-hot-fill",
+      "color": "bg-success-subtle text-success",
+      "id": "xvNUeAWvn-8"
+    },
+    {
+      "name": "Frontend Intern",
+      "description": "hgg",
+      "icon": "bi bi-cup-hot-fill",
+      "color": "bg-primary-subtle text-primary",
+      "id": "8IC6CZiDluI"
+    },
+    {
+      "name": "Frontend Intern",
+      "description": "aa",
+      "icon": "bi bi-cup-hot-fill",
+      "color": "bg-danger-subtle text-danger",
+      "id": "J2vbP7fpSs4"
+    },
+    {
+      "name": "Frontend Intern",
+      "description": "aa",
+      "icon": "bi bi-cupa-hot-fill",
+      "color": "bg-success-subtle text-success",
+      "id": "KGxm0fNDlkE"
+    },
+    {
+      "name": "Frontend Intern",
+      "description": "zzzzzzz",
+      "icon": "bi bi-cup-hot-fill",
+      "color": "bg-primary-subtle text-primary",
+      "id": "40q5dEL1bfI"
+    },
+    {
+      "name": "Frontend Intern",
+      "description": "11",
+      "icon": "bi bi-cup-hot-fill",
+      "color": "bg-success-subtle text-success",
+      "id": "tgWQiNPpdAQ"
     }
   ],
   "exams": [
@@ -2146,6 +2291,240 @@
       "explanation": "Python sử dụng cú pháp try ... except ... else ... finally để xử lý exception."
     },
     {
+<<<<<<< HEAD
+      "userId": null,
+      "examId": "ex-java-1",
+      "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
+      "score": 0,
+      "totalQuestions": 3,
+      "correctAnswersCount": 0,
+      "timeTaken": 22,
+      "userAnswers": {},
+      "completedAt": "2026-08-16T01:50:58.605Z",
+      "id": "5LChoemlEhk"
+    },
+    {
+      "userId": "rG2EfvkY9CQ",
+      "examId": "ex-java-1",
+      "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
+      "score": 0,
+      "totalQuestions": 3,
+      "correctAnswersCount": 0,
+      "timeTaken": 2,
+      "userAnswers": {},
+      "completedAt": "2026-08-17T01:23:29.190Z",
+      "id": "81m1UvFIuwQ"
+    },
+    {
+      "userId": "rG2EfvkY9CQ",
+      "examId": "ex-java-1",
+      "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
+      "score": 67,
+      "totalQuestions": 3,
+      "correctAnswersCount": 2,
+      "timeTaken": 6,
+      "userAnswers": {
+        "q-j1-1": 1,
+        "q-j1-2": 1,
+        "q-j1-3": 1
+      },
+      "completedAt": "2026-08-17T02:54:58.250Z",
+      "id": "dXurqmnZtc0"
+    },
+    {
+      "userId": "rG2EfvkY9CQ",
+      "examId": "ex-java-1",
+      "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
+      "score": 0,
+      "totalQuestions": 3,
+      "correctAnswersCount": 0,
+      "timeTaken": 3,
+      "userAnswers": {
+        "q-j1-1": 0
+      },
+      "completedAt": "2026-08-17T02:55:04.147Z",
+      "id": "7QKmwY_9DqU"
+    },
+    {
+      "userId": "rG2EfvkY9CQ",
+      "examId": "ex-java-1",
+      "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
+      "score": 33,
+      "totalQuestions": 3,
+      "correctAnswersCount": 1,
+      "timeTaken": 5,
+      "userAnswers": {
+        "q-j1-1": 0,
+        "q-j1-2": 1,
+        "q-j1-3": 1
+      },
+      "completedAt": "2026-08-17T02:56:37.348Z",
+      "id": "BCtqoBEXs8U"
+    },
+    {
+      "userId": "rG2EfvkY9CQ",
+      "examId": "ex-csharp-1",
+      "examTitle": "C# Basic, Class, Method & Class Inheritance",
+      "score": 67,
+      "totalQuestions": 3,
+      "correctAnswersCount": 2,
+      "timeTaken": 6,
+      "userAnswers": {
+        "q-cs1-1": 0,
+        "q-cs1-2": 0,
+        "q-cs1-3": 1
+      },
+      "completedAt": "2026-08-17T03:04:39.200Z",
+      "id": "iRI5lfYJBGQ"
+    },
+    {
+      "userId": "rG2EfvkY9CQ",
+      "examId": "ex-csharp-1",
+      "examTitle": "C# Basic, Class, Method & Class Inheritance",
+      "score": 67,
+      "totalQuestions": 3,
+      "correctAnswersCount": 2,
+      "timeTaken": 6,
+      "userAnswers": {
+        "q-cs1-1": 0,
+        "q-cs1-2": 1,
+        "q-cs1-3": 0
+      },
+      "completedAt": "2026-08-17T03:04:48.970Z",
+      "id": "sXoSx76d1oU"
+    },
+    {
+      "userId": "rG2EfvkY9CQ",
+      "examId": "ex-java-1",
+      "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
+      "score": 0,
+      "totalQuestions": 3,
+      "correctAnswersCount": 0,
+      "timeTaken": 7,
+      "userAnswers": {
+        "q-j1-1": 0,
+        "q-j1-2": 1,
+        "q-j1-3": 2
+      },
+      "completedAt": "2026-08-17T03:34:03.759Z",
+      "id": "VVhnpwYWT2M"
+    },
+    {
+      "userId": "rG2EfvkY9CQ",
+      "examId": "ex-java-1",
+      "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
+      "score": 0,
+      "totalQuestions": 3,
+      "correctAnswersCount": 0,
+      "timeTaken": 5,
+      "userAnswers": {
+        "q-j1-1": 0,
+        "q-j1-2": 1,
+        "q-j1-3": 2
+      },
+      "completedAt": "2026-08-17T03:37:21.012Z",
+      "id": "9IKYsNVorfc"
+    },
+    {
+      "userId": "rG2EfvkY9CQ",
+      "examId": "ex-java-1",
+      "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
+      "score": 0,
+      "totalQuestions": 3,
+      "correctAnswersCount": 0,
+      "timeTaken": 1,
+      "userAnswers": {},
+      "completedAt": "2026-08-17T03:37:24.761Z",
+      "id": "PXnMd7XG78c"
+    },
+    {
+      "userId": "rG2EfvkY9CQ",
+      "examId": "ex-java-1",
+      "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
+      "score": 0,
+      "totalQuestions": 3,
+      "correctAnswersCount": 0,
+      "timeTaken": 1,
+      "userAnswers": {},
+      "completedAt": "2026-08-17T03:37:27.781Z",
+      "id": "r0NdBdafvqo"
+    },
+    {
+      "userId": "rG2EfvkY9CQ",
+      "examId": "ex-java-1",
+      "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
+      "score": 0,
+      "totalQuestions": 3,
+      "correctAnswersCount": 0,
+      "timeTaken": 2,
+      "userAnswers": {},
+      "completedAt": "2026-08-17T03:37:33.303Z",
+      "id": "PTaI9My6ypI"
+    },
+    {
+      "userId": "rG2EfvkY9CQ",
+      "examId": "ex-java-1",
+      "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
+      "score": 0,
+      "totalQuestions": 3,
+      "correctAnswersCount": 0,
+      "timeTaken": 1,
+      "userAnswers": {},
+      "completedAt": "2026-08-17T03:37:36.352Z",
+      "id": "wMe5xFHPqPs"
+    },
+    {
+      "userId": "rG2EfvkY9CQ",
+      "examId": "ex-java-1",
+      "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
+      "score": 0,
+      "totalQuestions": 3,
+      "correctAnswersCount": 0,
+      "timeTaken": 1,
+      "userAnswers": {},
+      "completedAt": "2026-08-17T03:37:44.141Z",
+      "id": "XX96Fc0GJ7o"
+    },
+    {
+      "userId": "rG2EfvkY9CQ",
+      "examId": "ex-java-1",
+      "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
+      "score": 0,
+      "totalQuestions": 3,
+      "correctAnswersCount": 0,
+      "timeTaken": 1,
+      "userAnswers": {},
+      "completedAt": "2026-08-17T03:37:53.569Z",
+      "id": "S01LiirXr8c"
+    },
+    {
+      "userId": "rG2EfvkY9CQ",
+      "examId": "ex-java-1",
+      "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
+      "score": 33,
+      "totalQuestions": 3,
+      "correctAnswersCount": 1,
+      "timeTaken": 5,
+      "userAnswers": {
+        "q-j1-1": 0,
+        "q-j1-2": 2,
+        "q-j1-3": 0
+      },
+      "completedAt": "2026-08-17T03:45:49.955Z",
+      "id": "X23Xr5MZVbA"
+    },
+    {
+      "userId": "rG2EfvkY9CQ",
+      "examId": "ex-java-1",
+      "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
+      "score": 0,
+      "totalQuestions": 3,
+      "correctAnswersCount": 0,
+      "timeTaken": 2,
+      "userAnswers": {},
+      "completedAt": "2026-08-17T03:45:53.245Z",
+      "id": "rKybv4IVyqE"
+=======
       "id": "q-py2-10",
       "examId": "ex-python-2",
       "questionText": "Biến đặc biệt '__name__' trong file Python có giá trị là gì khi file được chạy trực tiếp từ Terminal?",
@@ -2157,6 +2536,7 @@
       ],
       "correctAnswer": 0,
       "explanation": "Khi script chạy trực tiếp, __name__ được gán bằng '__main__'; khi import thì bằng tên module."
+>>>>>>> e316793624ea43e124f14ae53a22518771301e72
     }
   ],
   "histories": [

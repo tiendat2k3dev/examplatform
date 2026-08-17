@@ -1,6 +1,9 @@
 // src/services/historyService.ts
 import axios from "axios";
 import { History, SubmitExamPayload } from "@/types/history";
+<<<<<<< HEAD
+import api from "../lib/apiClient";
+=======
 
 const API_URL = "http://localhost:4000";
 
@@ -9,6 +12,7 @@ export const generatePublicUserId = (): string => {
   const randomNum = Math.floor(100000 + Math.random() * 900000);
   return `Public-${randomNum}`;
 };
+>>>>>>> e316793624ea43e124f14ae53a22518771301e72
 
 // 1. Lưu kết quả làm bài vào db.json
 export const submitExamResultService = async (

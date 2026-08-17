@@ -1,6 +1,11 @@
 // src/services/authService.ts
 import axios from "axios";
 import bcrypt from "bcryptjs";
+<<<<<<< HEAD:src/services/authService.ts
+import api from "../lib/apiClient";
+
+=======
+>>>>>>> e316793624ea43e124f14ae53a22518771301e72:src/services/authService.tsx
 import {
   User,
   LoginPayload,

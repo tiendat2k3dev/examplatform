@@ -1,201 +1,504 @@
 "use client";
 
-import { useState } from "react";
-import HeaderExamGroupsPage from "../../../../components/exam-groups/HeaderExamGroupsPage";
-import Add from "../../../../components/modal/exam-groups/add/exam-groupsAdd";
-import Edit from "../../../../components/modal/exam-groups/edit/exam-groupsEdit";
-import Delete from "@/components/modal/exam-groups/delete/exam-groupsDelete";
-import { toast } from "react-toastify";
-import type { ExamGroup } from "@/components/modal/exam-groups/add/exam-groupsAdd";
-const ExamGroupsPage = () => {
-  const [examGroups, setExamGroups] = useState<ExamGroup[]>([
-    {
-      id: 1,
-      name: "Java Backend",
-      description:
-        "Java Core, OOP, Spring Boot, Collection Framework & Multithreading.",
-      icon: "☕",
-      iconClass: "bg-danger-subtle text-danger",
-    },
-    {
-      id: 2,
-      name: "C# & .NET",
-      description:
-        "C# Basic, .NET Core Web API, Entity Framework, LINQ & MVC Architecture.",
-      icon: "▦",
-      iconClass: "bg-primary-subtle text-primary",
-    },
-    {
-      id: 3,
-      name: "Frontend Web",
-      description:
-        "HTML5, CSS3, JavaScript ES6+, Bootstrap 5 & ReactJS căn bản.",
-      icon: "HTML",
-      iconClass: "bg-warning-subtle text-warning",
-    },
-    {
-      id: 4,
-      name: "Cơ Sở Dữ Liệu",
-      description:
-        "SQL Server, MySQL, các câu lệnh truy vấn Join, Group By, Subquery & Index.",
-      icon: "●",
-      iconClass: "bg-success-subtle text-success",
-    },
-    {
-      id: 5,
-      name: "C / C++ Base",
-      description:
-        "Cấu trúc dữ liệu & Giải thuật, Con trỏ, Mảng, Struct & Quản lý bộ nhớ.",
-      icon: "⚙",
-      iconClass: "bg-info-subtle text-info",
-    },
-    {
-      id: 6,
-      name: "Python Lập Trình",
-      description:
-        "Cú pháp cơ bản, String/List/Dict, Function, Module & xử lý File trong Python.",
-      icon: "<>",
-      iconClass: "bg-secondary-subtle text-secondary",
-    },
-  ]);
+import { useEffect, useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
 
-  const [showAddModal, setShowAddModal] = useState(false);
+import HeaderExamGroups from "../../../../components/exam-groups/HeaderExamGroupsPage";
+import CreateExamGroupModal from "../../../../components/modal/exam-groups/add/exam-groupsAdd";
+import EditExamGroupModal from "../../../../components/modal/exam-groups/edit/exam-groupsEdit";
+import DeleteExamGroupModal from "../../../../components/modal/exam-groups/delete/exam-groupsDelete";
+
+import {
+  getExamGroupsService,
+  createExamGroupService,
+  updateExamGroupService,
+  deleteExamGroupService,
+} from "../../../../services/examGroupService";
+
+import { ExamGroup } from "../../../../types/examGroup";
+
+const ExamGroups = () => {
+  // =====================================================
+  // DATA
+  // =====================================================
+
+  const [examGroups, setExamGroups] = useState<ExamGroup[]>([]);
+
+  const [loading, setLoading] = useState(true);
+
+  // =====================================================
+  // SEARCH
+  // =====================================================
+
+  const [searchText, setSearchText] = useState("");
+
+  // =====================================================
+  // MODAL
+  // =====================================================
+
+  const [showCreateModal, setShowCreateModal] = useState(false);
+
   const [showEditModal, setShowEditModal] = useState(false);
+
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedGroup, setSelectedGroup] = useState<ExamGroup | null>(null);
+
+  // =====================================================
+  // SELECTED EXAM GROUP
+  // =====================================================
+
+  const [selectedExamGroup, setSelectedExamGroup] = useState<ExamGroup | null>(
+    null,
+  );
+
+  // =====================================================
+  // LOAD EXAM GROUPS
+  // =====================================================
+
+  const fetchExamGroups = async () => {
+    try {
+      setLoading(true);
+
+      const data = await getExamGroupsService();
+
+      setExamGroups(data);
+    } catch (error) {
+      console.error("Lỗi khi tải danh sách nhóm đề thi:", error);
+
+      toast.error("Không thể tải danh sách nhóm đề thi!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // =====================================================
+  // USE EFFECT
+  // =====================================================
+
+  useEffect(() => {
+    fetchExamGroups();
+  }, []);
+
+  // =====================================================
+  // SEARCH
+  // =====================================================
+
+  const filteredExamGroups = examGroups.filter((group) => {
+    const keyword = searchText.trim().toLowerCase();
+
+    if (!keyword) {
+      return true;
+    }
+
+    return (
+      group.name.toLowerCase().includes(keyword) ||
+      group.description.toLowerCase().includes(keyword)
+    );
+  });
+
+  // =====================================================
+  // SEARCH CHANGE
+  // =====================================================
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(event.target.value);
+  };
+
+  // =====================================================
+  // ADD
+  // =====================================================
 
   const handleAdd = () => {
-    setShowAddModal(true);
+    setShowCreateModal(true);
   };
 
-  const handleCreate = (group: ExamGroup) => {
-    setExamGroups((prev) => [group, ...prev]);
+  // =====================================================
+  // CREATE
+  // =====================================================
+
+  const handleCreate = async (group: Omit<ExamGroup, "id">) => {
+    try {
+      const newExamGroup = await createExamGroupService(group);
+
+      setExamGroups((prev) => [...prev, newExamGroup]);
+
+      setShowCreateModal(false);
+
+      toast.success("Thêm nhóm đề thi thành công!");
+    } catch (error) {
+      console.error("Lỗi khi thêm nhóm đề thi:", error);
+
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Không thể thêm nhóm đề thi!");
+      }
+    }
   };
+
+  // =====================================================
+  // EDIT
+  // =====================================================
 
   const handleEdit = (group: ExamGroup) => {
-    setSelectedGroup(group);
+    setSelectedExamGroup(group);
+
     setShowEditModal(true);
   };
 
-  const handleUpdate = (updated: ExamGroup) => {
-    setExamGroups((prev) =>
-      prev.map((item) => (item.id === updated.id ? updated : item)),
-    );
+  // =====================================================
+  // UPDATE
+  // =====================================================
+
+  const handleUpdate = async (group: ExamGroup) => {
+    try {
+      const updatedExamGroup = await updateExamGroupService(String(group.id), {
+        name: group.name.trim(),
+        description: group.description.trim(),
+        icon: group.icon,
+        color: group.color,
+      });
+
+      setExamGroups((prev) =>
+        prev.map((item) =>
+          String(item.id) === String(updatedExamGroup.id)
+            ? updatedExamGroup
+            : item,
+        ),
+      );
+
+      setShowEditModal(false);
+
+      setSelectedExamGroup(null);
+
+      toast.success("Cập nhật nhóm đề thi thành công!");
+    } catch (error) {
+      console.error("Lỗi khi cập nhật nhóm đề thi:", error);
+
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Không thể cập nhật nhóm đề thi!");
+      }
+    }
   };
 
+  // =====================================================
+  // DELETE
+  // =====================================================
+
   const handleDelete = (group: ExamGroup) => {
-    setSelectedGroup(group);
+    setSelectedExamGroup(group);
+
     setShowDeleteModal(true);
   };
 
-  const handleConfirmDelete = () => {
-    if (!selectedGroup) {
+  // =====================================================
+  // CONFIRM DELETE
+  // =====================================================
+
+  const handleConfirmDelete = async () => {
+    if (!selectedExamGroup) {
       return;
     }
 
-    setExamGroups((prev) =>
-      prev.filter((item) => item.id !== selectedGroup.id),
-    );
+    try {
+      await deleteExamGroupService(String(selectedExamGroup.id));
 
-    toast.success("Xóa nhóm đề thi thành công!");
-    setShowDeleteModal(false);
-    setSelectedGroup(null);
+      setExamGroups((prev) =>
+        prev.filter(
+          (group) => String(group.id) !== String(selectedExamGroup.id),
+        ),
+      );
+
+      setShowDeleteModal(false);
+
+      setSelectedExamGroup(null);
+
+      toast.success("Xóa nhóm đề thi thành công!");
+    } catch (error) {
+      console.error("Lỗi khi xóa nhóm đề thi:", error);
+
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Không thể xóa nhóm đề thi!");
+      }
+    }
   };
 
+  // =====================================================
+  // ICON
+  // =====================================================
+
+  const renderIcon = (group: ExamGroup) => {
+    if (!group.icon) {
+      return <i className="bi bi-folder-fill"></i>;
+    }
+
+    if (group.icon.startsWith("bi ")) {
+      return <i className={group.icon}></i>;
+    }
+
+    if (group.icon.startsWith("bi-")) {
+      return <i className={`bi ${group.icon}`}></i>;
+    }
+
+    return (
+      <span
+        style={{
+          fontSize: "20px",
+          fontWeight: 700,
+        }}
+      >
+        {group.icon}
+      </span>
+    );
+  };
+
+  // =====================================================
+  // RENDER
+  // =====================================================
+
   return (
-    <div className="container-fluid bg-light min-vh-100 px-4 py-4">
-      <HeaderExamGroupsPage
-        title="Quản lý nhóm đề thi"
-        description="Quản lý các nhóm đề thi trong hệ thống"
-        add="Thêm nhóm mới"
-        onAdd={handleAdd}
-      />
+    <div
+      className="container-fluid py-4"
+      style={{
+        backgroundColor: "#f8f9fa",
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+      }}
+    >
+      {/* =====================================================
+          HEADER
+      ===================================================== */}
 
-      <div className="row g-4">
-        {examGroups.map((group) => (
-          <div key={group.id} className="col-12 col-md-6 col-lg-4">
-            <div className="card h-100 border shadow-sm">
-              <div className="card-body p-3">
-                <div
-                  className={`d-flex align-items-center justify-content-center rounded mb-3 ${group.iconClass}`}
-                  style={{
-                    width: "42px",
-                    height: "42px",
-                    fontSize: group.icon === "HTML" ? "9px" : "20px",
-                    fontWeight: "700",
-                  }}
-                >
-                  {group.icon}
-                </div>
-
-                <h5 className="card-title fw-semibold text-dark mb-2">
-                  {group.name}
-                </h5>
-
-                <p
-                  className="card-text text-secondary small mb-0"
-                  style={{
-                    minHeight: "48px",
-                    lineHeight: "1.5",
-                  }}
-                >
-                  {group.description}
-                </p>
-              </div>
-
-              <div className="card-footer bg-light border-top">
-                <div className="d-flex justify-content-end gap-3">
-                  <button
-                    type="button"
-                    className="btn btn-sm p-0 text-primary"
-                    title="Chỉnh sửa"
-                    onClick={() => handleEdit(group)}
-                  >
-                    <i className="bi bi-pencil"></i>
-                  </button>
-
-                  <button
-                    type="button"
-                    className="btn btn-sm p-0 text-danger"
-                    title="Xóa"
-                    onClick={() => handleDelete(group)}
-                  >
-                    <i className="bi bi-trash"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
+      <div className="flex-shrink-0">
+        <HeaderExamGroups
+          title="Quản lý nhóm đề thi"
+          description="Quản lý các nhóm đề thi trong hệ thống"
+          add="Thêm nhóm mới"
+          onAdd={handleAdd}
+        />
       </div>
 
-      <Add
-        show={showAddModal}
-        onClose={() => setShowAddModal(false)}
+      {/* =====================================================
+          SCROLLABLE CONTENT
+      ===================================================== */}
+
+      <div
+        className="flex-grow-1 overflow-auto px-4 pb-4"
+        style={{
+          scrollbarWidth: "thin",
+          scrollbarColor: "#adb5bd transparent",
+        }}
+      >
+        {/* SEARCH */}
+
+        <div className="bg-white p-3 rounded-3 shadow-sm mb-4">
+          <div
+            className="input-group"
+            style={{
+              maxWidth: "780px",
+            }}
+          >
+            <span className="input-group-text bg-white">
+              <i className="bi bi-search"></i>
+            </span>
+
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Tìm kiếm nhóm đề thi..."
+              value={searchText}
+              onChange={handleSearchChange}
+            />
+          </div>
+        </div>
+
+        {/* LOADING */}
+
+        {loading ? (
+          <div className="bg-white rounded-3 shadow-sm">
+            <div className="text-center py-5 text-secondary">
+              <div
+                className="spinner-border spinner-border-sm me-2"
+                role="status"
+              ></div>
+              Đang tải nhóm đề thi...
+            </div>
+          </div>
+        ) : filteredExamGroups.length === 0 ? (
+          /* =====================================================
+              EMPTY
+          ===================================================== */
+
+          <div className="bg-white rounded-3 shadow-sm">
+            <div className="text-center py-5 text-secondary">
+              <i
+                className="bi bi-folder-x"
+                style={{
+                  fontSize: "40px",
+                }}
+              ></i>
+
+              <p className="mt-3 mb-0">Không tìm thấy nhóm đề thi</p>
+            </div>
+          </div>
+        ) : (
+          /* =====================================================
+             LIST CARD
+          ===================================================== */
+
+          <div className="row g-4">
+            {filteredExamGroups.map((group) => (
+              <div className="col-12 col-md-6 col-lg-4" key={group.id}>
+                <div
+                  className="card h-100 shadow-sm"
+                  style={{
+                    border: "1px solid #dee2e6",
+                    borderRadius: "6px",
+                  }}
+                >
+                  {/* ================= CARD BODY ================= */}
+
+                  <div className="card-body">
+                    {/* ICON */}
+
+                    <div
+                      className="mb-4"
+                      style={{
+                        color: group.color || "#212529",
+                        fontSize: "22px",
+                        width: "40px",
+                        height: "40px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      {renderIcon(group)}
+                    </div>
+
+                    {/* NAME */}
+
+                    <h5
+                      className="card-title mb-2 fw-semibold"
+                      style={{
+                        color: "#111827",
+                      }}
+                    >
+                      {group.name}
+                    </h5>
+
+                    {/* DESCRIPTION */}
+
+                    <p
+                      className="card-text mb-0"
+                      style={{
+                        color: "#718096",
+                        fontSize: "14px",
+                        lineHeight: "1.6",
+                      }}
+                    >
+                      {group.description}
+                    </p>
+                  </div>
+
+                  {/* ================= CARD FOOTER ================= */}
+
+                  <div
+                    className="card-footer d-flex justify-content-end align-items-center"
+                    style={{
+                      backgroundColor: "#f8f9fa",
+                      borderTop: "1px solid #dee2e6",
+                    }}
+                  >
+                    {/* EDIT */}
+
+                    <button
+                      type="button"
+                      className="btn btn-sm p-1 text-primary me-3"
+                      title="Sửa"
+                      onClick={() => handleEdit(group)}
+                    >
+                      <i className="bi bi-pencil"></i>
+                    </button>
+
+                    {/* DELETE */}
+
+                    <button
+                      type="button"
+                      className="btn btn-sm p-1 text-danger"
+                      title="Xóa"
+                      onClick={() => handleDelete(group)}
+                    >
+                      <i className="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* =====================================================
+          CREATE MODAL
+      ===================================================== */}
+
+      <CreateExamGroupModal
+        show={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
         onCreate={handleCreate}
       />
 
-      <Edit
-        show={showEditModal}
-        group={selectedGroup}
-        onClose={() => {
-          setShowEditModal(false);
-          setSelectedGroup(null);
-        }}
-        onUpdate={handleUpdate}
-      />
+      {/* =====================================================
+          EDIT MODAL
+      ===================================================== */}
 
-      <Delete
-        show={showDeleteModal}
-        group={selectedGroup}
-        onClose={() => {
-          setShowDeleteModal(false);
-          setSelectedGroup(null);
-        }}
-        onConfirm={handleConfirmDelete}
+      {selectedExamGroup && (
+        <EditExamGroupModal
+          show={showEditModal}
+          group={selectedExamGroup}
+          onClose={() => {
+            setShowEditModal(false);
+            setSelectedExamGroup(null);
+          }}
+          onUpdate={handleUpdate}
+        />
+      )}
+
+      {/* =====================================================
+          DELETE MODAL
+      ===================================================== */}
+
+      {selectedExamGroup && (
+        <DeleteExamGroupModal
+          show={showDeleteModal}
+          group={selectedExamGroup}
+          onClose={() => {
+            setShowDeleteModal(false);
+            setSelectedExamGroup(null);
+          }}
+          onConfirm={handleConfirmDelete}
+        />
+      )}
+
+      {/* =====================================================
+          TOAST
+      ===================================================== */}
+
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
       />
     </div>
   );
 };
 
-export default ExamGroupsPage;
+export default ExamGroups;

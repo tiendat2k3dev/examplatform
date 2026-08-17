@@ -1,8 +1,12 @@
 // src/services/questionService.ts
 import axios from "axios";
 import { Question } from "@/types/question";
+<<<<<<< HEAD
+import api from "../lib/apiClient";
+=======
 
 const API_URL = "http://localhost:4000";
+>>>>>>> e316793624ea43e124f14ae53a22518771301e72
 
 // Lấy danh sách câu hỏi thuộc đề thi theo examId
 export const getQuestionsByExamIdService = async (

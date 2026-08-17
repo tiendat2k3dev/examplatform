@@ -1,6 +1,6 @@
 // src/services/questionService.ts
 import { Question } from "@/types/question";
-import api from "../lib/apiClient.js";
+import api from "../lib/apiClient";
 
 // Lấy danh sách câu hỏi thuộc đề thi theo examId
 export const getQuestionsByExamIdService = async (

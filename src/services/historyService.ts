@@ -1,6 +1,6 @@
 // src/services/historyService.ts
 import { History, SubmitExamPayload } from "@/types/history";
-import api from "../lib/apiClient.js";
+import api from "../lib/apiClient";
 
 // 1. Lưu kết quả làm bài vào db.json
 export const submitExamResultService = async (

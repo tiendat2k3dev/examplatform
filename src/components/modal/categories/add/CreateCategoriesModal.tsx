@@ -8,16 +8,32 @@ import * as Yup from "yup";
 interface CreateCategoriesModalProps {
   show: boolean;
   onClose: () => void;
-  onSubmit: (name: string) => void;
+  onSubmit: (names: string[]) => void;
 }
 
 const validationSchema = Yup.object({
-  name: Yup.string()
+  name1: Yup.string()
     .trim()
-    .required("Vui lòng nhập tên danh mục")
+    .required("Vui lòng nhập tên danh mục 1")
+    .min(2, "Tên danh mục phải có ít nhất 2 ký tự")
+    .max(100, "Tên danh mục không được quá 100 ký tự"),
+  name2: Yup.string()
+    .trim()
+    .required("Vui lòng nhập tên danh mục 2")
+    .min(2, "Tên danh mục phải có ít nhất 2 ký tự")
+    .max(100, "Tên danh mục không được quá 100 ký tự"),
+  name3: Yup.string()
+    .trim()
+    .required("Vui lòng nhập tên danh mục 3")
     .min(2, "Tên danh mục phải có ít nhất 2 ký tự")
     .max(100, "Tên danh mục không được quá 100 ký tự"),
 });
+
+const sampleCategories = [
+  "Toán học",
+  "Vật lý",
+  "Hóa học",
+];
 
 const CreateCategoriesModal = ({
   show,
@@ -73,11 +89,19 @@ const CreateCategoriesModal = ({
 
           <Formik
             initialValues={{
-              name: "",
+              name1: sampleCategories[0],
+              name2: sampleCategories[1],
+              name3: sampleCategories[2],
             }}
             validationSchema={validationSchema}
             onSubmit={(values, { resetForm }) => {
-              onSubmit(values.name.trim());
+              const names = [
+                values.name1.trim(),
+                values.name2.trim(),
+                values.name3.trim(),
+              ].filter((name) => name.length > 0);
+
+              onSubmit(names);
               resetForm();
             }}
           >
@@ -86,22 +110,68 @@ const CreateCategoriesModal = ({
                 <div className="modal-body">
                   <div className="mb-3">
                     <label
-                      htmlFor="createCategoryName"
+                      htmlFor="createCategoryName1"
                       className="form-label fw-semibold"
                     >
-                      Tên danh mục
+                      Danh mục 1 <span className="text-danger">*</span>
                     </label>
 
                     <Field
-                      id="createCategoryName"
-                      name="name"
+                      id="createCategoryName1"
+                      name="name1"
                       type="text"
                       className="form-control"
-                      placeholder="Nhập tên danh mục"
+                      placeholder="Nhập tên danh mục 1"
                     />
 
                     <ErrorMessage
-                      name="name"
+                      name="name1"
+                      component="div"
+                      className="text-danger mt-1 small"
+                    />
+                  </div>
+
+                  <div className="mb-3">
+                    <label
+                      htmlFor="createCategoryName2"
+                      className="form-label fw-semibold"
+                    >
+                      Danh mục 2 <span className="text-danger">*</span>
+                    </label>
+
+                    <Field
+                      id="createCategoryName2"
+                      name="name2"
+                      type="text"
+                      className="form-control"
+                      placeholder="Nhập tên danh mục 2"
+                    />
+
+                    <ErrorMessage
+                      name="name2"
+                      component="div"
+                      className="text-danger mt-1 small"
+                    />
+                  </div>
+
+                  <div className="mb-3">
+                    <label
+                      htmlFor="createCategoryName3"
+                      className="form-label fw-semibold"
+                    >
+                      Danh mục 3 <span className="text-danger">*</span>
+                    </label>
+
+                    <Field
+                      id="createCategoryName3"
+                      name="name3"
+                      type="text"
+                      className="form-control"
+                      placeholder="Nhập tên danh mục 3"
+                    />
+
+                    <ErrorMessage
+                      name="name3"
                       component="div"
                       className="text-danger mt-1 small"
                     />

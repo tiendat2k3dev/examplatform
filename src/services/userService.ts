@@ -1,6 +1,6 @@
 import { User } from "../types/user";
 import bcrypt from "bcryptjs";
-import api from "../lib/apiClient.js";
+import api from "../lib/apiClient";
 
 // Lấy danh sách người dùng
 export const getUsersService = async (): Promise<User[]> => {
@@ -82,6 +82,53 @@ export const deleteUserService = async (
     await api.delete(`/users/${userId}`);
   } catch (error) {
     console.error("Lỗi khi xóa người dùng:", error);
+    throw error;
+  }
+};
+// tim kiem Họ tên	Địa chỉ	Số điện thoại	Email	Vai trò
+// =========================
+// TÌM KIẾM NGƯỜI DÙNG
+// Họ tên + Địa chỉ + SĐT + Email
+// Vai trò + Trạng thái
+// =========================
+export const searchUsersService = async (
+  keyword: string = "",
+  role: string = "",
+  status: string = "",
+): Promise<User[]> => {
+  try {
+    const response = await api.get<User[]>("/users");
+
+    const users = Array.isArray(response.data) ? response.data : [];
+
+    const search = keyword.toLowerCase().trim();
+
+    return users.filter((user) => {
+      // =========================
+      // TÌM KIẾM TEXT
+      // =========================
+      const matchesKeyword =
+        search === "" ||
+        user.fullName.toLowerCase().includes(search) ||
+        user.address.toLowerCase().includes(search) ||
+        user.phone.toLowerCase().includes(search) ||
+        user.email.toLowerCase().includes(search);
+
+      // =========================
+      // LỌC VAI TRÒ
+      // =========================
+      const matchesRole = role === "" || user.role === role;
+
+      // =========================
+      // LỌC TRẠNG THÁI
+      // =========================
+      const matchesStatus = status === "" || user.status === status;
+
+      return matchesKeyword && matchesRole && matchesStatus;
+    });
+  } catch (error) {
+    console.error("Lỗi khi tìm kiếm người dùng:", error);
+
     throw error;
   }
 };

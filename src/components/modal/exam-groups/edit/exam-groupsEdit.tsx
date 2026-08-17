@@ -5,29 +5,51 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
 
-import type { ExamGroup } from "@/components/modal/exam-groups/add/exam-groupsAdd";
+import type { ExamGroup } from "../../../../types/examGroup";
+import { renderExamGroupIcon } from "../../../../utils/examGroupIcon";
 
 interface EditProps {
   show: boolean;
   group: ExamGroup | null;
   onClose: () => void;
-  onUpdate: (group: ExamGroup) => void;
+  onUpdate: (group: ExamGroup) => Promise<void> | void;
 }
 
 const validationSchema = Yup.object({
   name: Yup.string().trim().required("Vui lòng nhập tên nhóm đề thi"),
+
   description: Yup.string().trim().required("Vui lòng nhập mô tả"),
+
   icon: Yup.string().trim().required("Vui lòng nhập icon"),
+
   iconClass: Yup.string().trim().required("Vui lòng chọn màu icon"),
 });
 
 const colorOptions = [
-  { value: "bg-primary-subtle text-primary", label: "Xanh dương" },
-  { value: "bg-success-subtle text-success", label: "Xanh lá" },
-  { value: "bg-danger-subtle text-danger", label: "Đỏ" },
-  { value: "bg-warning-subtle text-warning", label: "Cam" },
-  { value: "bg-info-subtle text-info", label: "Xanh cyan" },
-  { value: "bg-secondary-subtle text-secondary", label: "Xám" },
+  {
+    value: "bg-primary-subtle text-primary",
+    label: "Xanh dương",
+  },
+  {
+    value: "bg-success-subtle text-success",
+    label: "Xanh lá",
+  },
+  {
+    value: "bg-danger-subtle text-danger",
+    label: "Đỏ",
+  },
+  {
+    value: "bg-warning-subtle text-warning",
+    label: "Cam",
+  },
+  {
+    value: "bg-info-subtle text-info",
+    label: "Xanh cyan",
+  },
+  {
+    value: "bg-secondary-subtle text-secondary",
+    label: "Xám",
+  },
 ];
 
 const Edit = ({ show, group, onClose, onUpdate }: EditProps) => {
@@ -35,13 +57,18 @@ const Edit = ({ show, group, onClose, onUpdate }: EditProps) => {
 
   const formik = useFormik({
     enableReinitialize: true,
+
     initialValues: {
       name: group?.name ?? "",
       description: group?.description ?? "",
-      icon: group?.icon ?? "",
-      iconClass: group?.iconClass ?? "bg-primary-subtle text-primary",
+      icon: group?.icon ?? "bi bi-cup-hot-fill",
+
+      // QUAN TRỌNG: lấy color, không phải icon
+      iconClass: group?.color ?? "bg-primary-subtle text-primary",
     },
+
     validationSchema,
+
     onSubmit: async (values, { resetForm }) => {
       if (!group) {
         return;
@@ -50,18 +77,19 @@ const Edit = ({ show, group, onClose, onUpdate }: EditProps) => {
       try {
         setSubmitting(true);
 
-        await new Promise((resolve) => setTimeout(resolve, 300));
-
-        onUpdate({
-          ...group,
-          ...values,
+        await onUpdate({
+          id: group.id,
+          name: values.name.trim(),
+          description: values.description.trim(),
+          icon: values.icon.trim(),
+          color: values.iconClass,
         });
 
-        toast.success("Cập nhật nhóm đề thi thành công!");
         resetForm();
         onClose();
       } catch (error) {
-        console.error(error);
+        console.error("Lỗi khi cập nhật nhóm đề thi:", error);
+
         toast.error("Không thể cập nhật nhóm đề thi!");
       } finally {
         setSubmitting(false);
@@ -93,6 +121,7 @@ const Edit = ({ show, group, onClose, onUpdate }: EditProps) => {
         style={{ maxWidth: "600px" }}
       >
         <div className="modal-content border-0 shadow">
+          {/* Header */}
           <div className="modal-header">
             <h5 className="modal-title fw-bold" style={{ color: "#173b69" }}>
               Chỉnh sửa nhóm đề thi
@@ -109,6 +138,7 @@ const Edit = ({ show, group, onClose, onUpdate }: EditProps) => {
           <form onSubmit={formik.handleSubmit}>
             <div className="modal-body">
               <div className="row g-3">
+                {/* Tên */}
                 <div className="col-12">
                   <label className="form-label small fw-semibold">
                     Tên nhóm đề thi <span className="text-danger">*</span>
@@ -133,6 +163,7 @@ const Edit = ({ show, group, onClose, onUpdate }: EditProps) => {
                   )}
                 </div>
 
+                {/* Mô tả */}
                 <div className="col-12">
                   <label className="form-label small fw-semibold">
                     Mô tả <span className="text-danger">*</span>
@@ -159,30 +190,46 @@ const Edit = ({ show, group, onClose, onUpdate }: EditProps) => {
                   )}
                 </div>
 
+                {/* Icon */}
                 <div className="col-12">
                   <label className="form-label small fw-semibold">
-                    Icon <span className="text-danger">*</span>
+                    Icon Bootstrap <span className="text-danger">*</span>
                   </label>
 
-                  <input
-                    type="text"
-                    name="icon"
-                    className={`form-control form-control-sm ${
-                      formik.touched.icon && formik.errors.icon
-                        ? "is-invalid"
-                        : ""
-                    }`}
-                    placeholder="Nhập ký tự icon (VD: ☕, ▦, HTML...)"
-                    value={formik.values.icon}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                  />
+                  <div className="input-group">
+                    <span className="input-group-text">
+                      <i className={formik.values.icon}></i>
+                    </span>
+
+                    <input
+                      type="text"
+                      name="icon"
+                      className={`form-control form-control-sm ${
+                        formik.touched.icon && formik.errors.icon
+                          ? "is-invalid"
+                          : ""
+                      }`}
+                      placeholder="VD: bi bi-cup-hot-fill"
+                      value={formik.values.icon}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                    />
+                  </div>
 
                   {formik.touched.icon && formik.errors.icon && (
-                    <div className="invalid-feedback">{formik.errors.icon}</div>
+                    <div className="invalid-feedback d-block">
+                      {formik.errors.icon}
+                    </div>
                   )}
+
+                  <div className="form-text">
+                    Ví dụ: <code>bi bi-cup-hot-fill</code>,{" "}
+                    <code>bi bi-database-fill</code>,{" "}
+                    <code>bi bi-code-slash</code>
+                  </div>
                 </div>
 
+                {/* Màu */}
                 <div className="col-12">
                   <label className="form-label small fw-semibold">
                     Màu icon <span className="text-danger">*</span>
@@ -212,9 +259,28 @@ const Edit = ({ show, group, onClose, onUpdate }: EditProps) => {
                     </div>
                   )}
                 </div>
+
+                {/* Preview */}
+                <div className="col-12">
+                  <label className="form-label small fw-semibold">
+                    Xem trước
+                  </label>
+
+                  <div
+                    className={`d-flex align-items-center justify-content-center rounded ${formik.values.iconClass}`}
+                    style={{
+                      width: "50px",
+                      height: "50px",
+                      fontSize: "24px",
+                    }}
+                  >
+                    {renderExamGroupIcon(formik.values.icon)}
+                  </div>
+                </div>
               </div>
             </div>
 
+            {/* Footer */}
             <div className="modal-footer">
               <button
                 type="button"

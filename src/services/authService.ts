@@ -1,7 +1,7 @@
 // src/services/authService.ts
 
 import bcrypt from "bcryptjs";
-import api from "../lib/apiClient.js";
+import api from "../lib/apiClient";
 
 import {
   User,

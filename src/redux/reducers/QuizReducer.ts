@@ -3,6 +3,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 import { Question } from "@/types/question";
 import { getQuestionsByExamIdService } from "@/services/questionService";
+import { getErrorMessage } from "@/utils/errorHandler";
 import { AppDispatch } from "../store";
 
 export interface QuizState {
@@ -131,12 +132,12 @@ export const fetchQuestionsByExamIdApiAsync =
       dispatch(setLoading(true));
       const questions = await getQuestionsByExamIdService(examId);
       dispatch(initQuizData({ questions, durationMinutes }));
-    } catch (error: any) {
+    } catch (error) {
       dispatch(setLoading(false));
-      const errorMsg =
-        error.response?.data?.message ||
-        error.message ||
-        "Lỗi khi tải câu hỏi bài thi!";
+      const errorMsg = getErrorMessage(
+        error,
+        "Lỗi khi tải câu hỏi bài thi!"
+      );
       console.error("Fetch questions error:", error);
       toast.error(errorMsg);
       throw error;

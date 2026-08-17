@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 
 import HeaderCategories from "../../../../components/categories/HeaderCategories";
@@ -8,134 +8,268 @@ import CreateCategoriesModal from "../../../../components/modal/categories/add/C
 import EditCategoriesModal from "../../../../components/modal/categories/edit/EditCategoriesModal";
 import DeleteCategoriesModal from "../../../../components/modal/categories/delete/DeleteCategoriesModal";
 
-interface Category {
-  id: number;
-  name: string;
-}
+import {
+  getCategoriesService,
+  createCategoryService,
+  updateCategoryService,
+  deleteCategoryService,
+  searchCategoriesService,
+} from "../../../../services/categories";
+
+import { Category } from "../../../../types/categories";
 
 const Categories = () => {
-  const [categories, setCategories] = useState<Category[]>([
-    {
-      id: 1,
-      name: "Toán học",
-    },
-    {
-      id: 2,
-      name: "Vật lý",
-    },
-  ]);
+  // =====================================================
+  // DATA
+  // =====================================================
 
-  // Tìm kiếm
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  const [loading, setLoading] = useState(true);
+
+  // =====================================================
+  // SEARCH
+  // =====================================================
+
   const [searchText, setSearchText] = useState("");
 
-  // Modal thêm
+  // =====================================================
+  // MODAL
+  // =====================================================
+
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  // Modal sửa
   const [showEditModal, setShowEditModal] = useState(false);
 
-  // Modal xóa
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  // Category đang được sửa / xóa
+  // =====================================================
+  // SELECTED CATEGORY
+  // =====================================================
+
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(
     null,
   );
 
-  // =========================
-  // LỌC CATEGORY
-  // =========================
+  // =====================================================
+  // LOAD CATEGORY
+  // =====================================================
+
+  const fetchCategories = async () => {
+    try {
+      setLoading(true);
+
+      const data = await getCategoriesService();
+
+      setCategories(data);
+    } catch (error) {
+      console.error("Lỗi khi tải danh sách danh mục:", error);
+
+      toast.error("Không thể tải danh sách danh mục!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // =====================================================
+  // USE EFFECT
+  // =====================================================
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  // =====================================================
+  // TÌM KIẾM
+  // =====================================================
+
   const filteredCategories = categories.filter((category) => {
     const keyword = searchText.trim().toLowerCase();
 
-    return !keyword || category.name.toLowerCase().includes(keyword);
+    if (!keyword) {
+      return true;
+    }
+
+    return category.name.toLowerCase().includes(keyword);
   });
 
-  // =========================
+  // =====================================================
   // MỞ MODAL THÊM
-  // =========================
+  // =====================================================
+
   const handleAdd = () => {
     setShowCreateModal(true);
   };
 
-  // =========================
+  // =====================================================
   // THÊM CATEGORY
-  // =========================
-  const handleCreate = (name: string) => {
-    const newCategory: Category = {
-      id: Date.now(),
-      name,
-    };
+  // =====================================================
 
-    setCategories((prev) => [...prev, newCategory]);
+  const handleCreate = async (names: string[]) => {
+    try {
+      const newCategories = await Promise.all(
+        names.map((name) =>
+          createCategoryService({
+            name: name.trim(),
+          }),
+        ),
+      );
 
-    setShowCreateModal(false);
+      setCategories((prev) => [...prev, ...newCategories]);
 
-    toast.success("Thêm danh mục thành công!");
+      setShowCreateModal(false);
+
+      toast.success(`Thêm ${newCategories.length} danh mục thành công!`);
+    } catch (error) {
+      console.error("Lỗi khi thêm danh mục:", error);
+
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Không thể thêm danh mục!");
+      }
+    }
   };
 
-  // =========================
+  // =====================================================
   // MỞ MODAL SỬA
-  // =========================
-  const handleEdit = (id: number) => {
-    const category = categories.find((item) => item.id === id);
+  // =====================================================
 
-    if (!category) return;
+  const handleEdit = (id: string) => {
+    const category = categories.find((item) => String(item.id) === String(id));
+
+    if (!category) {
+      return;
+    }
 
     setSelectedCategory(category);
+
     setShowEditModal(true);
   };
 
-  // =========================
+  // =====================================================
   // SỬA CATEGORY
-  // =========================
-  const handleUpdate = (name: string) => {
-    if (!selectedCategory) return;
+  // =====================================================
 
-    setCategories((prev) =>
-      prev.map((category) =>
-        category.id === selectedCategory.id
-          ? {
-              ...category,
-              name,
-            }
-          : category,
-      ),
-    );
+  const handleUpdate = async (name: string) => {
+    if (!selectedCategory) {
+      return;
+    }
 
-    setShowEditModal(false);
-    setSelectedCategory(null);
+    try {
+      const updatedCategory = await updateCategoryService(
+        String(selectedCategory.id),
+        {
+          name: name.trim(),
+        },
+      );
 
-    toast.success("Cập nhật danh mục thành công!");
+      setCategories((prev) =>
+        prev.map((category) =>
+          String(category.id) === String(updatedCategory.id)
+            ? updatedCategory
+            : category,
+        ),
+      );
+
+      setShowEditModal(false);
+
+      setSelectedCategory(null);
+
+      toast.success("Cập nhật danh mục thành công!");
+    } catch (error) {
+      console.error("Lỗi khi cập nhật danh mục:", error);
+
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Không thể cập nhật danh mục!");
+      }
+    }
   };
 
-  // =========================
+  // =====================================================
   // MỞ MODAL XÓA
-  // =========================
-  const handleDelete = (id: number) => {
-    const category = categories.find((item) => item.id === id);
+  // =====================================================
 
-    if (!category) return;
+  const handleDelete = (id: string) => {
+    const category = categories.find((item) => String(item.id) === String(id));
+
+    if (!category) {
+      return;
+    }
 
     setSelectedCategory(category);
+
     setShowDeleteModal(true);
   };
 
-  // =========================
+  // =====================================================
   // XÓA CATEGORY
-  // =========================
-  const handleConfirmDelete = () => {
-    if (!selectedCategory) return;
+  // =====================================================
 
-    setCategories((prev) =>
-      prev.filter((category) => category.id !== selectedCategory.id),
-    );
+  const handleConfirmDelete = async () => {
+    if (!selectedCategory) {
+      return;
+    }
 
-    setShowDeleteModal(false);
-    setSelectedCategory(null);
+    try {
+      await deleteCategoryService(String(selectedCategory.id));
 
-    toast.success("Xóa danh mục thành công!");
+      setCategories((prev) =>
+        prev.filter(
+          (category) => String(category.id) !== String(selectedCategory.id),
+        ),
+      );
+
+      setShowDeleteModal(false);
+
+      setSelectedCategory(null);
+
+      toast.success("Xóa danh mục thành công!");
+    } catch (error) {
+      console.error("Lỗi khi xóa danh mục:", error);
+
+      toast.error("Không thể xóa danh mục!");
+    }
   };
+
+  // =====================================================
+  // SEARCH API
+  // =====================================================
+
+  const handleSearch = async () => {
+    try {
+      if (!searchText.trim()) {
+        await fetchCategories();
+        return;
+      }
+
+      const result = await searchCategoriesService(searchText);
+
+      setCategories(result);
+    } catch (error) {
+      console.error("Lỗi khi tìm kiếm danh mục:", error);
+
+      toast.error("Không thể tìm kiếm danh mục!");
+    }
+  };
+
+  // =====================================================
+  // ENTER SEARCH
+  // =====================================================
+
+  const handleSearchKeyDown = (
+    event: React.KeyboardEvent<HTMLInputElement>,
+  ) => {
+    if (event.key === "Enter") {
+      handleSearch();
+    }
+  };
+
+  // =====================================================
+  // RENDER
+  // =====================================================
 
   return (
     <div
@@ -143,6 +277,10 @@ const Categories = () => {
       style={{ backgroundColor: "#f8f9fa" }}
     >
       <div className="bg-white p-4 rounded-3 shadow-sm">
+        {/* =====================================================
+            HEADER
+        ===================================================== */}
+
         <HeaderCategories
           title="Quản lý danh mục"
           description="Tạo, chỉnh sửa, xóa và quản lý danh mục"
@@ -150,9 +288,10 @@ const Categories = () => {
           onAdd={handleAdd}
         />
 
-        {/* =========================
-            TÌM KIẾM
-        ========================= */}
+        {/* =====================================================
+            SEARCH
+        ===================================================== */}
+
         <div className="row mb-4">
           <div className="col-md-6">
             <div className="input-group">
@@ -165,15 +304,26 @@ const Categories = () => {
                 className="form-control border-0 bg-light"
                 placeholder="Tìm kiếm danh mục..."
                 value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
+                onChange={(event) => setSearchText(event.target.value)}
+                onKeyDown={handleSearchKeyDown}
               />
+
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleSearch}
+                title="Tìm kiếm"
+              >
+                <i className="bi bi-search"></i>
+              </button>
             </div>
           </div>
         </div>
 
-        {/* =========================
+        {/* =====================================================
             TABLE
-        ========================= */}
+        ===================================================== */}
+
         <div className="table-responsive">
           <table className="table table-hover mb-0">
             <thead className="table-light">
@@ -187,7 +337,19 @@ const Categories = () => {
             </thead>
 
             <tbody>
-              {filteredCategories.length > 0 ? (
+              {/* LOADING */}
+
+              {loading ? (
+                <tr>
+                  <td colSpan={3} className="text-center py-4 text-secondary">
+                    <div
+                      className="spinner-border spinner-border-sm me-2"
+                      role="status"
+                    />
+                    Đang tải danh mục...
+                  </td>
+                </tr>
+              ) : filteredCategories.length > 0 ? (
                 filteredCategories.map((category, index) => (
                   <tr key={category.id} className="border-bottom">
                     <td>{index + 1}</td>
@@ -196,22 +358,24 @@ const Categories = () => {
 
                     <td>
                       <div className="d-flex gap-2">
-                        {/* Sửa */}
+                        {/* SỬA */}
+
                         <button
                           type="button"
                           className="btn btn-sm btn-outline-primary p-1"
                           title="Sửa"
-                          onClick={() => handleEdit(category.id)}
+                          onClick={() => handleEdit(String(category.id))}
                         >
                           <i className="bi bi-pencil"></i>
                         </button>
 
-                        {/* Xóa */}
+                        {/* XÓA */}
+
                         <button
                           type="button"
                           className="btn btn-sm btn-outline-danger p-1"
                           title="Xóa"
-                          onClick={() => handleDelete(category.id)}
+                          onClick={() => handleDelete(String(category.id))}
                         >
                           <i className="bi bi-trash"></i>
                         </button>
@@ -231,18 +395,20 @@ const Categories = () => {
         </div>
       </div>
 
-      {/* =========================
+      {/* =====================================================
           MODAL THÊM
-      ========================= */}
+      ===================================================== */}
+
       <CreateCategoriesModal
         show={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onSubmit={handleCreate}
       />
 
-      {/* =========================
+      {/* =====================================================
           MODAL SỬA
-      ========================= */}
+      ===================================================== */}
+
       <EditCategoriesModal
         show={showEditModal}
         categoryName={selectedCategory?.name ?? ""}
@@ -253,9 +419,10 @@ const Categories = () => {
         onSubmit={handleUpdate}
       />
 
-      {/* =========================
+      {/* =====================================================
           MODAL XÓA
-      ========================= */}
+      ===================================================== */}
+
       <DeleteCategoriesModal
         show={showDeleteModal}
         categoryName={selectedCategory?.name ?? ""}
@@ -266,7 +433,10 @@ const Categories = () => {
         onConfirm={handleConfirmDelete}
       />
 
-      {/* Toast */}
+      {/* =====================================================
+          TOAST
+      ===================================================== */}
+
       <ToastContainer
         position="top-right"
         autoClose={3000}

@@ -1,30 +1,34 @@
 // src/services/questionService.ts
-import axios from "axios";
-import { Question } from "@/types/question";
 
-const API_URL = "http://localhost:4000";
+import { Question } from "@/types/question";
+import api from "../lib/apiClient";
 
 // Lấy danh sách câu hỏi thuộc đề thi theo examId
 export const getQuestionsByExamIdService = async (
   examId: string
 ): Promise<Question[]> => {
   try {
-    // 1. Gọi trực tiếp API với URL tuyệt đối tới json-server
-    const response = await axios.get<Question[]>(
-      `${API_URL}/questions?examId=${encodeURIComponent(examId)}`
+    // 1. Gọi API lấy câu hỏi theo examId
+    const response = await api.get<Question[]>(
+      `/questions?examId=${encodeURIComponent(examId)}`
     );
 
     let questions = Array.isArray(response.data)
       ? response.data
-      : (response.data as any)?.data || [];
+      : [];
 
-    // 2. Fallback lọc thủ công nếu json-server trả về toàn bộ danh sách
+    // 2. Fallback: nếu API không trả về kết quả,
+    // lấy toàn bộ câu hỏi rồi lọc thủ công
     if (questions.length === 0) {
-      const allRes = await axios.get<Question[]>(`${API_URL}/questions`);
+      const allRes = await api.get<Question[]>("/questions");
+
       const allQuestions = Array.isArray(allRes.data)
         ? allRes.data
-        : (allRes.data as any)?.data || [];
-      questions = allQuestions.filter((q: any) => q.examId === examId);
+        : [];
+
+      questions = allQuestions.filter(
+        (q) => q.examId === examId
+      );
     }
 
     return questions;

@@ -1,10 +1,9 @@
 // src/services/historyService.ts
-import axios from "axios";
+
 import { History, SubmitExamPayload } from "@/types/history";
+import api from "../lib/apiClient";
 
-const API_URL = "http://localhost:4000";
-
-// Helper tạo mã số ngẫu nhiên cho Public User (ví dụ: Public-849201)
+// Helper tạo mã số ngẫu nhiên cho Public User
 export const generatePublicUserId = (): string => {
   const randomNum = Math.floor(100000 + Math.random() * 900000);
   return `Public-${randomNum}`;
@@ -15,11 +14,16 @@ export const submitExamResultService = async (
   payload: SubmitExamPayload
 ): Promise<History> => {
   try {
-    const isPublic = !payload.userId || payload.userId.startsWith("Public-");
+    const isPublic =
+      !payload.userId || payload.userId.startsWith("Public-");
+
     const finalUserId = isPublic
       ? payload.userId || generatePublicUserId()
       : payload.userId;
-    const finalUserName = isPublic ? "ANONYMOUS" : (payload as any).userName;
+
+    const finalUserName = isPublic
+      ? "ANONYMOUS"
+      : payload.userName;
 
     const newRecord = {
       ...payload,
@@ -28,7 +32,10 @@ export const submitExamResultService = async (
       completedAt: new Date().toISOString(),
     };
 
-    const response = await axios.post<History>(`${API_URL}/histories`, newRecord);
+    const response = await api.post<History>(
+      "/histories",
+      newRecord
+    );
 
     return response.data;
   } catch (error) {
@@ -42,7 +49,9 @@ export const getHistoryByIdService = async (
   historyId: string
 ): Promise<History> => {
   try {
-    const response = await axios.get<History>(`${API_URL}/histories/${historyId}`);
+    const response = await api.get<History>(
+      `/histories/${historyId}`
+    );
 
     return response.data;
   } catch (error) {
@@ -56,15 +65,17 @@ export const getUserHistoriesService = async (
   userId: string
 ): Promise<History[]> => {
   try {
+    // Public User không có lịch sử
     if (!userId || userId.startsWith("Public-")) {
       return [];
     }
 
-    const response = await axios.get<History[] | { data: History[] }>(
-      `${API_URL}/histories?userId=${userId}`
-    );
+    const response = await api.get<
+      History[] | { data: History[] }
+    >(`/histories?userId=${encodeURIComponent(userId)}`);
 
     const resData = response.data;
+
     let list: History[] = [];
 
     if (Array.isArray(resData)) {
@@ -80,10 +91,15 @@ export const getUserHistoriesService = async (
 
     return list.sort(
       (a, b) =>
-        new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime()
+        new Date(b.completedAt).getTime() -
+        new Date(a.completedAt).getTime()
     );
   } catch (error) {
-    console.error("Lỗi khi tải lịch sử bài thi của người dùng:", error);
+    console.error(
+      "Lỗi khi tải lịch sử bài thi của người dùng:",
+      error
+    );
+
     throw error;
   }
 };

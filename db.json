@@ -2172,6 +2172,21 @@
       "userAnswers": {},
       "completedAt": "2026-08-17T03:52:29.573Z",
       "id": "1aBdc9VJ72s"
+    },
+    {
+      "userId": "rG2EfvkY9CQ",
+      "userName": "Hai Dong",
+      "examId": "ex-java-1",
+      "examTitle": "Java Core & Lập Trình Hướng Đối Tượng (OOP)",
+      "score": 0,
+      "totalQuestions": 10,
+      "correctAnswersCount": 0,
+      "timeTaken": 16,
+      "userAnswers": {
+        "q-j1-7": 0
+      },
+      "completedAt": "2026-08-17T04:47:09.270Z",
+      "id": "SgqfjqLc43g"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

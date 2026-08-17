@@ -6,6 +6,7 @@ import {
   getExamsService,
   getPaginatedExamsService,
 } from "@/services/examService";
+import { getErrorMessage } from "@/utils/errorHandler";
 import { AppDispatch } from "../store";
 
 export interface ExamState {
@@ -58,12 +59,12 @@ export const fetchExamsApiAsync = () => async (dispatch: AppDispatch) => {
     dispatch(setLoading(true));
     const data = await getExamsService();
     dispatch(setExams(data));
-  } catch (error: any) {
-    dispatch(setLoading(false));
-    console.error("Fetch exams error:", error);
-    toast.error("Lỗi khi tải bài thi!");
-  }
-};
+    } catch (error) {
+      dispatch(setLoading(false));
+      console.error("Fetch exams error:", error);
+      toast.error(getErrorMessage(error, "Lỗi khi tải bài thi!"));
+    }
+  };
 
 // Async Thunk lấy bài thi phân trang
 export const fetchPaginatedExamsApiAsync =
@@ -79,9 +80,11 @@ export const fetchPaginatedExamsApiAsync =
           page,
         })
       );
-    } catch (error: any) {
+    } catch (error) {
       dispatch(setLoading(false));
       console.error("Fetch paginated exams error:", error);
-      toast.error("Lỗi khi tải danh sách bài thi!");
+      toast.error(
+        getErrorMessage(error, "Lỗi khi tải danh sách bài thi!")
+      );
     }
   };

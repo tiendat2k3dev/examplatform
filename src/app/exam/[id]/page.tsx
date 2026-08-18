@@ -95,7 +95,7 @@ const ExamPage = () => {
       userId: finalUserId,
       userName: finalUserName,
       examId,
-      examTitle: currentExam?.title || "Bài Thi Chuẩn",
+      examTitle: currentExam?.name || "Bài Thi Chuẩn",
       score,
       totalQuestions: total,
       correctAnswersCount: correctCount,
@@ -195,7 +195,7 @@ const ExamPage = () => {
         {/* Cột Trái: Khung câu hỏi */}
         <div className="col-lg-8 col-xl-9">
           <QuizQuestionBox
-            examTitle={currentExam?.title}
+            examTitle={currentExam?.name}
             examId={examId}
             question={currentQ}
             questionIndex={currentQuestionIndex}
@@ -244,7 +244,7 @@ const ExamPage = () => {
           correctCount={quizResult.correctCount}
           total={quizResult.total}
           timeTaken={quizResult.timeTaken}
-          examTitle={currentExam?.title}
+          examTitle={currentExam?.name}
           examId={examId}
           isPublic={isPublicUser}
           userId={currentUser ? String(currentUser.id) : publicUserId}

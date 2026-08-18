@@ -8,19 +8,30 @@ import { toast } from "react-toastify";
 import type {
   CreateExamFormValues,
   ExamGroup,
-  ExamQuestion,
+  QuestionWithAnswers,
 } from "@/types/exam";
+
+/* =========================================================
+   PROPS
+========================================================= */
 
 interface CreateExamModalProps {
   show: boolean;
   onClose: () => void;
   onCreate: (values: CreateExamFormValues) => Promise<void> | void;
-  questions: ExamQuestion[];
+  /** Danh sách câu hỏi từ ngân hàng */
+  questions: QuestionWithAnswers[];
+  /** Danh sách nhóm đề thi để chọn */
   examGroups: ExamGroup[];
 }
 
+/* =========================================================
+   VALIDATION
+   Dùng `categoryId` thay vì `category` để khớp với CreateExamFormValues
+========================================================= */
+
 const validationSchema = Yup.object({
-  id: Yup.string()
+  code: Yup.string()
     .trim()
     .required("Vui lòng nhập mã đề thi")
     .max(50, "Mã đề thi tối đa 50 ký tự"),
@@ -30,7 +41,7 @@ const validationSchema = Yup.object({
     .required("Vui lòng nhập tên đề thi")
     .max(200, "Tên đề thi tối đa 200 ký tự"),
 
-  category: Yup.string().required("Vui lòng chọn danh mục"),
+  categoryId: Yup.string().required("Vui lòng chọn danh mục"),
 
   examGroupId: Yup.string().required("Vui lòng chọn nhóm đề thi"),
 
@@ -53,10 +64,15 @@ const validationSchema = Yup.object({
     .min(1, "Vui lòng chọn ít nhất 1 câu hỏi"),
 });
 
+/* =========================================================
+   INITIAL VALUES
+   Khớp hoàn toàn với CreateExamFormValues từ @/types/exam
+========================================================= */
+
 const initialValues: CreateExamFormValues = {
-  id: "",
+  code: "",
   name: "",
-  category: "",
+  categoryId: "",
   examGroupId: "",
   duration: 45,
   passScore: 5,
@@ -64,6 +80,17 @@ const initialValues: CreateExamFormValues = {
   questionIds: [],
 };
 
+/* =========================================================
+   COMPONENT
+========================================================= */
+
+/**
+ * CreateExamModal – modal tạo đề thi mới.
+ *
+ * Hiển thị form nhập thông tin đề thi và cho phép chọn câu hỏi
+ * từ ngân hàng câu hỏi với tìm kiếm và phân trang.
+ * Khi submit gọi `onCreate(values)`.
+ */
 const CreateExamModal = ({
   show,
   onClose,
@@ -76,6 +103,10 @@ const CreateExamModal = ({
 
   const pageSize = 4;
 
+  /* =======================================================
+     FORMIK
+  ======================================================= */
+
   const formik = useFormik<CreateExamFormValues>({
     initialValues,
 
@@ -84,11 +115,8 @@ const CreateExamModal = ({
     onSubmit: async (values, { setSubmitting, resetForm }) => {
       try {
         await onCreate(values);
-
         toast.success("Tạo đề thi thành công!");
-
         resetForm();
-
         onClose();
       } catch (error) {
         console.error(error);
@@ -99,73 +127,74 @@ const CreateExamModal = ({
     },
   });
 
+  /* =======================================================
+     EFFECTS
+  ======================================================= */
+
   useEffect(() => {
     if (!show) {
       setSearch("");
       setCurrentPage(1);
       formik.resetForm();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [show]);
-
-  const filteredQuestions = useMemo(() => {
-    const keyword = search.trim().toLowerCase();
-
-    if (!keyword) {
-      return questions;
-    }
-
-    return questions.filter((question) => {
-      return (
-        question.content.toLowerCase().includes(keyword) ||
-        question.category.toLowerCase().includes(keyword)
-      );
-    });
-  }, [questions, search]);
 
   useEffect(() => {
     setCurrentPage(1);
   }, [search]);
 
+  /* =======================================================
+     FILTERED QUESTIONS
+  ======================================================= */
+
+  const filteredQuestions = useMemo(() => {
+    const keyword = search.trim().toLowerCase();
+    if (!keyword) return questions;
+    return questions.filter(
+      (q) =>
+        q.content.toLowerCase().includes(keyword) ||
+        (q.categoryName ?? "").toLowerCase().includes(keyword),
+    );
+  }, [questions, search]);
+
+  /* =======================================================
+     PAGINATION
+  ======================================================= */
+
   const totalPages = Math.max(
     1,
     Math.ceil(filteredQuestions.length / pageSize),
   );
-
   const safePage = Math.min(currentPage, totalPages);
-
   const startIndex = (safePage - 1) * pageSize;
-
   const currentQuestions = filteredQuestions.slice(
     startIndex,
     startIndex + pageSize,
   );
 
-  const isSelected = (id: string) => {
-    return formik.values.questionIds.includes(id);
-  };
+  /* =======================================================
+     QUESTION SELECTION HELPERS
+  ======================================================= */
+
+  const isSelected = (id: string) => formik.values.questionIds.includes(id);
 
   const handleSelectQuestion = (id: string) => {
     const currentIds = formik.values.questionIds;
-
-    if (currentIds.includes(id)) {
-      formik.setFieldValue(
-        "questionIds",
-        currentIds.filter((questionId) => questionId !== id),
-      );
-    } else {
-      formik.setFieldValue("questionIds", [...currentIds, id]);
-    }
+    formik.setFieldValue(
+      "questionIds",
+      currentIds.includes(id)
+        ? currentIds.filter((qId) => qId !== id)
+        : [...currentIds, id],
+    );
   };
 
   const allCurrentSelected =
     currentQuestions.length > 0 &&
-    currentQuestions.every((question) =>
-      formik.values.questionIds.includes(question.id),
-    );
+    currentQuestions.every((q) => formik.values.questionIds.includes(q.id));
 
   const handleSelectAll = () => {
-    const currentIds = currentQuestions.map((question) => question.id);
-
+    const currentIds = currentQuestions.map((q) => q.id);
     if (allCurrentSelected) {
       formik.setFieldValue(
         "questionIds",
@@ -178,35 +207,37 @@ const CreateExamModal = ({
     }
   };
 
-  if (!show) {
-    return null;
-  }
+  /* =======================================================
+     RENDER GUARD
+  ======================================================= */
+
+  if (!show) return null;
+
+  /* =======================================================
+     RENDER
+  ======================================================= */
 
   return (
     <div
       className="modal d-block"
       tabIndex={-1}
-      style={{
-        backgroundColor: "rgba(0, 0, 0, 0.5)",
-        zIndex: 1055,
-      }}
+      style={{ backgroundColor: "rgba(0, 0, 0, 0.5)", zIndex: 1055 }}
     >
       <div
         className="modal-dialog modal-xl modal-dialog-centered"
         style={{ maxWidth: "1200px" }}
       >
         <div className="modal-content border-0 shadow">
+          {/* Header */}
           <div className="modal-header">
             <div>
               <h5 className="modal-title fw-bold" style={{ color: "#173b69" }}>
                 Thêm đề thi mới
               </h5>
-
               <small className="text-secondary">
                 Tạo mới bài kiểm tra hoặc đề thi cho học viên.
               </small>
             </div>
-
             <button
               type="button"
               className="btn-close"
@@ -218,42 +249,45 @@ const CreateExamModal = ({
           <form onSubmit={formik.handleSubmit}>
             <div className="modal-body">
               <div className="row g-3">
+                {/* =========================================
+                    LEFT – Thông tin chung
+                ========================================= */}
                 <div className="col-lg-3">
                   <div className="border rounded p-3 h-100">
                     <h6 className="fw-bold mb-4" style={{ color: "#173b69" }}>
                       Thông tin chung
                     </h6>
 
+                    {/* Mã đề thi (code) */}
                     <div className="mb-3">
                       <label
-                        htmlFor="create-id"
+                        htmlFor="create-code"
                         className="form-label small fw-semibold"
                       >
                         Mã đề thi <span className="text-danger">*</span>
                       </label>
-
                       <input
-                        id="create-id"
-                        name="id"
+                        id="create-code"
+                        name="code"
                         type="text"
                         className={`form-control form-control-sm ${
-                          formik.touched.id && formik.errors.id
+                          formik.touched.code && formik.errors.code
                             ? "is-invalid"
                             : ""
                         }`}
                         placeholder="VD: TOAN01"
-                        value={formik.values.id}
+                        value={formik.values.code}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                       />
-
-                      {formik.touched.id && formik.errors.id && (
+                      {formik.touched.code && formik.errors.code && (
                         <div className="invalid-feedback">
-                          {formik.errors.id}
+                          {formik.errors.code}
                         </div>
                       )}
                     </div>
 
+                    {/* Tên đề thi */}
                     <div className="mb-3">
                       <label
                         htmlFor="create-name"
@@ -261,7 +295,6 @@ const CreateExamModal = ({
                       >
                         Tên đề thi <span className="text-danger">*</span>
                       </label>
-
                       <input
                         id="create-name"
                         name="name"
@@ -276,7 +309,6 @@ const CreateExamModal = ({
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                       />
-
                       {formik.touched.name && formik.errors.name && (
                         <div className="invalid-feedback">
                           {formik.errors.name}
@@ -284,44 +316,41 @@ const CreateExamModal = ({
                       )}
                     </div>
 
+                    {/* Danh mục – field name="categoryId" */}
                     <div className="mb-3">
                       <label
-                        htmlFor="create-category"
+                        htmlFor="create-categoryId"
                         className="form-label small fw-semibold"
                       >
                         Danh mục <span className="text-danger">*</span>
                       </label>
-
                       <select
-                        id="create-category"
-                        name="category"
+                        id="create-categoryId"
+                        name="categoryId"
                         className={`form-select form-select-sm ${
-                          formik.touched.category && formik.errors.category
+                          formik.touched.categoryId && formik.errors.categoryId
                             ? "is-invalid"
                             : ""
                         }`}
-                        value={formik.values.category}
+                        value={formik.values.categoryId}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                       >
                         <option value="">Chọn danh mục</option>
-
                         <option value="Toán học">Toán học</option>
-
                         <option value="Vật lý">Vật lý</option>
-
                         <option value="Hóa học">Hóa học</option>
-
                         <option value="Sinh học">Sinh học</option>
                       </select>
-
-                      {formik.touched.category && formik.errors.category && (
-                        <div className="invalid-feedback">
-                          {formik.errors.category}
-                        </div>
-                      )}
+                      {formik.touched.categoryId &&
+                        formik.errors.categoryId && (
+                          <div className="invalid-feedback">
+                            {formik.errors.categoryId}
+                          </div>
+                        )}
                     </div>
 
+                    {/* Nhóm đề thi */}
                     <div className="mb-3">
                       <label
                         htmlFor="create-examGroupId"
@@ -329,7 +358,6 @@ const CreateExamModal = ({
                       >
                         Nhóm đề thi <span className="text-danger">*</span>
                       </label>
-
                       <select
                         id="create-examGroupId"
                         name="examGroupId"
@@ -350,7 +378,6 @@ const CreateExamModal = ({
                           </option>
                         ))}
                       </select>
-
                       {formik.touched.examGroupId &&
                         formik.errors.examGroupId && (
                           <div className="invalid-feedback">
@@ -359,6 +386,7 @@ const CreateExamModal = ({
                         )}
                     </div>
 
+                    {/* Thời gian & Điểm pass */}
                     <div className="row g-2">
                       <div className="col-6">
                         <label
@@ -367,7 +395,6 @@ const CreateExamModal = ({
                         >
                           Thời gian (phút)
                         </label>
-
                         <input
                           id="create-duration"
                           name="duration"
@@ -382,7 +409,6 @@ const CreateExamModal = ({
                           onChange={formik.handleChange}
                           onBlur={formik.handleBlur}
                         />
-
                         {formik.touched.duration && formik.errors.duration && (
                           <div className="invalid-feedback">
                             {formik.errors.duration}
@@ -397,7 +423,6 @@ const CreateExamModal = ({
                         >
                           Điểm để pass
                         </label>
-
                         <input
                           id="create-passScore"
                           name="passScore"
@@ -414,7 +439,6 @@ const CreateExamModal = ({
                           onChange={formik.handleChange}
                           onBlur={formik.handleBlur}
                         />
-
                         {formik.touched.passScore &&
                           formik.errors.passScore && (
                             <div className="invalid-feedback">
@@ -424,11 +448,11 @@ const CreateExamModal = ({
                       </div>
                     </div>
 
+                    {/* Trạng thái */}
                     <div className="mt-3">
                       <label className="form-label small fw-semibold">
                         Trạng thái
                       </label>
-
                       <div className="d-flex gap-3">
                         <div className="form-check">
                           <input
@@ -440,7 +464,6 @@ const CreateExamModal = ({
                             checked={formik.values.status === "Hoạt động"}
                             onChange={formik.handleChange}
                           />
-
                           <label
                             htmlFor="create-open"
                             className="form-check-label small"
@@ -459,7 +482,6 @@ const CreateExamModal = ({
                             checked={formik.values.status === "Khóa"}
                             onChange={formik.handleChange}
                           />
-
                           <label
                             htmlFor="create-locked"
                             className="form-check-label small"
@@ -478,8 +500,12 @@ const CreateExamModal = ({
                   </div>
                 </div>
 
+                {/* =========================================
+                    RIGHT – Ngân hàng câu hỏi
+                ========================================= */}
                 <div className="col-lg-9">
                   <div className="border rounded overflow-hidden">
+                    {/* Toolbar */}
                     <div className="bg-light p-3 d-flex justify-content-between align-items-center gap-3">
                       <div>
                         <h6
@@ -488,7 +514,6 @@ const CreateExamModal = ({
                         >
                           Chọn câu hỏi từ ngân hàng
                         </h6>
-
                         <small className="text-secondary">
                           Đã chọn:{" "}
                           <strong>{formik.values.questionIds.length}</strong>{" "}
@@ -503,7 +528,6 @@ const CreateExamModal = ({
                         <span className="input-group-text bg-white">
                           <i className="bi bi-search" />
                         </span>
-
                         <input
                           type="text"
                           className="form-control"
@@ -514,6 +538,7 @@ const CreateExamModal = ({
                       </div>
                     </div>
 
+                    {/* Table */}
                     <div className="table-responsive">
                       <table className="table table-hover align-middle mb-0">
                         <thead className="table-light">
@@ -526,9 +551,7 @@ const CreateExamModal = ({
                                 onChange={handleSelectAll}
                               />
                             </th>
-
                             <th>Nội dung câu hỏi</th>
-
                             <th style={{ width: "110px" }}>Danh mục</th>
                           </tr>
                         </thead>
@@ -556,7 +579,6 @@ const CreateExamModal = ({
                                     }
                                   />
                                 </td>
-
                                 <td>
                                   <div
                                     className="small"
@@ -565,9 +587,8 @@ const CreateExamModal = ({
                                     {question.content}
                                   </div>
                                 </td>
-
                                 <td className="small text-secondary">
-                                  {question.category}
+                                  {question.categoryName}
                                 </td>
                               </tr>
                             ))
@@ -576,6 +597,7 @@ const CreateExamModal = ({
                       </table>
                     </div>
 
+                    {/* Pagination */}
                     <div className="d-flex justify-content-between align-items-center p-2 border-top">
                       <small className="text-secondary">
                         Hiển thị{" "}
@@ -601,7 +623,7 @@ const CreateExamModal = ({
 
                         {Array.from(
                           { length: totalPages },
-                          (_, index) => index + 1,
+                          (_, i) => i + 1,
                         ).map((page) => (
                           <button
                             key={page}
@@ -638,6 +660,7 @@ const CreateExamModal = ({
               </div>
             </div>
 
+            {/* Footer */}
             <div className="modal-footer">
               <button
                 type="button"
@@ -675,4 +698,5 @@ const CreateExamModal = ({
     </div>
   );
 };
+
 export default CreateExamModal;

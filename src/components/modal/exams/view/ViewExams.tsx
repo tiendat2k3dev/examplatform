@@ -1,12 +1,12 @@
 "use client";
 
-import type { EditExam, ExamQuestion } from "@/types/exam";
+import type { EditExam, QuestionWithAnswers } from "@/types/exam";
 
 interface ViewExamsProps {
   show: boolean;
   onClose: () => void;
   exam: EditExam | null;
-  questions: ExamQuestion[];
+  questions: QuestionWithAnswers[];
 }
 
 const ViewExams = ({ show, onClose, exam, questions }: ViewExamsProps) => {
@@ -70,7 +70,7 @@ const ViewExams = ({ show, onClose, exam, questions }: ViewExamsProps) => {
                     <div className="text-secondary small mb-1">Danh mục</div>
 
                     <div className="fw-semibold text-dark">
-                      {exam.category}
+                      {exam.categoryId}
                     </div>
                   </div>
                 </div>
@@ -81,7 +81,7 @@ const ViewExams = ({ show, onClose, exam, questions }: ViewExamsProps) => {
                     <div className="text-secondary small mb-1">Số câu hỏi</div>
 
                     <div className="fw-semibold text-dark">
-                      {exam.questions}
+                      {exam.questionIds?.length ?? 0}
                     </div>
                   </div>
                 </div>

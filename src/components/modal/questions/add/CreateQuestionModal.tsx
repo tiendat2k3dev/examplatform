@@ -2,85 +2,99 @@
 
 import { useFormik } from "formik";
 import { toast } from "react-toastify";
-import questionSchema from "@/utils/questionsInput";
 
-interface AnswerOption {
-  key: "A" | "B" | "C" | "D";
-  value: string;
-}
+import questionSchema from "@/utils/questionsInput";
+import { Category } from "../../../../types/categories";
+import {
+  AnswerLabel,
+  AnswerOption,
+  CreateQuestionData,
+} from "@/types/question";
 
 interface CreateQuestionModalProps {
   show: boolean;
   onClose: () => void;
-
-  onSubmit: (question: {
-    question: string;
-    category: string;
-    answers: AnswerOption[];
-    correctAnswer: "A" | "B" | "C" | "D";
-  }) => void;
+  categories: Category[];
+  onSubmit: (question: CreateQuestionData) => void | Promise<void>;
 }
 
 const CreateQuestionModal = ({
   show,
   onClose,
+  categories,
   onSubmit,
 }: CreateQuestionModalProps) => {
   const formik = useFormik({
     initialValues: {
-      question: "",
-      category: "",
+      content: "",
+      categoryId: "",
+
       answers: {
         A: "",
         B: "",
         C: "",
         D: "",
       },
-      correctAnswer: "A" as "A" | "B" | "C" | "D",
+
+      correctAnswer: "A" as AnswerLabel,
     },
+
     validationSchema: questionSchema,
-    onSubmit: (values) => {
-      const allAnswers: AnswerOption[] = (
-        Object.keys(values.answers) as Array<"A" | "B" | "C" | "D">
-      ).map((key) => ({
-        key,
-        value: values.answers[key].trim(),
-      }));
 
-      onSubmit({
-        question: values.question.trim(),
-        category: values.category,
-        answers: allAnswers,
-        correctAnswer: values.correctAnswer,
-      });
+    onSubmit: async (values) => {
+      try {
+        const allAnswers: AnswerOption[] = (
+          ["A", "B", "C", "D"] as AnswerLabel[]
+        ).map((key) => ({
+          key,
+          value: values.answers[key].trim(),
+        }));
 
-      toast.success("Thêm câu hỏi thành công!");
+        const questionData: CreateQuestionData = {
+          content: values.content.trim(),
+          categoryId: values.categoryId,
+          answers: allAnswers,
+          correctAnswer: values.correctAnswer,
+        };
 
-      formik.resetForm();
-      onClose();
+        await onSubmit(questionData);
+
+        toast.success("Thêm câu hỏi thành công!");
+
+        formik.resetForm();
+        onClose();
+      } catch (error) {
+        console.error("Lỗi khi tạo câu hỏi:", error);
+
+        toast.error("Không thể thêm câu hỏi!");
+      }
     },
   });
 
   if (!show) {
     return null;
   }
+
+  const handleClose = () => {
+    formik.resetForm();
+    onClose();
+  };
+
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
-      onClose();
-      formik.resetForm();
+      handleClose();
     }
   };
 
   return (
     <>
-      <div
-        className="modal-backdrop fade show"
-        onClick={handleBackdropClick}
-      ></div>
+      <div className="modal-backdrop fade show" onClick={handleBackdropClick} />
 
       <div className="modal d-block" tabIndex={-1} role="dialog">
         <div className="modal-dialog modal-lg modal-dialog-centered">
           <div className="modal-content">
+            {/* HEADER */}
+
             <div
               className="modal-header text-white"
               style={{
@@ -92,15 +106,16 @@ const CreateQuestionModal = ({
               <button
                 type="button"
                 className="btn-close btn-close-white"
-                onClick={() => {
-                  onClose();
-                  formik.resetForm();
-                }}
-              ></button>
+                onClick={handleClose}
+              />
             </div>
+
+            {/* FORM */}
 
             <form onSubmit={formik.handleSubmit}>
               <div className="modal-body">
+                {/* CÂU HỎI */}
+
                 <div className="mb-4">
                   <label className="form-label">
                     <span className="text-danger">*</span> Câu hỏi
@@ -108,22 +123,24 @@ const CreateQuestionModal = ({
 
                   <textarea
                     className={`form-control ${
-                      formik.touched.question && formik.errors.question
+                      formik.touched.content && formik.errors.content
                         ? "is-invalid"
                         : ""
                     }`}
                     rows={3}
                     autoFocus
                     placeholder="Nhập câu hỏi..."
-                    {...formik.getFieldProps("question")}
+                    {...formik.getFieldProps("content")}
                   />
 
-                  {formik.touched.question && formik.errors.question && (
+                  {formik.touched.content && formik.errors.content && (
                     <div className="invalid-feedback">
-                      {formik.errors.question}
+                      {formik.errors.content}
                     </div>
                   )}
                 </div>
+
+                {/* DANH MỤC */}
 
                 <div className="mb-4">
                   <label className="form-label">
@@ -132,41 +149,43 @@ const CreateQuestionModal = ({
 
                   <select
                     className={`form-select ${
-                      formik.touched.category && formik.errors.category
+                      formik.touched.categoryId && formik.errors.categoryId
                         ? "is-invalid"
                         : ""
                     }`}
-                    {...formik.getFieldProps("category")}
+                    {...formik.getFieldProps("categoryId")}
                   >
                     <option value="">Chọn danh mục</option>
 
-                    <option value="Toán">Toán</option>
-
-                    <option value="Khoa học">Khoa học</option>
-
-                    <option value="Lịch sử">Lịch sử</option>
-
-                    <option value="Văn học">Văn học</option>
+                    {categories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
                   </select>
 
-                  {formik.touched.category && formik.errors.category && (
+                  {formik.touched.categoryId && formik.errors.categoryId && (
                     <div className="invalid-feedback">
-                      {formik.errors.category}
+                      {formik.errors.categoryId}
                     </div>
                   )}
                 </div>
 
+                {/* ĐÁP ÁN */}
+
                 <div className="mb-4">
                   <label className="form-label fw-semibold">Đáp án</label>
 
-                  {(["A", "B", "C", "D"] as const).map((option) => (
+                  {(["A", "B", "C", "D"] as AnswerLabel[]).map((option) => (
                     <div
                       key={option}
                       className="d-flex align-items-center mb-2"
                     >
                       <div
                         className="form-check me-2"
-                        style={{ minWidth: "44px" }}
+                        style={{
+                          minWidth: "44px",
+                        }}
                       >
                         <input
                           className="form-check-input"
@@ -204,20 +223,23 @@ const CreateQuestionModal = ({
                 </div>
               </div>
 
+              {/* FOOTER */}
+
               <div className="modal-footer">
                 <button
                   type="button"
                   className="btn btn-outline-secondary"
-                  onClick={() => {
-                    onClose();
-                    formik.resetForm();
-                  }}
+                  onClick={handleClose}
                 >
-                  Cancel
+                  Hủy
                 </button>
 
-                <button type="submit" className="btn btn-primary">
-                  Create
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={formik.isSubmitting}
+                >
+                  {formik.isSubmitting ? "Đang thêm..." : "Thêm câu hỏi"}
                 </button>
               </div>
             </form>

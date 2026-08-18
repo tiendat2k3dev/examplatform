@@ -1,18 +1,20 @@
 "use client";
 
-interface Exam {
-  id: string;
-  name: string;
-  category: string;
-}
+import type { EditExam } from "@/types/exam";
 
+/** Props cho DeleteExamModal */
 interface DeleteExamModalProps {
   show: boolean;
   onClose: () => void;
   onConfirm: () => void;
-  exam: Exam | null;
+  /** Đề thi cần xóa; null khi modal chưa mở */
+  exam: EditExam | null;
 }
 
+/**
+ * DeleteExamModal – modal xác nhận xóa đề thi.
+ * Nhận `exam` (EditExam) và hiển thị tên, mã đề thi trước khi xóa.
+ */
 const DeleteExamModal = ({
   show,
   onClose,
@@ -52,9 +54,7 @@ const DeleteExamModal = ({
 
               <div className="mt-3 p-3 border rounded bg-light">
                 <strong>{exam.name}</strong>
-                <div className="text-secondary small mt-1">
-                  {exam.category}
-                </div>
+                <div className="text-secondary small mt-1">{exam.categoryId}</div>
                 <div className="text-secondary small">Mã: {exam.id}</div>
               </div>
             </div>
@@ -68,14 +68,14 @@ const DeleteExamModal = ({
                 Hủy
               </button>
 
-                <button
-                  type="button"
-                  className="btn btn-danger"
-                  onClick={() => {
-                    onConfirm();
-                    onClose();
-                  }}
-                >
+              <button
+                type="button"
+                className="btn btn-danger"
+                onClick={() => {
+                  onConfirm();
+                  onClose();
+                }}
+              >
                 Xóa
               </button>
             </div>

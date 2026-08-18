@@ -28,7 +28,7 @@ export const ExamCard = ({ exam, onStartExam }: ExamCardProps) => {
             </span>
           </div>
 
-          <h5 className="fw-bold mb-3 text-white">{exam.title}</h5>
+          <h5 className="fw-bold mb-3 text-white">{exam.name}</h5>
 
           <div className="mt-auto pt-3 border-top border-secondary border-opacity-25">
             <button

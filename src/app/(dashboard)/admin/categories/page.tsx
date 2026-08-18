@@ -1,5 +1,6 @@
 "use client";
 
+import { Pagination } from "antd";
 import { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 
@@ -34,6 +35,14 @@ const Categories = () => {
   const [searchText, setSearchText] = useState("");
 
   // =====================================================
+  // PAGINATION
+  // =====================================================
+
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const pageSize = 5;
+
+  // =====================================================
   // MODAL
   // =====================================================
 
@@ -62,6 +71,9 @@ const Categories = () => {
       const data = await getCategoriesService();
 
       setCategories(data);
+
+      // Load lại danh sách → về trang 1
+      setCurrentPage(1);
     } catch (error) {
       console.error("Lỗi khi tải danh sách danh mục:", error);
 
@@ -94,6 +106,15 @@ const Categories = () => {
   });
 
   // =====================================================
+  // PHÂN TRANG
+  // =====================================================
+
+  const paginatedCategories = filteredCategories.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize,
+  );
+
+  // =====================================================
   // MỞ MODAL THÊM
   // =====================================================
 
@@ -118,6 +139,9 @@ const Categories = () => {
       setCategories((prev) => [...prev, ...newCategories]);
 
       setShowCreateModal(false);
+
+      // Về trang 1 sau khi thêm
+      setCurrentPage(1);
 
       toast.success(`Thêm ${newCategories.length} danh mục thành công!`);
     } catch (error) {
@@ -227,6 +251,12 @@ const Categories = () => {
       setSelectedCategory(null);
 
       toast.success("Xóa danh mục thành công!");
+
+      // Nếu xóa hết dữ liệu của trang hiện tại
+      // thì chuyển về trang trước
+      if (paginatedCategories.length === 1 && currentPage > 1) {
+        setCurrentPage((prev) => prev - 1);
+      }
     } catch (error) {
       console.error("Lỗi khi xóa danh mục:", error);
 
@@ -248,6 +278,9 @@ const Categories = () => {
       const result = await searchCategoriesService(searchText);
 
       setCategories(result);
+
+      // Tìm kiếm mới → về trang 1
+      setCurrentPage(1);
     } catch (error) {
       console.error("Lỗi khi tìm kiếm danh mục:", error);
 
@@ -304,7 +337,10 @@ const Categories = () => {
                 className="form-control border-0 bg-light"
                 placeholder="Tìm kiếm danh mục..."
                 value={searchText}
-                onChange={(event) => setSearchText(event.target.value)}
+                onChange={(event) => {
+                  setSearchText(event.target.value);
+                  setCurrentPage(1);
+                }}
                 onKeyDown={handleSearchKeyDown}
               />
 
@@ -349,10 +385,10 @@ const Categories = () => {
                     Đang tải danh mục...
                   </td>
                 </tr>
-              ) : filteredCategories.length > 0 ? (
-                filteredCategories.map((category, index) => (
+              ) : paginatedCategories.length > 0 ? (
+                paginatedCategories.map((category, index) => (
                   <tr key={category.id} className="border-bottom">
-                    <td>{index + 1}</td>
+                    <td>{(currentPage - 1) * pageSize + index + 1}</td>
 
                     <td>{category.name}</td>
 
@@ -393,6 +429,24 @@ const Categories = () => {
             </tbody>
           </table>
         </div>
+
+        {/* =====================================================
+            PAGINATION
+        ===================================================== */}
+
+        {!loading && filteredCategories.length > 0 && (
+          <div className="d-flex justify-content-end mt-4">
+            <Pagination
+              current={currentPage}
+              pageSize={pageSize}
+              total={filteredCategories.length}
+              onChange={(page) => {
+                setCurrentPage(page);
+              }}
+              showSizeChanger={false}
+            />
+          </div>
+        )}
       </div>
 
       {/* =====================================================

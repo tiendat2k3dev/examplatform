@@ -58,12 +58,12 @@ export const QuizQuestionBox = ({
       {/* Question Body */}
       <div className="card-body p-4 p-md-5">
         <h5 className="fw-bold lh-base text-white mb-4">
-          Câu {questionIndex + 1}: {question.questionText}
+          Câu {questionIndex + 1}: {question.questionText ?? ""}
         </h5>
 
         {/* Đáp án trắc nghiệm */}
         <div className="d-flex flex-column gap-3 mb-4">
-          {question.options.map((optionText, index) => {
+          {(question.options ?? []).map((optionText: string, index: number) => {
             const isSelected = selectedOptionIndex === index;
             return (
               <label

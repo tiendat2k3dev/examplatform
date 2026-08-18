@@ -1,9 +1,9 @@
 import * as Yup from "yup";
 
 const questionSchema = Yup.object({
-  question: Yup.string().trim().required("Vui lòng nhập câu hỏi"),
+  content: Yup.string().trim().required("Vui lòng nhập câu hỏi"),
 
-  category: Yup.string().required("Vui lòng chọn danh mục"),
+  categoryId: Yup.string().required("Vui lòng chọn danh mục"),
 
   answers: Yup.object({
     A: Yup.string().trim().required("Vui lòng nhập đáp án A"),

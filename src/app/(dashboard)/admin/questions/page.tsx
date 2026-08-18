@@ -1,143 +1,40 @@
 "use client";
 
-// useState dùng để quản lý state trong component
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Pagination } from "antd";
 
-// Import các component con
+import {
+  getQuestionsService,
+  getQuestionDetailService,
+  createQuestionService,
+  updateQuestionService,
+  deleteQuestionService,
+} from "../../../../services/questionService";
+
+import { getCategoriesService } from "../../../../services/categories";
+
 import HeaderQuestions from "../../../../components/questions/HeaderQuestions";
+
 import CreateQuestionModal from "../../../../components/modal/questions/add/CreateQuestionModal";
 import EditQuestionModal from "../../../../components/modal/questions/edit/EditQuestionModal";
 import DeleteQuestionModal from "../../../../components/modal/questions/delete/DeleteQuestionModal";
 import ViewQuestionModal from "../../../../components/modal/questions/view/ViewQuestionModal";
 
-// ======================================================
-// KIỂU DỮ LIỆU CHO ĐÁP ÁN
-// ======================================================
+import {
+  Question,
+  CreateQuestionData,
+  UpdateQuestionData,
+} from "@/types/question";
 
-interface AnswerOption {
-  // key chỉ được phép là A, B, C hoặc D
-  key: "A" | "B" | "C" | "D";
+import { Category } from "../../../../types/categories";
 
-  // Nội dung của đáp án
-  value: string;
-}
+import { toast } from "react-toastify";
 
 // ======================================================
-// KIỂU DỮ LIỆU CHO CÂU HỎI
-// ======================================================
-
-export interface Question {
-  // ID của câu hỏi
-  id: number;
-
-  // Nội dung câu hỏi
-  question: string;
-
-  // Danh mục của câu hỏi
-  category: string;
-
-  // Danh sách đáp án
-  // ? nghĩa là thuộc tính này có thể không có
-  answers?: AnswerOption[];
-
-  // Đáp án đúng
-  // Chỉ có thể là A, B, C hoặc D
-  correctAnswer?: "A" | "B" | "C" | "D";
-}
-
-// ======================================================
-// TÊN CÁC CỘT CỦA TABLE
+// TÊN CÁC CỘT TABLE
 // ======================================================
 
 const table: string[] = ["STT", "CÂU HỎI", "DANH MỤC", "THAO TÁC"];
-
-// ======================================================
-// DỮ LIỆU CÂU HỎI BAN ĐẦU
-// Đây chỉ là dữ liệu mẫu, sau này có thể lấy từ API
-// ======================================================
-
-const initialQuestions: Question[] = [
-  {
-    id: 1,
-
-    // Nội dung câu hỏi
-    question: "1+1= ?",
-
-    // Danh mục
-    category: "Toán",
-
-    // Các đáp án
-    answers: [
-      { key: "A", value: "2" },
-      { key: "B", value: "3" },
-      { key: "C", value: "4" },
-      { key: "D", value: "5" },
-    ],
-
-    // Đáp án đúng
-    correctAnswer: "A",
-  },
-
-  {
-    id: 2,
-    question: "What is the capital of France?",
-    category: "Geography",
-
-    answers: [
-      { key: "A", value: "Berlin" },
-      { key: "B", value: "Paris" },
-      { key: "C", value: "Rome" },
-      { key: "D", value: "Madrid" },
-    ],
-
-    correctAnswer: "B",
-  },
-
-  {
-    id: 3,
-    question: "Who wrote Hamlet?",
-    category: "Literature",
-
-    answers: [
-      { key: "A", value: "Shakespeare" },
-      { key: "B", value: "Tolstoy" },
-      { key: "C", value: "Dostoevsky" },
-      { key: "D", value: "Hemingway" },
-    ],
-
-    correctAnswer: "A",
-  },
-
-  {
-    id: 4,
-    question: "What is the chemical symbol for Gold?",
-    category: "Science",
-
-    answers: [
-      { key: "A", value: "Go" },
-      { key: "B", value: "Gd" },
-      { key: "C", value: "Au" },
-      { key: "D", value: "Ag" },
-    ],
-
-    correctAnswer: "C",
-  },
-
-  {
-    id: 5,
-    question: "When did WWII end?",
-    category: "History",
-
-    answers: [
-      { key: "A", value: "1943" },
-      { key: "B", value: "1945" },
-      { key: "C", value: "1947" },
-      { key: "D", value: "1939" },
-    ],
-
-    correctAnswer: "B",
-  },
-];
 
 // ======================================================
 // COMPONENT QUESTIONS
@@ -148,46 +45,54 @@ const Questions = () => {
   // STATE DANH SÁCH CÂU HỎI
   // ====================================================
 
-  // questions: danh sách câu hỏi hiện tại
-  // setQuestions: hàm dùng để cập nhật danh sách câu hỏi
-  //
-  // Ban đầu lấy dữ liệu từ initialQuestions
-  const [questions, setQuestions] = useState<Question[]>(initialQuestions);
+  const [questions, setQuestions] = useState<Question[]>([]);
 
   // ====================================================
-  // STATE HIỂN THỊ MODAL THÊM
+  // STATE DANH SÁCH DANH MỤC
   // ====================================================
 
-  // false = modal đang đóng
-  // true = modal đang mở
-  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   // ====================================================
-  // STATE HIỂN THỊ MODAL SỬA
+  // STATE LOADING DANH SÁCH
   // ====================================================
 
-  const [showEditModal, setShowEditModal] = useState(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
   // ====================================================
-  // STATE HIỂN THỊ MODAL XÓA
+  // STATE LOADING THAO TÁC
   // ====================================================
 
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [actionLoading, setActionLoading] = useState<boolean>(false);
 
   // ====================================================
-  // STATE HIỂN THỊ MODAL XEM
+  // STATE MODAL THÊM
   // ====================================================
 
-  const [showViewModal, setShowViewModal] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
+
+  // ====================================================
+  // STATE MODAL SỬA
+  // ====================================================
+
+  const [showEditModal, setShowEditModal] = useState<boolean>(false);
+
+  // ====================================================
+  // STATE MODAL XÓA
+  // ====================================================
+
+  const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
+
+  // ====================================================
+  // STATE MODAL XEM
+  // ====================================================
+
+  const [showViewModal, setShowViewModal] = useState<boolean>(false);
 
   // ====================================================
   // CÂU HỎI ĐANG ĐƯỢC CHỌN
   // ====================================================
 
-  // null = chưa chọn câu hỏi nào
-  //
-  // Ví dụ click sửa câu số 2:
-  // selectedQuestion = câu hỏi có id = 2
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(
     null,
   );
@@ -196,136 +101,228 @@ const Questions = () => {
   // STATE TÌM KIẾM
   // ====================================================
 
-  // Lưu nội dung người dùng nhập vào ô tìm kiếm
-  const [searchKeyword, setSearchKeyword] = useState("");
+  const [searchKeyword, setSearchKeyword] = useState<string>("");
 
   // ====================================================
-  // LỌC DANH SÁCH CÂU HỎI
+  // STATE PHÂN TRANG
   // ====================================================
 
-  // filter() dùng để lấy ra những câu hỏi phù hợp
-  // với từ khóa tìm kiếm
+  const [currentPage, setCurrentPage] = useState<number>(1);
+
+  const [pageSize, setPageSize] = useState<number>(10);
+
+  // ====================================================
+  // LẤY DANH SÁCH QUESTIONS + CATEGORIES
+  // ====================================================
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+
+      const [questionsData, categoriesData] = await Promise.all([
+        getQuestionsService(),
+        getCategoriesService(),
+      ]);
+
+      console.log("Danh sách câu hỏi:", questionsData);
+
+      console.log("Danh sách danh mục:", categoriesData);
+
+      setQuestions(questionsData);
+      setCategories(categoriesData);
+    } catch (error) {
+      console.error("Lỗi khi lấy dữ liệu:", error);
+
+      toast.error("Không thể tải danh sách câu hỏi");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ====================================================
+  // USE EFFECT
+  // ====================================================
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  // ====================================================
+  // LẤY TÊN DANH MỤC THEO CATEGORY ID
+  // ====================================================
+
+  const getCategoryName = (categoryId?: string): string => {
+    if (!categoryId) {
+      return "Không xác định";
+    }
+
+    const category = categories.find((item) => item.id === categoryId);
+
+    return category?.name || "Không xác định";
+  };
+
+  // ====================================================
+  // TÌM KIẾM
+  // ====================================================
+
   const filteredQuestions = questions.filter((item) => {
-    // trim() bỏ khoảng trắng đầu/cuối
-    // toLowerCase() chuyển thành chữ thường
     const keyword = searchKeyword.trim().toLowerCase();
 
-    // Nếu không nhập từ khóa
-    // thì hiển thị tất cả câu hỏi
     if (!keyword) {
       return true;
     }
 
-    // Tìm kiếm theo:
-    // 1. Nội dung câu hỏi
-    // 2. Danh mục
-    return (
-      item.question.toLowerCase().includes(keyword) ||
-      item.category.toLowerCase().includes(keyword)
-    );
+    const questionContent = item.content?.toLowerCase() || "";
+
+    const categoryName = getCategoryName(item.categoryId).toLowerCase();
+
+    return questionContent.includes(keyword) || categoryName.includes(keyword);
   });
+
+  // ====================================================
+  // DỮ LIỆU THEO TRANG
+  // ====================================================
+
+  const startIndex = (currentPage - 1) * pageSize;
+
+  const endIndex = startIndex + pageSize;
+
+  const paginatedQuestions = filteredQuestions.slice(startIndex, endIndex);
 
   // ====================================================
   // THÊM CÂU HỎI
   // ====================================================
 
-  const handleCreateQuestion = (newQuestion: {
-    question: string;
-    category: string;
-    answers: AnswerOption[];
-    correctAnswer: "A" | "B" | "C" | "D";
-  }) => {
-    // Cập nhật danh sách câu hỏi
-    setQuestions((prev) => {
-      // Tạo ID mới
-      //
-      // Ví dụ:
-      // Danh sách hiện tại có ID: 1, 2, 3, 4, 5
-      // nextId sẽ bằng 6
-      const nextId =
-        prev.length > 0 ? Math.max(...prev.map((item) => item.id)) + 1 : 1;
+  const handleCreateQuestion = async (data: CreateQuestionData) => {
+    try {
+      setActionLoading(true);
 
-      // Giữ lại tất cả câu hỏi cũ
-      // sau đó thêm câu hỏi mới vào cuối
-      return [
-        ...prev,
+      console.log("Dữ liệu tạo câu hỏi:", data);
 
-        {
-          id: nextId,
+      // ================================================
+      // GỌI API CREATE
+      // ================================================
 
-          question: newQuestion.question,
+      const newQuestion = await createQuestionService(data);
 
-          category: newQuestion.category,
+      console.log("Câu hỏi sau khi tạo:", newQuestion);
 
-          answers: newQuestion.answers,
+      // ================================================
+      // CẬP NHẬT DANH SÁCH
+      // ================================================
 
-          correctAnswer: newQuestion.correctAnswer,
-        },
-      ];
-    });
+      setQuestions((prev) => [...prev, newQuestion]);
 
-    // Thêm thành công thì đóng modal
-    setShowCreateModal(false);
+      // ================================================
+      // ĐÓNG MODAL
+      // ================================================
+
+      setShowCreateModal(false);
+
+      // ================================================
+      // CHUYỂN VỀ TRANG CUỐI
+      // ================================================
+
+      const newTotal = questions.length + 1;
+
+      const newLastPage = Math.max(1, Math.ceil(newTotal / pageSize));
+
+      setCurrentPage(newLastPage);
+
+      toast.success("Thêm câu hỏi thành công");
+    } catch (error) {
+      console.error("Lỗi khi thêm câu hỏi:", error);
+
+      toast.error("Thêm câu hỏi thất bại");
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   // ====================================================
   // MỞ MODAL SỬA
   // ====================================================
 
-  const handleOpenEdit = (question: Question) => {
-    // Lưu câu hỏi đang muốn sửa
-    setSelectedQuestion(question);
+  const handleOpenEdit = async (question: Question) => {
+    if (!question.id) {
+      toast.error("Không tìm thấy ID câu hỏi");
+      return;
+    }
 
-    // Mở modal sửa
-    setShowEditModal(true);
+    try {
+      setActionLoading(true);
+
+      const detail = await getQuestionDetailService(question.id);
+
+      console.log("Chi tiết câu hỏi:", detail);
+
+      setSelectedQuestion(detail);
+      setShowEditModal(true);
+    } catch (error) {
+      console.error("Lỗi khi tải chi tiết câu hỏi:", error);
+
+      // Nếu API detail lỗi thì vẫn mở
+      // dữ liệu hiện tại
+
+      setSelectedQuestion(question);
+      setShowEditModal(true);
+
+      toast.error("Không thể tải chi tiết câu hỏi");
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   // ====================================================
   // SỬA CÂU HỎI
   // ====================================================
 
-  const handleEditQuestion = (updatedQuestion: Question) => {
-    // map() duyệt qua toàn bộ danh sách
-    setQuestions((prev) =>
-      prev.map((item) =>
-        // Nếu ID giống câu hỏi đang sửa
-        // thì thay bằng dữ liệu mới
-        item.id === updatedQuestion.id
-          ? updatedQuestion
-          : // Nếu không giống thì giữ nguyên
-            item,
-      ),
-    );
+  const handleEditQuestion = async (id: string, data: UpdateQuestionData) => {
+    try {
+      setActionLoading(true);
 
-    // Đóng modal sửa
-    setShowEditModal(false);
+      console.log("ID câu hỏi sửa:", id);
 
-    // Xóa câu hỏi đang được chọn
-    setSelectedQuestion(null);
-  };
+      console.log("Dữ liệu sửa:", data);
 
-  // ====================================================
-  // XÓA CÂU HỎI
-  // ====================================================
+      // ================================================
+      // GỌI API UPDATE
+      // ================================================
 
-  const handleDeleteQuestion = () => {
-    // Nếu chưa chọn câu hỏi
-    // thì không thực hiện xóa
-    if (!selectedQuestion) {
-      return;
+      const updatedQuestion = await updateQuestionService(id, data);
+
+      console.log("Câu hỏi sau khi sửa:", updatedQuestion);
+
+      // ================================================
+      // CẬP NHẬT STATE
+      // ================================================
+
+      setQuestions((prev) =>
+        prev.map((item) =>
+          item.id === id
+            ? {
+                ...item,
+                ...updatedQuestion,
+              }
+            : item,
+        ),
+      );
+
+      // ================================================
+      // ĐÓNG MODAL
+      // ================================================
+
+      setShowEditModal(false);
+      setSelectedQuestion(null);
+
+      toast.success("Cập nhật câu hỏi thành công");
+    } catch (error) {
+      console.error("Lỗi khi sửa câu hỏi:", error);
+
+      toast.error("Cập nhật câu hỏi thất bại");
+    } finally {
+      setActionLoading(false);
     }
-
-    // filter() tạo ra danh sách mới
-    // không chứa câu hỏi đang được chọn
-    setQuestions((prev) =>
-      prev.filter((item) => item.id !== selectedQuestion.id),
-    );
-
-    // Đóng modal xóa
-    setShowDeleteModal(false);
-
-    // Xóa câu hỏi đang chọn
-    setSelectedQuestion(null);
   };
 
   // ====================================================
@@ -333,22 +330,94 @@ const Questions = () => {
   // ====================================================
 
   const handleOpenDelete = (question: Question) => {
-    // Lưu câu hỏi muốn xóa
     setSelectedQuestion(question);
-
-    // Mở modal xác nhận xóa
     setShowDeleteModal(true);
+  };
+
+  // ====================================================
+  // XÓA CÂU HỎI
+  // ====================================================
+
+  const handleDeleteQuestion = async () => {
+    if (!selectedQuestion?.id) {
+      toast.error("Không tìm thấy ID câu hỏi");
+      return;
+    }
+
+    try {
+      setActionLoading(true);
+
+      const questionId = selectedQuestion.id;
+
+      console.log("ID câu hỏi cần xóa:", questionId);
+
+      // ================================================
+      // GỌI API DELETE
+      // ================================================
+
+      await deleteQuestionService(questionId);
+
+      // ================================================
+      // XÓA KHỎI STATE
+      // ================================================
+
+      setQuestions((prev) => prev.filter((item) => item.id !== questionId));
+
+      // ================================================
+      // ĐÓNG MODAL
+      // ================================================
+
+      setShowDeleteModal(false);
+      setSelectedQuestion(null);
+
+      // ================================================
+      // TÍNH LẠI TRANG
+      // ================================================
+
+      const remaining = questions.length - 1;
+
+      const maxPage = Math.max(1, Math.ceil(remaining / pageSize));
+
+      if (currentPage > maxPage) {
+        setCurrentPage(maxPage);
+      }
+
+      toast.success("Xóa câu hỏi thành công");
+    } catch (error) {
+      console.error("Lỗi khi xóa câu hỏi:", error);
+
+      toast.error("Xóa câu hỏi thất bại");
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   // ====================================================
   // MỞ MODAL XEM
   // ====================================================
 
-  const handleOpenView = (question: Question) => {
-    // Lưu câu hỏi muốn xem
-    setSelectedQuestion(question);
+  const handleOpenView = async (question: Question) => {
+    if (!question.id) {
+      toast.error("Không tìm thấy ID câu hỏi");
+      return;
+    }
 
-    // Mở modal xem
+    try {
+      setActionLoading(true);
+
+      const detail = await getQuestionDetailService(question.id);
+
+      setSelectedQuestion(detail);
+    } catch (error) {
+      console.error("Lỗi khi tải chi tiết câu hỏi:", error);
+
+      setSelectedQuestion(question);
+
+      toast.error("Không thể tải chi tiết câu hỏi");
+    } finally {
+      setActionLoading(false);
+    }
+
     setShowViewModal(true);
   };
 
@@ -357,10 +426,7 @@ const Questions = () => {
   // ====================================================
 
   const handleCloseEdit = () => {
-    // Đóng modal sửa
     setShowEditModal(false);
-
-    // Xóa câu hỏi đang chọn
     setSelectedQuestion(null);
   };
 
@@ -369,10 +435,7 @@ const Questions = () => {
   // ====================================================
 
   const handleCloseDelete = () => {
-    // Đóng modal xóa
     setShowDeleteModal(false);
-
-    // Xóa câu hỏi đang chọn
     setSelectedQuestion(null);
   };
 
@@ -381,11 +444,35 @@ const Questions = () => {
   // ====================================================
 
   const handleCloseView = () => {
-    // Đóng modal xem
     setShowViewModal(false);
-
-    // Xóa câu hỏi đang chọn
     setSelectedQuestion(null);
+  };
+
+  // ====================================================
+  // TÌM KIẾM
+  // ====================================================
+
+  const handleSearch = (value: string) => {
+    setSearchKeyword(value);
+    setCurrentPage(1);
+  };
+
+  // ====================================================
+  // XÓA TỪ KHÓA
+  // ====================================================
+
+  const handleClearSearch = () => {
+    setSearchKeyword("");
+    setCurrentPage(1);
+  };
+
+  // ====================================================
+  // PAGINATION CHANGE
+  // ====================================================
+
+  const handlePaginationChange = (page: number, size: number) => {
+    setCurrentPage(page);
+    setPageSize(size);
   };
 
   // ====================================================
@@ -395,15 +482,26 @@ const Questions = () => {
   return (
     <div
       className="container-fluid py-4"
-      style={{ backgroundColor: "#f8f9fa" }}
+      style={{
+        backgroundColor: "#f8f9fa",
+        minHeight: "100vh",
+      }}
     >
       <div className="bg-white p-4 rounded-3 shadow-sm">
+        {/* ==================================================
+            HEADER
+        ================================================== */}
+
         <HeaderQuestions
           title="Quản lý câu hỏi"
           description="Tạo, chỉnh sửa, xóa và quản lý câu hỏi"
           add="Thêm"
           onAdd={() => setShowCreateModal(true)}
         />
+
+        {/* ==================================================
+            SEARCH
+        ================================================== */}
 
         <div className="row mb-4 g-3">
           <div className="col-md-12">
@@ -418,14 +516,14 @@ const Questions = () => {
                 className="form-control border-0 bg-light"
                 placeholder="Tìm kiếm câu hỏi hoặc danh mục..."
                 value={searchKeyword}
-                onChange={(e) => setSearchKeyword(e.target.value)}
+                onChange={(e) => handleSearch(e.target.value)}
               />
 
               {searchKeyword && (
                 <button
                   type="button"
                   className="btn btn-outline-secondary border-0 bg-light"
-                  onClick={() => setSearchKeyword("")}
+                  onClick={handleClearSearch}
                   title="Xóa tìm kiếm"
                 >
                   <i className="bi bi-x-lg"></i>
@@ -435,8 +533,14 @@ const Questions = () => {
           </div>
         </div>
 
+        {/* ==================================================
+            TABLE
+        ================================================== */}
+
         <div className="table-responsive">
           <table className="table table-hover mb-0">
+            {/* HEADER */}
+
             <thead className="table-light">
               <tr>
                 {table.map((item, index) => (
@@ -460,73 +564,89 @@ const Questions = () => {
               </tr>
             </thead>
 
-            {/* ================================
-                TABLE BODY
-            ================================= */}
+            {/* BODY */}
 
             <tbody>
-              {/* Nếu không tìm thấy câu hỏi */}
-              {filteredQuestions.length === 0 ? (
+              {/* LOADING */}
+
+              {loading ? (
+                <tr>
+                  <td colSpan={4} className="text-center py-5">
+                    <div className="spinner-border text-primary" role="status">
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+
+                    <div className="mt-2 text-secondary">
+                      Đang tải danh sách câu hỏi...
+                    </div>
+                  </td>
+                </tr>
+              ) : paginatedQuestions.length === 0 ? (
+                /* EMPTY */
+
                 <tr>
                   <td colSpan={4} className="text-center py-5 text-secondary">
-                    {/* Icon tìm kiếm */}
                     <i className="bi bi-search fs-3 d-block mb-2"></i>
-                    Không tìm thấy câu hỏi
+
+                    {searchKeyword
+                      ? "Không tìm thấy câu hỏi phù hợp"
+                      : "Chưa có câu hỏi"}
                   </td>
                 </tr>
               ) : (
-                // Nếu có dữ liệu
-                // duyệt qua danh sách câu hỏi
-                filteredQuestions.map((item) => (
+                /* DATA */
+
+                paginatedQuestions.map((item, index) => (
                   <tr key={item.id}>
-                    {/* =========================
-                        STT
-                    ========================== */}
+                    {/* STT */}
 
-                    <td className="px-3">{item.id}</td>
+                    <td className="px-3">{startIndex + index + 1}</td>
 
-                    {/* =========================
-                        CÂU HỎI
-                    ========================== */}
+                    {/* CÂU HỎI */}
 
-                    <td>{item.question}</td>
+                    <td>{item.content}</td>
 
-                    {/* =========================
-                        DANH MỤC
-                        Không dùng badge
-                        => chỉ hiển thị chữ đen
-                    ========================== */}
+                    {/* DANH MỤC */}
 
-                    <td className="text-dark">{item.category}</td>
+                    <td className="text-dark">
+                      {getCategoryName(item.categoryId)}
+                    </td>
 
-                    {/* =========================
-                        THAO TÁC
-                    ========================== */}
+                    {/* THAO TÁC */}
 
                     <td>
                       <div className="d-flex gap-2">
+                        {/* VIEW */}
+
                         <button
                           type="button"
                           className="btn btn-sm btn-outline-secondary p-1"
                           title="Xem"
+                          disabled={actionLoading}
                           onClick={() => handleOpenView(item)}
                         >
                           <i className="bi bi-eye"></i>
                         </button>
 
+                        {/* EDIT */}
+
                         <button
                           type="button"
                           className="btn btn-sm btn-outline-primary p-1"
                           title="Sửa"
+                          disabled={actionLoading}
                           onClick={() => handleOpenEdit(item)}
                         >
                           <i className="bi bi-pencil"></i>
                         </button>
 
+                        {/* DELETE */}
+
                         <button
                           type="button"
                           className="btn btn-sm btn-outline-danger p-1"
                           title="Xóa"
+                          disabled={actionLoading}
                           onClick={() => handleOpenDelete(item)}
                         >
                           <i className="bi bi-trash"></i>
@@ -540,94 +660,78 @@ const Questions = () => {
           </table>
         </div>
 
-        <div className="d-flex justify-content-between align-items-center mt-4">
-          <span className="text-secondary small">
-            Hiển thị 1-{filteredQuestions.length} trong tổng{" "}
-            {filteredQuestions.length} câu hỏi
-          </span>
+        {/* ==================================================
+            PAGINATION
+        ================================================== */}
 
-          <nav>
-            <ul className="pagination mb-0">
-              <li className="page-item disabled">
-                <button type="button" className="page-link">
-                  <i className="bi bi-chevron-left"></i>
-                </button>
-              </li>
+        {!loading && filteredQuestions.length > 0 && (
+          <div className="d-flex justify-content-between align-items-center mt-4">
+            <span className="text-secondary small">
+              {startIndex + 1}-{Math.min(endIndex, filteredQuestions.length)}{" "}
+              trong tổng {filteredQuestions.length} câu hỏi
+              {searchKeyword && ` (lọc từ ${questions.length} câu hỏi)`}
+            </span>
 
-              <li className="page-item active">
-                <button type="button" className="page-link">
-                  1
-                </button>
-              </li>
+            <Pagination
+              current={currentPage}
+              pageSize={pageSize}
+              total={filteredQuestions.length}
+              showSizeChanger
+              pageSizeOptions={[5, 10, 20, 50]}
+              showQuickJumper
+              onChange={handlePaginationChange}
+              showTotal={(total, range) => `${range[0]}-${range[1]} / ${total}`}
+            />
+          </div>
+        )}
 
-              <li className="page-item">
-                <button type="button" className="page-link">
-                  <i className="bi bi-chevron-right"></i>
-                </button>
-              </li>
-            </ul>
-          </nav>
-        </div>
+        {/* ==================================================
+            CREATE MODAL
+        ================================================== */}
+
+        <CreateQuestionModal
+          show={showCreateModal}
+          onClose={() => setShowCreateModal(false)}
+          categories={categories}
+          onSubmit={handleCreateQuestion}
+        />
+
+        {/* ==================================================
+            EDIT MODAL
+        ================================================== */}
+
+        <EditQuestionModal
+          show={showEditModal}
+          onClose={handleCloseEdit}
+          onSubmit={handleEditQuestion}
+          questionToEdit={selectedQuestion}
+          categories={categories}
+        />
+
+        {/* ==================================================
+            DELETE MODAL
+        ================================================== */}
+
+        <DeleteQuestionModal
+          show={showDeleteModal}
+          onClose={handleCloseDelete}
+          onConfirm={handleDeleteQuestion}
+          question={selectedQuestion}
+        />
+
+        {/* ==================================================
+            VIEW MODAL
+        ================================================== */}
+
+        <ViewQuestionModal
+          show={showViewModal}
+          onClose={handleCloseView}
+          question={selectedQuestion}
+          categories={categories}
+        />
       </div>
-
-      {/* ==================================================
-          CREATE QUESTION MODAL
-      ================================================== */}
-
-      <CreateQuestionModal
-        // true => hiển thị modal
-        show={showCreateModal}
-        // Đóng modal
-        onClose={() => setShowCreateModal(false)}
-        // Xử lý khi submit câu hỏi mới
-        onSubmit={handleCreateQuestion}
-      />
-
-      {/* ==================================================
-          EDIT QUESTION MODAL
-      ================================================== */}
-
-      <EditQuestionModal
-        // true => hiển thị modal sửa
-        show={showEditModal}
-        // Đóng modal
-        onClose={handleCloseEdit}
-        // Xử lý khi sửa
-        onSubmit={handleEditQuestion}
-        // Truyền câu hỏi đang chọn vào modal
-        questionToEdit={selectedQuestion}
-      />
-
-      {/* ==================================================
-          DELETE QUESTION MODAL
-      ================================================== */}
-
-      <DeleteQuestionModal
-        // true => hiển thị modal xóa
-        show={showDeleteModal}
-        // Đóng modal
-        onClose={handleCloseDelete}
-        // Xác nhận xóa
-        onConfirm={handleDeleteQuestion}
-        // Câu hỏi cần xóa
-        question={selectedQuestion}
-      />
-
-      {/* ==================================================
-          VIEW QUESTION MODAL
-      ================================================== */}
-
-      <ViewQuestionModal
-        // true => hiển thị modal xem
-        show={showViewModal}
-        // Đóng modal
-        onClose={handleCloseView}
-        // Câu hỏi cần xem
-        question={selectedQuestion}
-      />
     </div>
   );
 };
 
-// Export component để sử dụng ở page
 export default Questions;

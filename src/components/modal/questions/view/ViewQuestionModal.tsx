@@ -1,34 +1,33 @@
 "use client";
 
-interface AnswerOption {
-  key: "A" | "B" | "C" | "D";
-  value: string;
-}
-
-interface Question {
-  id: number;
-  question: string;
-  category: string;
-  answers?: AnswerOption[];
-  correctAnswer?: "A" | "B" | "C" | "D";
-}
+import { Question, Answer } from "@/types/question";
+import { Category } from "@/types/categories";
 
 interface ViewQuestionModalProps {
   show: boolean;
   onClose: () => void;
   question: Question | null;
+  categories: Category[];
 }
 
 const ViewQuestionModal = ({
   show,
   onClose,
   question,
+  categories,
 }: ViewQuestionModalProps) => {
   if (!show || !question) {
     return null;
   }
 
-  const answers = question.answers ?? [];
+  const answers: Answer[] = question.answers ?? [];
+
+  const correctAnswer = answers.find((a) => a.isCorrect);
+
+  const categoryName =
+    categories.find((c) => c.id === question.categoryId)?.name ||
+    question.category ||
+    "Không xác định";
 
   return (
     <>
@@ -56,16 +55,25 @@ const ViewQuestionModal = ({
               <div className="mb-4">
                 <div className="fw-semibold mb-2">Nội dung câu hỏi</div>
                 <div className="border rounded p-3 bg-light">
-                  {question.question}
+                  {question.content || "Không có nội dung"}
                 </div>
               </div>
 
               <div className="mb-4">
                 <div className="fw-semibold mb-2">Danh mục</div>
                 <div className="border rounded p-3 bg-light">
-                  {question.category}
+                  {categoryName}
                 </div>
               </div>
+
+              {correctAnswer && (
+                <div className="mb-4">
+                  <div className="fw-semibold mb-2">Đáp án đúng</div>
+                  <div className="border rounded p-3 bg-success-subtle">
+                    {correctAnswer.label}. {correctAnswer.content}
+                  </div>
+                </div>
+              )}
 
               <div>
                 <div className="fw-semibold mb-2">Danh sách phương án</div>
@@ -73,11 +81,11 @@ const ViewQuestionModal = ({
                 <div className="d-flex flex-column gap-2">
                   {answers.length > 0 ? (
                     answers.map((answer) => {
-                      const isCorrect = question.correctAnswer === answer.key;
+                      const isCorrect = answer.isCorrect;
 
                       return (
                         <div
-                          key={answer.key}
+                          key={answer.id || answer.label}
                           className={`d-flex align-items-center justify-content-between border rounded p-3 ${
                             isCorrect
                               ? "bg-success-subtle border-success"
@@ -91,10 +99,10 @@ const ViewQuestionModal = ({
                               }`}
                               style={{ minWidth: 32 }}
                             >
-                              {answer.key}
+                              {answer.label}
                             </span>
 
-                            <span>{answer.value}</span>
+                            <span>{answer.content}</span>
                           </div>
 
                           {isCorrect && (

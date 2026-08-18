@@ -24,7 +24,7 @@ export const ExamCard = ({ exam, onStartExam }: ExamCardProps) => {
               <i className="bi bi-clock me-1"></i> {exam.duration} Phút
             </span>
             <span className="badge bg-secondary bg-opacity-20 text-light border border-secondary border-opacity-25 px-3 py-2 rounded-pill">
-              <i className="bi bi-question-circle me-1"></i> {exam.totalQuestions} Câu hỏi
+              <i className="bi bi-question-circle me-1"></i> {exam.totalQuestions ?? 0} Câu hỏi
             </span>
           </div>
 

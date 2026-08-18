@@ -27,12 +27,11 @@ const ExamGroupPage = () => {
     dispatch(fetchExamsApiAsync());
   }, [dispatch, limit]);
 
-  // Log kiểm tra dữ liệu
-  console.log("ExamGroups State:", examGroups);
-  console.log("Total Count:", totalCount);
-
-  const getExamCount = (categoryId: string) => {
-    return exams.filter((exam) => exam.categoryId === categoryId).length;
+  // SỬA TẠI ĐÂY: Kiểm tra cả examGroupId và categoryId
+  const getExamCount = (groupId: string) => {
+    return exams.filter(
+      (exam) => exam.examGroupId === groupId || exam.categoryId === groupId
+    ).length;
   };
 
   const totalPages = Math.max(1, Math.ceil(totalCount / limit));

@@ -1,5 +1,4 @@
 // src/services/examService.ts
-
 import { Exam } from "@/types/exam";
 import api from "@/lib/apiClient";
 
@@ -12,40 +11,44 @@ export interface PaginatedExamsResponse {
   totalCount: number;
 }
 
-// =========================
-// LẤY DANH SÁCH BÀI THI PHÂN TRANG
-// =========================
 export const getPaginatedExamsService = async (
   page: number = 1,
   limit: number = 6,
-  groupId?: string,
+  groupId?: string
 ): Promise<PaginatedExamsResponse> => {
   try {
-    const response = await api.get<Exam[] | ApiResponse<Exam[]>>("/exams");
+    const [examsRes, examQuestionsRes] = await Promise.all([
+      api.get<Exam[] | ApiResponse<Exam[]>>("/exams"),
+      api.get<any[]>("/exam_questions"),
+    ]);
 
-    let allExams: Exam[] = Array.isArray(response.data)
-      ? response.data
-      : response.data.data;
+    let allExams: Exam[] = Array.isArray(examsRes.data)
+      ? examsRes.data
+      : (examsRes.data as any).data;
 
-    // =========================
-    // LỌC THEO NHÓM ĐỀ / CATEGORY
-    // =========================
+    const allExamQuestions = Array.isArray(examQuestionsRes.data)
+      ? examQuestionsRes.data
+      : (examQuestionsRes.data as any).data || [];
+
+    // Gắn số lượng câu hỏi thực tế tính từ bảng exam_questions
+    allExams = allExams.map((exam) => {
+      const qCount = allExamQuestions.filter(
+        (eq: any) => eq.examId === exam.id
+      ).length;
+      return {
+        ...exam,
+        totalQuestions: exam.totalQuestions || qCount,
+      };
+    });
+
     if (groupId) {
       allExams = allExams.filter(
-        (exam) => exam.examGroupId === groupId || exam.categoryId === groupId,
+        (exam) => exam.examGroupId === groupId || exam.categoryId === groupId
       );
     }
 
-    // =========================
-    // TỔNG SỐ BÀI THI
-    // =========================
     const totalCount = allExams.length;
-
-    // =========================
-    // PHÂN TRANG
-    // =========================
     const startIndex = (page - 1) * limit;
-
     const paginatedData = allExams.slice(startIndex, startIndex + limit);
 
     return {
@@ -54,22 +57,33 @@ export const getPaginatedExamsService = async (
     };
   } catch (error) {
     console.error("Lỗi khi tải danh sách bài thi:", error);
-
     throw error;
   }
 };
 
-// =========================
-// LẤY TOÀN BỘ BÀI THI
-// =========================
 export const getExamsService = async (): Promise<Exam[]> => {
   try {
-    const response = await api.get<Exam[] | ApiResponse<Exam[]>>("/exams");
+    const [examsRes, examQuestionsRes] = await Promise.all([
+      api.get<Exam[] | ApiResponse<Exam[]>>("/exams"),
+      api.get<any[]>("/exam_questions"),
+    ]);
 
-    return Array.isArray(response.data) ? response.data : response.data.data;
+    const allExams: Exam[] = Array.isArray(examsRes.data)
+      ? examsRes.data
+      : (examsRes.data as any).data;
+
+    const allExamQuestions = Array.isArray(examQuestionsRes.data)
+      ? examQuestionsRes.data
+      : (examQuestionsRes.data as any).data || [];
+
+    return allExams.map((exam) => ({
+      ...exam,
+      totalQuestions:
+        exam.totalQuestions ||
+        allExamQuestions.filter((eq: any) => eq.examId === exam.id).length,
+    }));
   } catch (error) {
     console.error("Lỗi khi tải toàn bộ bài thi:", error);
-
     throw error;
   }
 };

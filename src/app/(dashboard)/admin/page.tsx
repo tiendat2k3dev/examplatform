@@ -6,7 +6,7 @@ import type { Exam } from "@/types/exam";
 import type { Category } from "@/types/categories";
 
 /* =========================================================
-   RAW TYPES từ db.json
+   TYPES
 ========================================================= */
 
 interface User {
@@ -34,24 +34,20 @@ interface History {
 
 interface Question {
   id: string;
-  content: string;
-  categoryId: string;
 }
 
 /* =========================================================
-   HELPER
+   HELPERS
 ========================================================= */
 
-const formatDate = (iso: string) => {
-  const d = new Date(iso);
-  return d.toLocaleString("vi-VN", {
+const formatDate = (iso: string) =>
+  new Date(iso).toLocaleString("vi-VN", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
   });
-};
 
 const getInitial = (name: string) => name.trim().charAt(0).toUpperCase();
 
@@ -60,9 +56,6 @@ const getInitial = (name: string) => name.trim().charAt(0).toUpperCase();
 ========================================================= */
 
 const AdminPage = () => {
-  /* -------------------------------------------------------
-     STATE
-  ------------------------------------------------------- */
   const [users, setUsers] = useState<User[]>([]);
   const [exams, setExams] = useState<Exam[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -70,79 +63,60 @@ const AdminPage = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
 
-  /* -------------------------------------------------------
-     FETCH ALL
-  ------------------------------------------------------- */
   useEffect(() => {
-    const fetchAll = async () => {
-      try {
-        const [usersRes, examsRes, questionsRes, historiesRes, categoriesRes] =
-          await Promise.all([
-            api.get<User[]>("/users"),
-            api.get<Exam[]>("/exams"),
-            api.get<Question[]>("/questions"),
-            api.get<History[]>("/histories"),
-            api.get<Category[]>("/categories"),
-          ]);
-
-        setUsers(Array.isArray(usersRes.data) ? usersRes.data : []);
-        setExams(Array.isArray(examsRes.data) ? examsRes.data : []);
-        setQuestions(Array.isArray(questionsRes.data) ? questionsRes.data : []);
-        setHistories(Array.isArray(historiesRes.data) ? historiesRes.data : []);
-        setCategories(
-          Array.isArray(categoriesRes.data) ? categoriesRes.data : [],
-        );
-      } catch (err) {
-        console.error("Lỗi tải dữ liệu dashboard:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAll();
+    Promise.all([
+      api.get<User[]>("/users"),
+      api.get<Exam[]>("/exams"),
+      api.get<Question[]>("/questions"),
+      api.get<History[]>("/histories"),
+      api.get<Category[]>("/categories"),
+    ])
+      .then(([u, e, q, h, c]) => {
+        setUsers(Array.isArray(u.data) ? u.data : []);
+        setExams(Array.isArray(e.data) ? e.data : []);
+        setQuestions(Array.isArray(q.data) ? q.data : []);
+        setHistories(Array.isArray(h.data) ? h.data : []);
+        setCategories(Array.isArray(c.data) ? c.data : []);
+      })
+      .catch((err) => console.error("Lỗi tải dữ liệu:", err))
+      .finally(() => setLoading(false));
   }, []);
 
   /* -------------------------------------------------------
-     COMPUTED STATS
+     COMPUTED
   ------------------------------------------------------- */
   const categoryMap = new Map(categories.map((c) => [c.id, c.name]));
+  const userMap = new Map(users.map((u) => [u.id, u]));
+  const members = users.filter((u) => u.role === "Member");
 
-  const totalMembers = users.filter((u) => u.role === "Member").length;
-
-  const totalExams = exams.length;
-
-  const totalQuestions = questions.length;
-
-  // Lượt thi hôm nay
   const todayStr = new Date().toISOString().slice(0, 10);
   const todayAttempts = histories.filter((h) =>
     h.completedAt?.startsWith(todayStr),
   ).length;
 
-  // 5 đề thi mới nhất (sort theo createdAt)
+  // Lượt thi hôm qua (để tính chênh lệch)
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = yesterday.toISOString().slice(0, 10);
+  const yesterdayAttempts = histories.filter((h) =>
+    h.completedAt?.startsWith(yesterdayStr),
+  ).length;
+
   const recentExams = [...exams]
-    .sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    )
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 5);
 
-  // 5 thành viên đăng ký mới nhất
-  const recentMembers = [...users]
-    .filter((u) => u.role === "Member")
-    .sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    )
+  const recentMembers = [...members]
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 5);
 
-  // Top thành viên: gộp histories theo userId, tính tổng score
+  // Top members — dùng tên mới nhất từ userMap
   const scoreMap = new Map<string, { name: string; total: number }>();
   histories.forEach((h) => {
     if (!h.userId || h.userId.startsWith("Public-")) return;
     const prev = scoreMap.get(h.userId);
     scoreMap.set(h.userId, {
-      name: h.userName,
+      name: userMap.get(h.userId)?.fullName ?? h.userName,
       total: (prev?.total ?? 0) + h.score,
     });
   });
@@ -151,38 +125,99 @@ const AdminPage = () => {
     .sort((a, b) => b.total - a.total)
     .slice(0, 5);
 
+  // Chart: lượt thi 7 ngày — dùng line chart SVG
+  const chartDays = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - (6 - i));
+    return {
+      label: `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}`,
+      dateStr: d.toISOString().slice(0, 10),
+      count: 0,
+    };
+  });
+  histories.forEach((h) => {
+    if (!h.completedAt) return;
+    const found = chartDays.find((d) => d.dateStr === h.completedAt.slice(0, 10));
+    if (found) found.count += 1;
+  });
+
+  const chartH = 160;
+  const chartW = 460;
+  const chartMax = Math.max(...chartDays.map((d) => d.count), 1);
+  const padL = 36;
+  const padB = 24;
+  const padT = 16;
+  const padR = 12;
+  const innerW = chartW - padL - padR;
+  const innerH = chartH - padT - padB;
+
+  const pts = chartDays.map((d, i) => ({
+    x: padL + (i / 6) * innerW,
+    y: padT + innerH - (d.count / chartMax) * innerH,
+    count: d.count,
+    label: d.label,
+  }));
+
+  const polyline = pts.map((p) => `${p.x},${p.y}`).join(" ");
+
+  // Filled area path
+  const areaPath =
+    `M ${pts[0].x},${padT + innerH} ` +
+    pts.map((p) => `L ${p.x},${p.y}`).join(" ") +
+    ` L ${pts[pts.length - 1].x},${padT + innerH} Z`;
+
+  const yTicks = [0, 1, 2, 3, 4].map((i) =>
+    Math.round((chartMax * (4 - i)) / 4),
+  );
+
   /* -------------------------------------------------------
-     STATS CARDS
+     STATS CARDS CONFIG
   ------------------------------------------------------- */
   const stats = [
     {
       icon: "bi-people-fill",
-      title: "Tổng thành viên",
-      value: totalMembers.toLocaleString("vi-VN"),
       color: "primary",
+      bg: "#eef2ff",
+      iconColor: "#6366f1",
+      title: "Tổng thành viên",
+      value: members.length.toLocaleString("vi-VN"),
+      change: "+0",
+      changeText: "so với tháng trước",
     },
     {
       icon: "bi-file-earmark-text-fill",
-      title: "Tổng đề thi",
-      value: totalExams.toLocaleString("vi-VN"),
       color: "success",
+      bg: "#f0fdf4",
+      iconColor: "#22c55e",
+      title: "Tổng đề thi",
+      value: exams.length.toLocaleString("vi-VN"),
+      change: `+${exams.filter((e) => e.createdAt?.startsWith(todayStr)).length}`,
+      changeText: "so với tháng trước",
     },
     {
       icon: "bi-question-circle-fill",
-      title: "Tổng câu hỏi",
-      value: totalQuestions.toLocaleString("vi-VN"),
       color: "info",
+      bg: "#eff6ff",
+      iconColor: "#3b82f6",
+      title: "Tổng câu hỏi",
+      value: questions.length.toLocaleString("vi-VN"),
+      change: "+0",
+      changeText: "so với tháng trước",
     },
     {
       icon: "bi-graph-up-arrow",
+      color: "warning",
+      bg: "#fffbeb",
+      iconColor: "#f59e0b",
       title: "Lượt thi hôm nay",
       value: todayAttempts.toLocaleString("vi-VN"),
-      color: "warning",
+      change: `+${Math.max(0, todayAttempts - yesterdayAttempts)}`,
+      changeText: "so với hôm qua",
     },
   ];
 
   /* -------------------------------------------------------
-     RENDER – LOADING
+     LOADING
   ------------------------------------------------------- */
   if (loading) {
     return (
@@ -195,56 +230,61 @@ const AdminPage = () => {
   }
 
   /* -------------------------------------------------------
-     RENDER – MAIN
+     RENDER
   ------------------------------------------------------- */
   return (
-    <div className="container-fluid bg-light min-vh-100 p-3">
-      {/* ================= HEADER ================= */}
-      <div className="card border-0 shadow-sm mb-3 overflow-hidden">
+    <div className="container-fluid bg-light min-vh-100 p-4">
+
+      {/* ===== HEADER ===== */}
+      <div
+        className="card border-0 shadow-sm mb-4 overflow-hidden"
+        style={{ background: "linear-gradient(135deg, #f8faff 0%, #eef2ff 100%)" }}
+      >
         <div className="card-body p-4">
           <div className="d-flex justify-content-between align-items-center">
             <div>
-              <h4 className="fw-bold text-dark mb-2">
-                Chào mừng trở lại, Admin! 👋
-              </h4>
-              <p className="text-secondary small mb-0">
+              <h4 className="fw-bold text-dark mb-1">Chào mừng trở lại, Admin! 👋</h4>
+              <p className="text-secondary mb-0">
                 Quản lý và theo dõi hệ thống trắc nghiệm của bạn.
               </p>
             </div>
-            <div className="d-none d-md-flex align-items-center">
-              <div
-                className="bg-primary-subtle rounded-4 d-flex align-items-center justify-content-center"
-                style={{ width: "130px", height: "70px" }}
-              >
-                <i
-                  className="bi bi-bar-chart-line-fill text-primary"
-                  style={{ fontSize: "40px" }}
-                />
-              </div>
+            {/* Illustration */}
+            <div className="d-none d-md-block" style={{ width: "120px" }}>
+              <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="10" y="10" width="100" height="60" rx="8" fill="#c7d2fe" />
+                <rect x="20" y="20" width="80" height="40" rx="4" fill="white" />
+                <rect x="28" y="28" width="12" height="24" rx="2" fill="#6366f1" opacity="0.6" />
+                <rect x="46" y="34" width="12" height="18" rx="2" fill="#6366f1" opacity="0.8" />
+                <rect x="64" y="30" width="12" height="22" rx="2" fill="#6366f1" />
+                <rect x="82" y="36" width="12" height="16" rx="2" fill="#6366f1" opacity="0.5" />
+                <circle cx="96" cy="14" r="12" fill="#818cf8" />
+                <path d="M90 14 L96 20 L104 10" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
             </div>
           </div>
         </div>
       </div>
 
-      {/* ================= STATISTICS ================= */}
-      <div className="row g-3 mb-3">
-        {stats.map((stat) => (
-          <div key={stat.title} className="col-12 col-sm-6 col-xl-3">
+      {/* ===== STATS CARDS ===== */}
+      <div className="row g-3 mb-4">
+        {stats.map((s) => (
+          <div key={s.title} className="col-6 col-xl-3">
             <div className="card border-0 shadow-sm h-100">
               <div className="card-body p-3">
                 <div className="d-flex align-items-center gap-3">
                   <div
-                    className={`bg-${stat.color}-subtle text-${stat.color} rounded-circle d-flex align-items-center justify-content-center`}
-                    style={{ width: "48px", height: "48px", minWidth: "48px" }}
+                    className="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                    style={{ width: "50px", height: "50px", background: s.bg }}
                   >
-                    <i
-                      className={`bi ${stat.icon}`}
-                      style={{ fontSize: "21px" }}
-                    />
+                    <i className={`bi ${s.icon}`} style={{ fontSize: "22px", color: s.iconColor }} />
                   </div>
                   <div>
-                    <div className="text-secondary small">{stat.title}</div>
-                    <div className="fw-bold fs-4 text-dark">{stat.value}</div>
+                    <div className="text-secondary small">{s.title}</div>
+                    <div className="fw-bold fs-4 lh-1 text-dark">{s.value}</div>
+                    <div className="small mt-1">
+                      <span className="text-success fw-semibold">{s.change}</span>{" "}
+                      <span className="text-secondary">{s.changeText}</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -253,18 +293,128 @@ const AdminPage = () => {
         ))}
       </div>
 
-      {/* ================= EXAMS + MEMBERS ================= */}
-      <div className="row g-3 mb-3">
-        {/* Đề thi gần đây */}
+      {/* ===== CHART + MEMBERS ===== */}
+      <div className="row g-3 mb-4">
+
+        {/* Line chart */}
+        <div className="col-12 col-xl-7">
+          <div className="card border-0 shadow-sm h-100">
+            <div className="card-body">
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <h6 className="fw-semibold mb-0">Thống kê lượt thi trong 7 ngày qua</h6>
+                <span className="badge bg-light text-secondary border rounded-pill px-3">
+                  7 ngày qua ∨
+                </span>
+              </div>
+
+              <svg
+                viewBox={`0 0 ${chartW} ${chartH}`}
+                width="100%"
+                style={{ overflow: "visible" }}
+              >
+                {/* Y-axis grid + labels */}
+                {yTicks.map((tick, i) => {
+                  const y = padT + (i / 4) * innerH;
+                  return (
+                    <g key={tick}>
+                      <line x1={padL} y1={y} x2={chartW - padR} y2={y}
+                        stroke="#f1f5f9" strokeWidth="1" />
+                      <text x={padL - 6} y={y + 4} fontSize="10" fill="#94a3b8"
+                        textAnchor="end">{tick}</text>
+                    </g>
+                  );
+                })}
+
+                {/* Filled area */}
+                <path d={areaPath} fill="rgba(99,102,241,0.08)" />
+
+                {/* Line */}
+                <polyline
+                  points={polyline}
+                  fill="none"
+                  stroke="#6366f1"
+                  strokeWidth="2.5"
+                  strokeLinejoin="round"
+                  strokeLinecap="round"
+                />
+
+                {/* Dots + labels */}
+                {pts.map((p, i) => (
+                  <g key={i}>
+                    <circle cx={p.x} cy={p.y} r="4" fill="#6366f1" />
+                    <circle cx={p.x} cy={p.y} r="2" fill="white" />
+                    {p.count > 0 && (
+                      <text x={p.x} y={p.y - 10} fontSize="10"
+                        fill="#6366f1" textAnchor="middle" fontWeight="600">
+                        {p.count}
+                      </text>
+                    )}
+                    {/* X-axis label */}
+                    <text x={p.x} y={chartH - 4} fontSize="10"
+                      fill="#94a3b8" textAnchor="middle">
+                      {p.label}
+                    </text>
+                  </g>
+                ))}
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        {/* Recent members */}
+        <div className="col-12 col-xl-5">
+          <div className="card border-0 shadow-sm h-100">
+            <div className="card-body">
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <h6 className="fw-semibold mb-0">Thành viên mới nhất</h6>
+                <a href="/admin/members" className="text-primary small text-decoration-none">
+                  Xem tất cả
+                </a>
+              </div>
+
+              {recentMembers.length === 0 ? (
+                <p className="text-secondary small text-center py-3">Chưa có thành viên</p>
+              ) : (
+                recentMembers.map((m) => (
+                  <div key={m.id}
+                    className="d-flex align-items-center justify-content-between py-2 border-bottom">
+                    <div className="d-flex align-items-center gap-2">
+                      {m.avatarUrl ? (
+                        <img src={m.avatarUrl} alt={m.fullName}
+                          className="rounded-circle object-fit-cover flex-shrink-0"
+                          style={{ width: "36px", height: "36px" }} />
+                      ) : (
+                        <div className="rounded-circle d-flex align-items-center justify-content-center fw-semibold flex-shrink-0"
+                          style={{ width: "36px", height: "36px", background: "#eef2ff", color: "#6366f1" }}>
+                          {getInitial(m.fullName)}
+                        </div>
+                      )}
+                      <div>
+                        <div className="fw-semibold small">{m.fullName}</div>
+                        <div className="text-secondary" style={{ fontSize: "12px" }}>{m.email}</div>
+                      </div>
+                    </div>
+                    <small className="text-secondary text-nowrap ms-2" style={{ fontSize: "11px" }}>
+                      {formatDate(m.createdAt)}
+                    </small>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ===== EXAMS + RANKING ===== */}
+      <div className="row g-3">
+
+        {/* Recent exams */}
         <div className="col-12 col-xl-7">
           <div className="card border-0 shadow-sm h-100">
             <div className="card-body p-0">
-              <div className="d-flex justify-content-between align-items-center p-3">
-                <h6 className="fw-bold mb-0">Đề thi được tạo gần đây</h6>
-                <a
-                  href="/admin/exams"
-                  className="text-primary small text-decoration-none"
-                >
+              <div className="d-flex justify-content-between align-items-center px-3 pt-3 pb-2">
+                <h6 className="fw-semibold mb-0">Đề thi được tạo gần đây</h6>
+                <a href="/admin/exams" className="text-primary small text-decoration-none">
                   Xem tất cả
                 </a>
               </div>
@@ -273,20 +423,17 @@ const AdminPage = () => {
                 <table className="table table-hover align-middle mb-0">
                   <thead className="table-light">
                     <tr>
-                      <th className="small text-secondary">Mã đề thi</th>
-                      <th className="small text-secondary">Tên đề thi</th>
-                      <th className="small text-secondary">Danh mục</th>
-                      <th className="small text-secondary">Thời gian</th>
-                      <th className="small text-secondary">Trạng thái</th>
+                      <th className="small text-secondary fw-normal">Mã đề thi</th>
+                      <th className="small text-secondary fw-normal">Tên đề thi</th>
+                      <th className="small text-secondary fw-normal">Danh mục</th>
+                      <th className="small text-secondary fw-normal">Thời gian</th>
+                      <th className="small text-secondary fw-normal">Trạng thái</th>
                     </tr>
                   </thead>
                   <tbody>
                     {recentExams.length === 0 ? (
                       <tr>
-                        <td
-                          colSpan={5}
-                          className="text-center text-secondary py-4"
-                        >
+                        <td colSpan={5} className="text-center text-secondary py-4">
                           Chưa có đề thi nào
                         </td>
                       </tr>
@@ -295,23 +442,18 @@ const AdminPage = () => {
                         const isActive = exam.status === "ACTIVE";
                         return (
                           <tr key={exam.id}>
-                            <td className="small fw-semibold text-primary">
-                              {exam.code}
-                            </td>
+                            <td className="small fw-semibold text-primary">{exam.code}</td>
                             <td className="small">{exam.name}</td>
                             <td className="small text-secondary">
-                              {categoryMap.get(exam.categoryId) ??
-                                exam.categoryId}
+                              {categoryMap.get(exam.categoryId) ?? exam.categoryId}
                             </td>
                             <td className="small">{exam.duration} phút</td>
                             <td>
-                              <span
-                                className={`badge rounded-pill fw-normal ${
-                                  isActive
-                                    ? "bg-success-subtle text-success"
-                                    : "bg-danger-subtle text-danger"
-                                }`}
-                              >
+                              <span className={`badge rounded-pill fw-normal px-3 ${
+                                isActive
+                                  ? "bg-success-subtle text-success"
+                                  : "bg-danger-subtle text-danger"
+                              }`}>
                                 {isActive ? "Hoạt động" : "Khóa"}
                               </span>
                             </td>
@@ -326,73 +468,13 @@ const AdminPage = () => {
           </div>
         </div>
 
-        {/* Thành viên mới nhất */}
-        <div className="col-12 col-xl-5">
-          <div className="card border-0 shadow-sm h-100">
-            <div className="card-body">
-              <div className="d-flex justify-content-between align-items-center mb-3">
-                <h6 className="fw-bold mb-0">Thành viên mới nhất</h6>
-                <a
-                  href="/admin/members"
-                  className="text-primary small text-decoration-none"
-                >
-                  Xem tất cả
-                </a>
-              </div>
-
-              {recentMembers.length === 0 ? (
-                <p className="text-secondary small text-center py-3">
-                  Chưa có thành viên nào
-                </p>
-              ) : (
-                recentMembers.map((member) => (
-                  <div
-                    key={member.id}
-                    className="d-flex align-items-center justify-content-between py-2 border-bottom"
-                  >
-                    <div className="d-flex align-items-center gap-2">
-                      {member.avatarUrl ? (
-                        <img
-                          src={member.avatarUrl}
-                          alt={member.fullName}
-                          className="rounded-circle object-fit-cover"
-                          style={{ width: "36px", height: "36px" }}
-                        />
-                      ) : (
-                        <div
-                          className="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center fw-semibold"
-                          style={{ width: "36px", height: "36px" }}
-                        >
-                          {getInitial(member.fullName)}
-                        </div>
-                      )}
-                      <div>
-                        <div className="fw-semibold small">{member.fullName}</div>
-                        <div className="text-secondary small">{member.email}</div>
-                      </div>
-                    </div>
-                    <small className="text-secondary text-nowrap ms-2">
-                      {formatDate(member.createdAt)}
-                    </small>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ================= RANKING ================= */}
-      <div className="row g-3">
+        {/* Top members */}
         <div className="col-12 col-xl-5">
           <div className="card border-0 shadow-sm h-100">
             <div className="card-body p-0">
-              <div className="d-flex justify-content-between align-items-center p-3">
-                <h6 className="fw-bold mb-0">Top thành viên có điểm cao</h6>
-                <a
-                  href="/admin/ranking"
-                  className="text-primary small text-decoration-none"
-                >
+              <div className="d-flex justify-content-between align-items-center px-3 pt-3 pb-2">
+                <h6 className="fw-semibold mb-0">Top thành viên có điểm cao</h6>
+                <a href="/admin/ranking" className="text-primary small text-decoration-none">
                   Xem tất cả
                 </a>
               </div>
@@ -401,20 +483,15 @@ const AdminPage = () => {
                 <table className="table table-hover align-middle mb-0">
                   <thead className="table-light">
                     <tr>
-                      <th className="small text-secondary">Hạng</th>
-                      <th className="small text-secondary">Thành viên</th>
-                      <th className="small text-secondary text-end">
-                        Tổng điểm
-                      </th>
+                      <th className="small text-secondary fw-normal">Hạng</th>
+                      <th className="small text-secondary fw-normal">Thành viên</th>
+                      <th className="small text-secondary fw-normal text-end">Tổng điểm</th>
                     </tr>
                   </thead>
                   <tbody>
                     {topMembers.length === 0 ? (
                       <tr>
-                        <td
-                          colSpan={3}
-                          className="text-center text-secondary py-4"
-                        >
+                        <td colSpan={3} className="text-center text-secondary py-4">
                           Chưa có dữ liệu
                         </td>
                       </tr>
@@ -423,17 +500,13 @@ const AdminPage = () => {
                         const rank = idx + 1;
                         return (
                           <tr key={member.userId}>
-                            <td>
+                            <td style={{ width: "60px" }}>
                               {rank <= 3 ? (
-                                <span style={{ fontSize: "18px" }}>
-                                  {rank === 1
-                                    ? "🥇"
-                                    : rank === 2
-                                      ? "🥈"
-                                      : "🥉"}
+                                <span style={{ fontSize: "20px" }}>
+                                  {rank === 1 ? "🥇" : rank === 2 ? "🥈" : "🥉"}
                                 </span>
                               ) : (
-                                <span className="small fw-semibold">{rank}</span>
+                                <span className="small fw-semibold ms-1">{rank}</span>
                               )}
                             </td>
                             <td className="small">{member.name}</td>
@@ -450,81 +523,10 @@ const AdminPage = () => {
             </div>
           </div>
         </div>
-
-        {/* Thống kê lượt thi gần đây */}
-        <div className="col-12 col-xl-7">
-          <div className="card border-0 shadow-sm h-100">
-            <div className="card-body p-0">
-              <div className="d-flex justify-content-between align-items-center p-3">
-                <h6 className="fw-bold mb-0">Lịch sử thi gần đây</h6>
-              </div>
-
-              <div className="table-responsive">
-                <table className="table table-hover align-middle mb-0">
-                  <thead className="table-light">
-                    <tr>
-                      <th className="small text-secondary">Học viên</th>
-                      <th className="small text-secondary">Đề thi</th>
-                      <th className="small text-secondary text-center">
-                        Điểm
-                      </th>
-                      <th className="small text-secondary">Thời gian</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {histories.length === 0 ? (
-                      <tr>
-                        <td
-                          colSpan={4}
-                          className="text-center text-secondary py-4"
-                        >
-                          Chưa có lịch sử thi
-                        </td>
-                      </tr>
-                    ) : (
-                      [...histories]
-                        .sort(
-                          (a, b) =>
-                            new Date(b.completedAt).getTime() -
-                            new Date(a.completedAt).getTime(),
-                        )
-                        .slice(0, 6)
-                        .map((h) => (
-                          <tr key={h.id}>
-                            <td className="small fw-semibold">{h.userName}</td>
-                            <td
-                              className="small text-truncate"
-                              style={{ maxWidth: "180px" }}
-                            >
-                              {h.examTitle}
-                            </td>
-                            <td className="text-center">
-                              <span
-                                className={`badge rounded-pill ${
-                                  h.score >= 50
-                                    ? "bg-success-subtle text-success"
-                                    : "bg-danger-subtle text-danger"
-                                }`}
-                              >
-                                {h.score}%
-                              </span>
-                            </td>
-                            <td className="small text-secondary text-nowrap">
-                              {formatDate(h.completedAt)}
-                            </td>
-                          </tr>
-                        ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Footer */}
-      <div className="text-center text-secondary small py-3">
+      <div className="text-center text-secondary small py-4">
         © 2026 Online Quiz. All rights reserved.
       </div>
     </div>

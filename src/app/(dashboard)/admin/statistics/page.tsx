@@ -106,7 +106,10 @@ const Statistics = () => {
     )
     .slice(0, 5);
 
-  // Ranking: gộp histories theo userId, cộng dồn score
+  // Build user lookup map: id → User
+  const userMap = new Map(users.map((u) => [u.id, u]));
+
+  // Gộp histories theo userId: tổng điểm tích lũy
   interface RankEntry {
     userId: string;
     name: string;
@@ -116,11 +119,13 @@ const Statistics = () => {
   const scoreMap = new Map<string, RankEntry>();
   histories.forEach((h) => {
     if (!h.userId || h.userId.startsWith("Public-")) return;
+    const user = userMap.get(h.userId);
     const prev = scoreMap.get(h.userId);
     scoreMap.set(h.userId, {
       userId: h.userId,
-      name: h.userName,
-      avatarUrl: users.find((u) => u.id === h.userId)?.avatarUrl,
+      // Ưu tiên tên mới nhất từ bảng users, fallback về userName trong history
+      name: user?.fullName ?? h.userName,
+      avatarUrl: user?.avatarUrl,
       total: (prev?.total ?? 0) + h.score,
     });
   });
@@ -188,6 +193,16 @@ const Statistics = () => {
   ------------------------------------------------------- */
   return (
     <div className="container-fluid bg-light min-vh-100 px-4 py-4">
+
+      {/* ================= HEADER ================= */}
+      <div className="d-flex justify-content-between align-items-start mb-4">
+        <div>
+          <h2 className="fw-bold text-primary mb-2">THỐNG KÊ HỆ THỐNG</h2>
+          <p className="text-secondary mb-0 small">
+            Tổng quan số liệu thành viên, đề thi và câu hỏi trong hệ thống.
+          </p>
+        </div>
+      </div>
 
       {/* ===================== STATS CARDS ===================== */}
       <div className="row g-3 mb-3">

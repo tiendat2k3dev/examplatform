@@ -124,8 +124,9 @@ const Ranking = () => {
     .map(([userId, data]) => {
       const user = userMap.get(userId);
       return {
-        rank: 0, // gán sau khi sort
+        rank: 0,
         userId,
+        // Ưu tiên tên mới nhất từ bảng users, fallback về userName trong history
         name: user?.fullName ?? data.userName,
         email: user?.email ?? "",
         avatarUrl: user?.avatarUrl,

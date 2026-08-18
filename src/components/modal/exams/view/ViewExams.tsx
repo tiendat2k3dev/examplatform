@@ -1,6 +1,9 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import type { EditExam, QuestionWithAnswers } from "@/types/exam";
+import { getCategoriesService } from "@/services/categories";
+import type { Category } from "@/types/categories";
 
 interface ViewExamsProps {
   show: boolean;
@@ -10,21 +13,25 @@ interface ViewExamsProps {
 }
 
 const ViewExams = ({ show, onClose, exam, questions }: ViewExamsProps) => {
-  if (!show || !exam) {
-    return null;
-  }
+  const [categories, setCategories] = useState<Category[]>([]);
 
+  // Fetch danh mục để resolve tên từ id
+  useEffect(() => {
+    getCategoriesService()
+      .then(setCategories)
+      .catch((err) => console.error("Lỗi tải danh mục:", err));
+  }, []);
+
+  if (!show || !exam) return null;
+
+  // Resolve tên danh mục từ categoryId
+  const categoryName =
+    categories.find((c) => c.id === exam.categoryId)?.name ?? exam.categoryId;
+
+  // Lọc câu hỏi thuộc đề thi
   const examQuestions = exam.questionIds
     ? questions.filter((q) => exam.questionIds!.includes(q.id))
     : [];
-
-  const getStatusBadge = (status: EditExam["status"]) => {
-    if (status === "Hoạt động") {
-      return <span className="badge bg-success">✓ Hoạt động</span>;
-    }
-
-    return <span className="badge bg-danger">× Khóa</span>;
-  };
 
   return (
     <>
@@ -38,40 +45,33 @@ const ViewExams = ({ show, onClose, exam, questions }: ViewExamsProps) => {
             {/* Header */}
             <div
               className="modal-header text-white"
-              style={{
-                background: "linear-gradient(90deg, #25489f, #367ff0)",
-              }}
+              style={{ background: "linear-gradient(90deg, #25489f, #367ff0)" }}
             >
               <h5 className="modal-title fw-bold">Chi tiết đề thi</h5>
-
               <button
                 type="button"
                 className="btn-close btn-close-white"
                 onClick={onClose}
                 aria-label="Đóng"
-              ></button>
+              />
             </div>
 
             {/* Body */}
             <div className="modal-body">
               <div className="row g-3 mb-4">
-                {/* Mã đề */}
+                {/* Mã đề – hiển thị code, không phải id */}
                 <div className="col-md-6">
                   <div className="p-3 border rounded bg-light h-100">
                     <div className="text-secondary small mb-1">Mã đề</div>
-
-                    <div className="fw-semibold text-dark">{exam.id}</div>
+                    <div className="fw-semibold text-dark">{exam.code}</div>
                   </div>
                 </div>
 
-                {/* Danh mục */}
+                {/* Danh mục – hiển thị tên, không phải id */}
                 <div className="col-md-6">
                   <div className="p-3 border rounded bg-light h-100">
                     <div className="text-secondary small mb-1">Danh mục</div>
-
-                    <div className="fw-semibold text-dark">
-                      {exam.categoryId}
-                    </div>
+                    <div className="fw-semibold text-dark">{categoryName}</div>
                   </div>
                 </div>
 
@@ -79,7 +79,6 @@ const ViewExams = ({ show, onClose, exam, questions }: ViewExamsProps) => {
                 <div className="col-md-6">
                   <div className="p-3 border rounded bg-light h-100">
                     <div className="text-secondary small mb-1">Số câu hỏi</div>
-
                     <div className="fw-semibold text-dark">
                       {exam.questionIds?.length ?? 0}
                     </div>
@@ -90,10 +89,31 @@ const ViewExams = ({ show, onClose, exam, questions }: ViewExamsProps) => {
                 <div className="col-md-6">
                   <div className="p-3 border rounded bg-light h-100">
                     <div className="text-secondary small mb-1">Thời gian</div>
-
                     <div className="fw-semibold text-dark">
                       {exam.duration} phút
                     </div>
+                  </div>
+                </div>
+
+                {/* Trạng thái */}
+                <div className="col-md-6">
+                  <div className="p-3 border rounded bg-light h-100">
+                    <div className="text-secondary small mb-1">Trạng thái</div>
+                    <div className="fw-semibold">
+                      {exam.status === "Hoạt động" ? (
+                        <span className="badge bg-success">✓ Hoạt động</span>
+                      ) : (
+                        <span className="badge bg-danger">× Khóa</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Điểm pass */}
+                <div className="col-md-6">
+                  <div className="p-3 border rounded bg-light h-100">
+                    <div className="text-secondary small mb-1">Điểm đạt</div>
+                    <div className="fw-semibold text-dark">{exam.passScore}</div>
                   </div>
                 </div>
               </div>
@@ -106,10 +126,7 @@ const ViewExams = ({ show, onClose, exam, questions }: ViewExamsProps) => {
                   </h6>
 
                   {examQuestions.map((q, index) => (
-                    <div
-                      key={q.id}
-                      className="border rounded p-3 mb-3 bg-light"
-                    >
+                    <div key={q.id} className="border rounded p-3 mb-3 bg-light">
                       <div className="fw-semibold text-dark mb-2">
                         {index + 1}. {q.content}
                       </div>
@@ -137,6 +154,13 @@ const ViewExams = ({ show, onClose, exam, questions }: ViewExamsProps) => {
                       )}
                     </div>
                   ))}
+                </div>
+              )}
+
+              {examQuestions.length === 0 && (
+                <div className="text-center text-secondary py-4">
+                  <i className="bi bi-inbox fs-3 d-block mb-2" />
+                  Đề thi chưa có câu hỏi nào
                 </div>
               )}
             </div>

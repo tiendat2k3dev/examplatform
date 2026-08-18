@@ -56,6 +56,9 @@ const CategoryExamsPage = () => {
     router.push(`/exam/${examId}`);
   };
 
+  // Chỉ hiển thị đề thi đang mở (ACTIVE)
+  const activeExams = exams.filter((exam) => exam.status === "ACTIVE");
+
   if (examLoading && exams.length === 0) {
     return (
       <div className="d-flex justify-content-center align-items-center min-vh-100">
@@ -71,8 +74,8 @@ const CategoryExamsPage = () => {
       <ExamHeader examGroup={currentGroup} totalExams={totalCount} />
 
       <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
-        {exams && exams.length > 0 ? (
-          exams.map((exam) => (
+        {activeExams.length > 0 ? (
+          activeExams.map((exam) => (
             <ExamCard
               key={exam.id}
               exam={exam}

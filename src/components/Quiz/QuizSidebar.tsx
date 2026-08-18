@@ -62,22 +62,23 @@ export const QuizSidebar = ({
           </div>
 
           <div className="d-flex flex-wrap gap-2 justify-content-center">
-            {questions.map((q, idx) => {
-              const isAnswered = userAnswers[q.id] !== undefined;
-              const isCurrent = currentQuestionIndex === idx;
+      {questions.map((q, idx) => {
+        const questionId = q.id ?? String(idx);
+        const isAnswered = userAnswers[questionId] !== undefined;
+        const isCurrent = currentQuestionIndex === idx;
 
-              let btnClass = "btn-outline-secondary text-white";
-              if (isCurrent) {
-                btnClass = "btn-info text-white border-2 border-white";
-              } else if (isAnswered) {
-                btnClass = "btn-success text-white";
-              }
+        let btnClass = "btn-outline-secondary text-white";
+        if (isCurrent) {
+          btnClass = "btn-info text-white border-2 border-white";
+        } else if (isAnswered) {
+          btnClass = "btn-success text-white";
+        }
 
-              return (
-                <button
-                  key={q.id}
-                  onClick={() => onJumpQuestion(idx)}
-                  className={`btn rounded-3 ${btnClass}`}
+        return (
+          <button
+            key={q.id ?? idx}
+            onClick={() => onJumpQuestion(idx)}
+            className={`btn rounded-3 ${btnClass}`}
                   style={{
                     width: "40px",
                     height: "40px",

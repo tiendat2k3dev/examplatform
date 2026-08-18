@@ -83,82 +83,57 @@
       "status": "ACTIVE",
       "creatorId": "user001",
       "createdAt": "2026-08-17T10:20:00.000Z",
-      "updatedAt": "2026-08-18T08:13:06.117Z"
+      "updatedAt": "2026-08-18T08:23:17.895Z"
     },
     {
-      "id": "jnsXuOT02Ss",
-      "code": "Toan2",
-      "name": "toan lop1",
-      "categoryId": "cat001",
-      "examGroupId": "Xy59dRK75qk",
+      "id": "_7HI8l9h6NE",
+      "code": "java",
+      "name": "thi java",
+      "categoryId": "xcr_bZoi2-o",
+      "examGroupId": "pa-JYSNC8ag",
       "duration": 45,
       "passScore": 5,
       "status": "ACTIVE",
       "creatorId": "admin",
-      "createdAt": "2026-08-18T02:44:06.374Z",
-      "updatedAt": "2026-08-18T07:48:01.791Z"
-    },
-    {
-      "id": "DpQztDrRzv4",
-      "code": "Toan39",
-      "name": "Toan 30",
-      "categoryId": "cat001",
-      "examGroupId": "Xy59dRK75qk",
-      "duration": 45,
-      "passScore": 5,
-      "status": "ACTIVE",
-      "creatorId": "admin",
-      "createdAt": "2026-08-18T07:32:20.790Z",
-      "updatedAt": "2026-08-18T08:11:30.333Z"
+      "createdAt": "2026-08-18T08:23:56.103Z",
+      "updatedAt": "2026-08-18T08:23:56.103Z"
     }
   ],
   "exam_questions": [
     {
-      "id": "KNcWil3U060",
-      "examId": "jnsXuOT02Ss",
+      "id": "I7IYHs2HVXc",
+      "examId": "ex-toan-001",
       "questionId": "q-toan-001",
       "questionOrder": 1
     },
     {
-      "id": "9F20GUXgKq4",
-      "examId": "jnsXuOT02Ss",
+      "id": "TcXjrtQT6jI",
+      "examId": "ex-toan-001",
       "questionId": "gvpQVc8xsxk",
       "questionOrder": 2
     },
     {
-      "id": "3CfYB88qE-I",
-      "examId": "DpQztDrRzv4",
+      "id": "KxgeAbLF9kA",
+      "examId": "ex-toan-001",
       "questionId": "T_gOvtUzzYs",
-      "questionOrder": 1
-    },
-    {
-      "id": "Ex0iNydm6xU",
-      "examId": "DpQztDrRzv4",
-      "questionId": "gvpQVc8xsxk",
-      "questionOrder": 2
-    },
-    {
-      "id": "i3A4OufbIf4",
-      "examId": "DpQztDrRzv4",
-      "questionId": "q-toan-001",
       "questionOrder": 3
     },
     {
-      "id": "ABB68Kmv9tY",
-      "examId": "ex-toan-001",
-      "questionId": "q-toan-001",
+      "id": "qXSxAGucadc",
+      "examId": "_7HI8l9h6NE",
+      "questionId": "OwB_aX_9x-8",
       "questionOrder": 1
     },
     {
-      "id": "SnNZj6Ssaw0",
-      "examId": "ex-toan-001",
-      "questionId": "gvpQVc8xsxk",
+      "id": "G2AUO2-5ogo",
+      "examId": "_7HI8l9h6NE",
+      "questionId": "Ed1kQOmKiSQ",
       "questionOrder": 2
     },
     {
-      "id": "3hhSfVB9aTA",
-      "examId": "ex-toan-001",
-      "questionId": "T_gOvtUzzYs",
+      "id": "MDOzUeKmbj4",
+      "examId": "_7HI8l9h6NE",
+      "questionId": "CPdfWOGdExg",
       "questionOrder": 3
     }
   ],
@@ -187,6 +162,20 @@
       "categoryId": "xcr_bZoi2-o",
       "updatedAt": "2026-08-18T08:00:07.558Z",
       "id": "OwB_aX_9x-8"
+    },
+    {
+      "id": "Ed1kQOmKiSQ",
+      "content": "Kết quả của đoạn code sau là gì?\nint a = 10;\nint b = 3;\nSystem.out.println(a / b);",
+      "categoryId": "xcr_bZoi2-o",
+      "createdAt": "2026-08-18T08:21:32.313Z",
+      "updatedAt": "2026-08-18T08:21:32.313Z"
+    },
+    {
+      "id": "CPdfWOGdExg",
+      "content": "Kiểu dữ liệu nào dùng để lưu giá trị true hoặc false trong Java?",
+      "categoryId": "xcr_bZoi2-o",
+      "createdAt": "2026-08-18T08:22:24.486Z",
+      "updatedAt": "2026-08-18T08:22:24.486Z"
     }
   ],
   "answers": [
@@ -333,6 +322,78 @@
       "questionId": "OwB_aX_9x-8",
       "createdAt": "2026-08-18T02:30:05.362Z",
       "updatedAt": "2026-08-18T08:00:07.558Z"
+    },
+    {
+      "id": "F9SSqMlvSI4",
+      "content": "3.33",
+      "label": "A",
+      "isCorrect": false,
+      "questionId": "Ed1kQOmKiSQ",
+      "createdAt": "2026-08-18T08:21:32.313Z",
+      "updatedAt": "2026-08-18T08:21:32.313Z"
+    },
+    {
+      "id": "DISacfkiUwY",
+      "content": "3",
+      "label": "B",
+      "isCorrect": true,
+      "questionId": "Ed1kQOmKiSQ",
+      "createdAt": "2026-08-18T08:21:32.313Z",
+      "updatedAt": "2026-08-18T08:21:32.313Z"
+    },
+    {
+      "id": "7RZoxZ3QwwM",
+      "content": "4",
+      "label": "C",
+      "isCorrect": false,
+      "questionId": "Ed1kQOmKiSQ",
+      "createdAt": "2026-08-18T08:21:32.313Z",
+      "updatedAt": "2026-08-18T08:21:32.313Z"
+    },
+    {
+      "id": "ZJBZ-fJfhPk",
+      "content": "3.0",
+      "label": "D",
+      "isCorrect": false,
+      "questionId": "Ed1kQOmKiSQ",
+      "createdAt": "2026-08-18T08:21:32.313Z",
+      "updatedAt": "2026-08-18T08:21:32.313Z"
+    },
+    {
+      "id": "p5H_rHCbTJs",
+      "content": "int",
+      "label": "A",
+      "isCorrect": false,
+      "questionId": "CPdfWOGdExg",
+      "createdAt": "2026-08-18T08:22:24.486Z",
+      "updatedAt": "2026-08-18T08:22:24.486Z"
+    },
+    {
+      "id": "kruXK2jaN5I",
+      "content": "String",
+      "label": "B",
+      "isCorrect": false,
+      "questionId": "CPdfWOGdExg",
+      "createdAt": "2026-08-18T08:22:24.486Z",
+      "updatedAt": "2026-08-18T08:22:24.486Z"
+    },
+    {
+      "id": "UX3kdCWYC2s",
+      "content": "boolean",
+      "label": "C",
+      "isCorrect": true,
+      "questionId": "CPdfWOGdExg",
+      "createdAt": "2026-08-18T08:22:24.486Z",
+      "updatedAt": "2026-08-18T08:22:24.486Z"
+    },
+    {
+      "id": "d8ejKhvG1Cg",
+      "content": "bool",
+      "label": "D",
+      "isCorrect": false,
+      "questionId": "CPdfWOGdExg",
+      "createdAt": "2026-08-18T08:22:24.486Z",
+      "updatedAt": "2026-08-18T08:22:24.486Z"
     }
   ],
   "histories": [
@@ -407,7 +468,7 @@
     {
       "userId": null,
       "userName": "Nguyễn Văn B",
-      "examId": "jnsXuOT02Ss",
+      "examId": null,
       "examTitle": "toan lop1",
       "score": 100,
       "totalQuestions": 2,
@@ -506,7 +567,7 @@
     {
       "userId": "BB_zznwgRJg",
       "userName": "Nguyen van A",
-      "examId": "jnsXuOT02Ss",
+      "examId": null,
       "examTitle": "toan lop1",
       "score": 100,
       "totalQuestions": 2,

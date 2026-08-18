@@ -2,14 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { Pagination } from "antd";
+import { toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 
 import HeaderMembers from "@/components/members/HeaderMembers";
+
 import CreateMembersModal from "@/components/modal/members/add/CreateMembersModal";
+
 import EditMembersModal from "@/components/modal/members/edit/EditMembersModal";
+
 import DeleteMembersModal from "@/components/modal/members/delete/DeleteMembesModal";
+
 import ConfirmModal from "@/components/modal/common/ConfirmModal";
 
-import { toast } from "react-toastify";
 import { User } from "@/types/user";
 
 import {
@@ -25,6 +30,7 @@ const MembersPage = () => {
   // =====================================================
 
   const [members, setMembers] = useState<User[]>([]);
+
   const [loading, setLoading] = useState(true);
 
   // =====================================================
@@ -32,7 +38,9 @@ const MembersPage = () => {
   // =====================================================
 
   const [showCreateModal, setShowCreateModal] = useState(false);
+
   const [showEditModal, setShowEditModal] = useState(false);
+
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const [selectedMember, setSelectedMember] = useState<User | null>(null);
@@ -51,14 +59,16 @@ const MembersPage = () => {
   // SEARCH + FILTER
   // =====================================================
 
-  // Giá trị người dùng đang nhập/chọn
   const [searchTerm, setSearchTerm] = useState("");
+
   const [statusFilter, setStatusFilter] = useState("");
+
   const [roleFilter, setRoleFilter] = useState("");
 
-  // Giá trị thực tế được áp dụng
   const [appliedSearchTerm, setAppliedSearchTerm] = useState("");
+
   const [appliedStatusFilter, setAppliedStatusFilter] = useState("");
+
   const [appliedRoleFilter, setAppliedRoleFilter] = useState("");
 
   // =====================================================
@@ -67,7 +77,6 @@ const MembersPage = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Mỗi trang 5 user
   const pageSize = 5;
 
   // =====================================================
@@ -95,37 +104,21 @@ const MembersPage = () => {
   }, []);
 
   // =====================================================
-  // LỌC + TÌM KIẾM
+  // FILTER
   // =====================================================
 
   const filteredMembers = members.filter((member) => {
     const search = appliedSearchTerm.toLowerCase().trim();
 
-    // -----------------------------------------
-    // Tìm kiếm:
-    // Họ tên
-    // Địa chỉ
-    // Số điện thoại
-    // Email
-    // -----------------------------------------
-
     const matchesSearch =
       search === "" ||
-      member.fullName.toLowerCase().includes(search) ||
-      member.address.toLowerCase().includes(search) ||
-      member.phone.toLowerCase().includes(search) ||
-      member.email.toLowerCase().includes(search);
-
-    // -----------------------------------------
-    // Lọc trạng thái
-    // -----------------------------------------
+      (member.fullName ?? "").toLowerCase().includes(search) ||
+      (member.address ?? "").toLowerCase().includes(search) ||
+      (member.phone ?? "").toLowerCase().includes(search) ||
+      (member.email ?? "").toLowerCase().includes(search);
 
     const matchesStatus =
       appliedStatusFilter === "" || member.status === appliedStatusFilter;
-
-    // -----------------------------------------
-    // Lọc vai trò
-    // -----------------------------------------
 
     const matchesRole =
       appliedRoleFilter === "" || member.role === appliedRoleFilter;
@@ -134,7 +127,7 @@ const MembersPage = () => {
   });
 
   // =====================================================
-  // PHÂN TRANG
+  // PAGINATION
   // =====================================================
 
   const paginatedMembers = filteredMembers.slice(
@@ -143,20 +136,21 @@ const MembersPage = () => {
   );
 
   // =====================================================
-  // TÌM KIẾM
+  // SEARCH
   // =====================================================
 
   const handleSearch = () => {
     setAppliedSearchTerm(searchTerm);
+
     setAppliedStatusFilter(statusFilter);
+
     setAppliedRoleFilter(roleFilter);
 
-    // Tìm kiếm mới => quay về trang 1
     setCurrentPage(1);
   };
 
   // =====================================================
-  // ENTER ĐỂ TÌM KIẾM
+  // ENTER SEARCH
   // =====================================================
 
   const handleSearchKeyDown = (
@@ -168,7 +162,7 @@ const MembersPage = () => {
   };
 
   // =====================================================
-  // ĐỔI TRANG
+  // PAGINATION
   // =====================================================
 
   const handlePageChange = (page: number) => {
@@ -176,24 +170,78 @@ const MembersPage = () => {
   };
 
   // =====================================================
-  // THÊM USER
+  // MỞ MODAL THÊM
   // =====================================================
 
   const handleAdd = () => {
     setShowCreateModal(true);
   };
 
+  // =====================================================
+  // THÊM USER
+  // =====================================================
+
   const handleCreate = async (member: User) => {
     try {
       const newMember = await createUserService(member);
 
+      // Thêm user mới vào đầu danh sách
       setMembers((prev) => [newMember, ...prev]);
 
+      // Đóng modal
       setShowCreateModal(false);
 
+      // Về trang đầu
       setCurrentPage(1);
+
+      // Thông báo thành công
+      toast.success("Thêm người dùng thành công!");
     } catch (error) {
       console.error("Lỗi khi thêm người dùng:", error);
+
+      // =================================================
+      // XỬ LÝ USERNAME TRÙNG
+      // =================================================
+
+      if (error instanceof Error) {
+        if (error.message.startsWith("USERNAME_EXISTS:")) {
+          const username = error.message.substring("USERNAME_EXISTS:".length);
+
+          toast.error(`Tên đăng nhập "${username}" đã tồn tại!`);
+
+          return;
+        }
+
+        // ===============================================
+        // XỬ LÝ EMAIL TRÙNG
+        // ===============================================
+
+        if (error.message.startsWith("EMAIL_EXISTS:")) {
+          const email = error.message.substring("EMAIL_EXISTS:".length);
+
+          toast.error(`Email "${email}" đã tồn tại!`);
+
+          return;
+        }
+
+        // ===============================================
+        // XỬ LÝ PHONE TRÙNG
+        // ===============================================
+
+        if (error.message.startsWith("PHONE_EXISTS:")) {
+          const phone = error.message.substring("PHONE_EXISTS:".length);
+
+          toast.error(`Số điện thoại "${phone}" đã tồn tại!`);
+
+          return;
+        }
+      }
+
+      // =================================================
+      // LỖI KHÁC
+      // =================================================
+
+      toast.error("Không thể thêm người dùng!");
     }
   };
 
@@ -203,8 +251,13 @@ const MembersPage = () => {
 
   const handleEdit = (member: User) => {
     setSelectedMember(member);
+
     setShowEditModal(true);
   };
+
+  // =====================================================
+  // UPDATE USER
+  // =====================================================
 
   const handleUpdate = async (updated: User) => {
     try {
@@ -215,11 +268,41 @@ const MembersPage = () => {
           item.id === updatedMember.id ? updatedMember : item,
         ),
       );
-
       setShowEditModal(false);
       setSelectedMember(null);
+      toast.success("Cập nhật người dùng thành công!");
     } catch (error) {
       console.error("Lỗi khi cập nhật người dùng:", error);
+
+      // Xử lý lỗi trùng lặp từ service (fallback cho race condition)
+
+      if (error instanceof Error) {
+        if (error.message.startsWith("USERNAME_EXISTS:")) {
+          const username = error.message.substring("USERNAME_EXISTS:".length);
+
+          toast.error(`Tên đăng nhập "${username}" đã tồn tại!`);
+
+          return;
+        }
+
+        if (error.message.startsWith("EMAIL_EXISTS:")) {
+          const email = error.message.substring("EMAIL_EXISTS:".length);
+
+          toast.error(`Email "${email}" đã tồn tại!`);
+
+          return;
+        }
+
+        if (error.message.startsWith("PHONE_EXISTS:")) {
+          const phone = error.message.substring("PHONE_EXISTS:".length);
+
+          toast.error(`Số điện thoại "${phone}" đã tồn tại!`);
+
+          return;
+        }
+      }
+
+      toast.error("Không thể cập nhật người dùng!");
     }
   };
 
@@ -229,8 +312,13 @@ const MembersPage = () => {
 
   const handleDelete = (member: User) => {
     setSelectedMember(member);
+
     setShowDeleteModal(true);
   };
+
+  // =====================================================
+  // XÁC NHẬN XÓA
+  // =====================================================
 
   const handleConfirmDelete = async () => {
     if (!selectedMember) {
@@ -245,7 +333,10 @@ const MembersPage = () => {
       );
 
       setShowDeleteModal(false);
+
       setSelectedMember(null);
+
+      toast.success("Xóa người dùng thành công!");
 
       const newTotal = filteredMembers.length - 1;
 
@@ -256,17 +347,24 @@ const MembersPage = () => {
       }
     } catch (error) {
       console.error("Lỗi khi xóa người dùng:", error);
+
+      toast.error("Không thể xóa người dùng!");
     }
   };
 
   // =====================================================
-  // ĐỔI TRẠNG THÁI
+  // TOGGLE STATUS
   // =====================================================
 
   const handleToggleClick = (member: User) => {
     setPendingToggleMember(member);
+
     setShowToggleConfirm(true);
   };
+
+  // =====================================================
+  // CONFIRM TOGGLE
+  // =====================================================
 
   const handleConfirmToggle = async () => {
     if (!pendingToggleMember) {
@@ -301,6 +399,7 @@ const MembersPage = () => {
       );
 
       setShowToggleConfirm(false);
+
       setPendingToggleMember(null);
     } catch (error) {
       console.error("Lỗi khi cập nhật trạng thái:", error);
@@ -310,11 +409,12 @@ const MembersPage = () => {
   };
 
   // =====================================================
-  // ĐÓNG MODAL TOGGLE
+  // CLOSE TOGGLE
   // =====================================================
 
   const handleCloseToggleConfirm = () => {
     setShowToggleConfirm(false);
+
     setPendingToggleMember(null);
   };
 
@@ -324,9 +424,9 @@ const MembersPage = () => {
 
   return (
     <div className="container-fluid py-4 px-4 bg-light min-vh-100">
-      {/* =====================================================
+      {/* =================================================
           HEADER
-      ===================================================== */}
+      ================================================= */}
 
       <HeaderMembers
         title="Quản lý người dùng"
@@ -335,16 +435,14 @@ const MembersPage = () => {
         onAdd={handleAdd}
       />
 
-      {/* =====================================================
-          SEARCH + FILTER
-      ===================================================== */}
+      {/* =================================================
+          SEARCH
+      ================================================= */}
 
       <div className="card border-0 shadow-sm mb-3">
         <div className="card-body p-3">
           <div className="row g-2">
-            {/* =========================
-                SEARCH
-            ========================= */}
+            {/* SEARCH */}
 
             <div className="col-md-5">
               <div className="input-group">
@@ -363,9 +461,7 @@ const MembersPage = () => {
               </div>
             </div>
 
-            {/* =========================
-                STATUS
-            ========================= */}
+            {/* STATUS */}
 
             <div className="col-md-3">
               <select
@@ -381,9 +477,7 @@ const MembersPage = () => {
               </select>
             </div>
 
-            {/* =========================
-                ROLE
-            ========================= */}
+            {/* ROLE */}
 
             <div className="col-md-3">
               <select
@@ -399,9 +493,7 @@ const MembersPage = () => {
               </select>
             </div>
 
-            {/* =========================
-                SEARCH BUTTON
-            ========================= */}
+            {/* SEARCH BUTTON */}
 
             <div className="col-md-1">
               <button
@@ -417,9 +509,9 @@ const MembersPage = () => {
         </div>
       </div>
 
-      {/* =====================================================
+      {/* =================================================
           TABLE
-      ===================================================== */}
+      ================================================= */}
 
       <div className="card border-0 shadow-sm">
         <div className="card-body p-0">
@@ -429,7 +521,9 @@ const MembersPage = () => {
                 <tr>
                   <th
                     className="text-center text-uppercase small text-muted"
-                    style={{ width: "60px" }}
+                    style={{
+                      width: "60px",
+                    }}
                   >
                     STT
                   </th>
@@ -452,7 +546,9 @@ const MembersPage = () => {
 
                   <th
                     className="text-center text-uppercase small text-muted"
-                    style={{ width: "120px" }}
+                    style={{
+                      width: "120px",
+                    }}
                   >
                     Thao tác
                   </th>
@@ -460,8 +556,6 @@ const MembersPage = () => {
               </thead>
 
               <tbody>
-                {/* LOADING */}
-
                 {loading ? (
                   <tr>
                     <td colSpan={8} className="text-center py-5 text-muted">
@@ -473,16 +567,12 @@ const MembersPage = () => {
                     </td>
                   </tr>
                 ) : paginatedMembers.length === 0 ? (
-                  /* EMPTY */
-
                   <tr>
                     <td colSpan={8} className="text-center py-5 text-muted">
                       Không có người dùng nào.
                     </td>
                   </tr>
                 ) : (
-                  /* DATA */
-
                   paginatedMembers.map((member, index) => {
                     const isActive = member.status === "Mở";
 
@@ -508,7 +598,7 @@ const MembersPage = () => {
                           </div>
                         </td>
 
-                        {/* ĐỊA CHỈ */}
+                        {/* ADDRESS */}
 
                         <td className="small text-muted">{member.address}</td>
 
@@ -596,9 +686,9 @@ const MembersPage = () => {
             </table>
           </div>
 
-          {/* =====================================================
+          {/* =================================================
               PAGINATION
-          ===================================================== */}
+          ================================================= */}
 
           <div className="d-flex justify-content-between align-items-center px-3 py-3 border-top">
             <small className="text-muted">
@@ -624,9 +714,9 @@ const MembersPage = () => {
         </div>
       </div>
 
-      {/* =====================================================
+      {/* =================================================
           CREATE MODAL
-      ===================================================== */}
+      ================================================= */}
 
       <CreateMembersModal
         show={showCreateModal}
@@ -634,37 +724,39 @@ const MembersPage = () => {
         onCreate={handleCreate}
       />
 
-      {/* =====================================================
+      {/* =================================================
           EDIT MODAL
-      ===================================================== */}
+      ================================================= */}
 
       <EditMembersModal
         show={showEditModal}
         member={selectedMember}
         onClose={() => {
           setShowEditModal(false);
+
           setSelectedMember(null);
         }}
         onUpdate={handleUpdate}
       />
 
-      {/* =====================================================
+      {/* =================================================
           DELETE MODAL
-      ===================================================== */}
+      ================================================= */}
 
       <DeleteMembersModal
         show={showDeleteModal}
         member={selectedMember}
         onClose={() => {
           setShowDeleteModal(false);
+
           setSelectedMember(null);
         }}
         onConfirm={handleConfirmDelete}
       />
 
-      {/* =====================================================
+      {/* =================================================
           TOGGLE CONFIRM
-      ===================================================== */}
+      ================================================= */}
 
       <ConfirmModal
         show={showToggleConfirm}
@@ -678,6 +770,7 @@ const MembersPage = () => {
             : "Bạn có chắc muốn thay đổi trạng thái tài khoản này không?"
         }
       />
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 };

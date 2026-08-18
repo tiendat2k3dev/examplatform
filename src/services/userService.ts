@@ -2,7 +2,10 @@ import { User } from "../types/user";
 import bcrypt from "bcryptjs";
 import api from "../lib/apiClient";
 
-// Lấy danh sách người dùng
+// =====================================================
+// LẤY DANH SÁCH NGƯỜI DÙNG
+// =====================================================
+
 export const getUsersService = async (): Promise<User[]> => {
   try {
     const response = await api.get<User[]>("/users");
@@ -10,11 +13,15 @@ export const getUsersService = async (): Promise<User[]> => {
     return Array.isArray(response.data) ? response.data : [];
   } catch (error) {
     console.error("Lỗi khi tải danh sách người dùng:", error);
+
     throw error;
   }
 };
 
-// Lấy người dùng theo ID
+// =====================================================
+// LẤY NGƯỜI DÙNG THEO ID
+// =====================================================
+
 export const getUserByIdService = async (
   userId: string | number,
 ): Promise<User> => {
@@ -24,56 +31,155 @@ export const getUserByIdService = async (
     return response.data;
   } catch (error) {
     console.error("Lỗi khi tải thông tin người dùng:", error);
+
     throw error;
   }
 };
 
-// Thêm người dùng
+// =====================================================
+// HÀM KIỂM TRA TRÙNG (DÙNG CHO YUP VALIDATION)
+// =====================================================
+
+export const checkUsernameExists = async (
+  username: string,
+  excludeUserId?: string | number,
+): Promise<boolean> => {
+  const users = await getUsersService();
+
+  const normalized = username.trim().toLowerCase();
+
+  return users.some(
+    (u) =>
+      u.username?.trim().toLowerCase() === normalized &&
+      (excludeUserId ? String(u.id) !== String(excludeUserId) : true),
+  );
+};
+
+export const checkEmailExists = async (
+  email: string,
+  excludeUserId?: string | number,
+): Promise<boolean> => {
+  const users = await getUsersService();
+
+  const normalized = email.trim().toLowerCase();
+
+  return users.some(
+    (u) =>
+      u.email?.trim().toLowerCase() === normalized &&
+      (excludeUserId ? String(u.id) !== String(excludeUserId) : true),
+  );
+};
+
+export const checkPhoneExists = async (
+  phone: string,
+  excludeUserId?: string | number,
+): Promise<boolean> => {
+  const users = await getUsersService();
+
+  const normalized = phone.trim();
+
+  return users.some(
+    (u) =>
+      u.phone?.trim() === normalized &&
+      (excludeUserId ? String(u.id) !== String(excludeUserId) : true),
+  );
+};
+
+// =====================================================
+// THÊM NGƯỜI DÙNG
+// =====================================================
+
 export const createUserService = async (
   userData: Omit<User, "id" | "createdAt" | "updatedAt">,
 ): Promise<User> => {
   try {
-    // 1. Lấy danh sách người dùng hiện tại để kiểm tra trùng lặp
+    // =================================================
+    // 1. LẤY DANH SÁCH USER
+    // =================================================
+
     const existingUsers = await getUsersService();
 
-    // 2. Kiểm tra username đã tồn tại
-    if (
-      existingUsers.some(
-        (u) => u.username.toLowerCase().trim() === userData.username.toLowerCase().trim()
-      )
-    ) {
-      throw new Error("USERNAME_EXISTS");
+    // =================================================
+    // 2. CHUẨN HÓA DỮ LIỆU
+    // =================================================
+
+    const username = userData.username?.trim() ?? "";
+    const email = userData.email?.trim().toLowerCase() ?? "";
+    const phone = userData.phone?.trim() ?? "";
+
+    // =================================================
+    // 3. KIỂM TRA USERNAME TRÙNG
+    // =================================================
+
+    const isUsernameExists = existingUsers.some(
+      (user) => user.username?.trim().toLowerCase() === username.toLowerCase(),
+    );
+
+    if (isUsernameExists) {
+      throw new Error(`USERNAME_EXISTS:${username}`);
     }
 
-    // 3. Kiểm tra email đã tồn tại
-    if (
-      existingUsers.some(
-        (u) => u.email.toLowerCase().trim() === userData.email.toLowerCase().trim()
-      )
-    ) {
-      throw new Error("EMAIL_EXISTS");
+    // =================================================
+    // 4. KIỂM TRA EMAIL TRÙNG
+    // =================================================
+
+    const isEmailExists = existingUsers.some(
+      (user) => user.email?.trim().toLowerCase() === email,
+    );
+
+    if (isEmailExists) {
+      throw new Error(`EMAIL_EXISTS:${email}`);
     }
 
-    // 4. Kiểm tra số điện thoại đã tồn tại
-    if (
-      existingUsers.some(
-        (u) => u.phone.trim() === userData.phone.trim()
-      )
-    ) {
-      throw new Error("PHONE_EXISTS");
+    // =================================================
+    // 5. KIỂM TRA SỐ ĐIỆN THOẠI TRÙNG
+    // =================================================
+
+    const isPhoneExists = existingUsers.some(
+      (user) => user.phone?.trim() === phone,
+    );
+
+    if (isPhoneExists) {
+      throw new Error(`PHONE_EXISTS:${phone}`);
     }
 
-    // 5. Mã hóa mật khẩu trước khi lưu
+    // =================================================
+    // 6. MÃ HÓA PASSWORD
+    // =================================================
+
     const salt = await bcrypt.genSalt(10);
+
     const hashedPassword = await bcrypt.hash(userData.password, salt);
 
-    // 6. Tạo user (không gửi password hash về client)
-    const response = await api.post<User>("/users", {
+    // =================================================
+    // 7. PAYLOAD
+    // =================================================
+
+    const payload = {
       ...userData,
+
+      username,
+
+      email,
+
+      phone,
+
       password: hashedPassword,
+
       createdAt: new Date().toISOString(),
+
       updatedAt: null,
-    });
+    };
+
+    // =================================================
+    // 8. GỌI API
+    // =================================================
+
+    const response = await api.post<User>("/users", payload);
+
+    // =================================================
+    // 9. KHÔNG TRẢ PASSWORD VỀ CLIENT
+    // =================================================
 
     const { password: _password, ...userWithoutPassword } = response.data;
 
@@ -85,30 +191,98 @@ export const createUserService = async (
   }
 };
 
-// Cập nhật người dùng
+// =====================================================
+// CẬP NHẬT NGƯỜI DÙNG
+// =====================================================
+
 export const updateUserService = async (
   userId: string | number,
   userData: Partial<User>,
 ): Promise<User> => {
   try {
+    // =================================================
+    // 1. KIỂM TRA TRÙNG USERNAME / EMAIL / PHONE
+    // =================================================
+
+    const existingUsers = await getUsersService();
+
+    const excludeId = String(userId);
+
+    // --- Username ---
+
+    if (userData.username) {
+      const normalizedUsername = userData.username.trim().toLowerCase();
+
+      const isUsernameTaken = existingUsers.some(
+        (u) =>
+          u.username?.trim().toLowerCase() === normalizedUsername &&
+          String(u.id) !== excludeId,
+      );
+
+      if (isUsernameTaken) {
+        throw new Error(`USERNAME_EXISTS:${userData.username}`);
+      }
+    }
+
+    // --- Email ---
+
+    if (userData.email) {
+      const normalizedEmail = userData.email.trim().toLowerCase();
+
+      const isEmailTaken = existingUsers.some(
+        (u) =>
+          u.email?.trim().toLowerCase() === normalizedEmail &&
+          String(u.id) !== excludeId,
+      );
+
+      if (isEmailTaken) {
+        throw new Error(`EMAIL_EXISTS:${userData.email}`);
+      }
+    }
+
+    // --- Phone ---
+
+    if (userData.phone) {
+      const normalizedPhone = userData.phone.trim();
+
+      const isPhoneTaken = existingUsers.some(
+        (u) =>
+          u.phone?.trim() === normalizedPhone &&
+          String(u.id) !== excludeId,
+      );
+
+      if (isPhoneTaken) {
+        throw new Error(`PHONE_EXISTS:${userData.phone}`);
+      }
+    }
+
+    // =================================================
+    // 2. PAYLOAD
+    // =================================================
+
     const payload: Partial<User> = {
       ...userData,
       updatedAt: new Date().toISOString(),
     };
 
-    // Không xử lý password ở đây.
-    // Khi cập nhật thông tin user, password cũ phải được giữ nguyên.
+    // =================================================
+    // 3. GỌI API
+    // =================================================
 
     const response = await api.patch<User>(`/users/${userId}`, payload);
 
     return response.data;
   } catch (error) {
     console.error("Lỗi khi cập nhật người dùng:", error);
+
     throw error;
   }
 };
 
-// Xóa người dùng
+// =====================================================
+// XÓA NGƯỜI DÙNG
+// =====================================================
+
 export const deleteUserService = async (
   userId: string | number,
 ): Promise<void> => {
@@ -116,15 +290,15 @@ export const deleteUserService = async (
     await api.delete(`/users/${userId}`);
   } catch (error) {
     console.error("Lỗi khi xóa người dùng:", error);
+
     throw error;
   }
 };
-// tim kiem Họ tên	Địa chỉ	Số điện thoại	Email	Vai trò
-// =========================
+
+// =====================================================
 // TÌM KIẾM NGƯỜI DÙNG
-// Họ tên + Địa chỉ + SĐT + Email
-// Vai trò + Trạng thái
-// =========================
+// =====================================================
+
 export const searchUsersService = async (
   keyword: string = "",
   role: string = "",
@@ -138,9 +312,6 @@ export const searchUsersService = async (
     const search = keyword.toLowerCase().trim();
 
     return users.filter((user) => {
-      // =========================
-      // TÌM KIẾM TEXT
-      // =========================
       const matchesKeyword =
         search === "" ||
         (user.fullName ?? "").toLowerCase().includes(search) ||
@@ -148,14 +319,8 @@ export const searchUsersService = async (
         (user.phone ?? "").toLowerCase().includes(search) ||
         (user.email ?? "").toLowerCase().includes(search);
 
-      // =========================
-      // LỌC VAI TRÒ
-      // =========================
       const matchesRole = role === "" || user.role === role;
 
-      // =========================
-      // LỌC TRẠNG THÁI
-      // =========================
       const matchesStatus = status === "" || user.status === status;
 
       return matchesKeyword && matchesRole && matchesStatus;

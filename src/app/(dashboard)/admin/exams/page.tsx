@@ -17,8 +17,6 @@ import type {
   QuestionWithAnswers,
 } from "@/types/exam";
 
-import { mapStatusToUI } from "@/types/exam";
-
 import type { Category } from "@/types/categories";
 import type { ExamGroup } from "@/types/examGroup";
 
@@ -152,8 +150,7 @@ const ExamManagement = () => {
       exam.code.toLowerCase().includes(keyword) ||
       exam.name.toLowerCase().includes(keyword);
 
-    const matchCategory =
-      !categoryFilter || exam.categoryId === categoryFilter;
+    const matchCategory = !categoryFilter || exam.categoryId === categoryFilter;
 
     const matchStatus =
       statusFilter === "all" ||
@@ -365,7 +362,9 @@ const ExamManagement = () => {
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Đang tải...</span>
         </div>
-        <span className="ms-3 text-secondary">Đang tải danh sách đề thi...</span>
+        <span className="ms-3 text-secondary">
+          Đang tải danh sách đề thi...
+        </span>
       </div>
     );
   }
@@ -456,8 +455,8 @@ const ExamManagement = () => {
               onChange={(e) => setStatusFilter(e.target.value)}
             >
               <option value="all">Tất cả trạng thái</option>
-              <option value="active">Hoạt động</option>
-              <option value="inactive">Khóa</option>
+              <option value="active">Mở bài thi</option>
+              <option value="inactive">Khóa bài thi</option>
             </select>
           </div>
         </div>
@@ -558,8 +557,7 @@ const ExamManagement = () => {
 
         <div className="d-flex justify-content-between align-items-center mt-4">
           <div className="text-secondary small">
-            Hiển thị{" "}
-            {filteredExams.length === 0 ? 0 : startIndex + 1}–
+            Hiển thị {filteredExams.length === 0 ? 0 : startIndex + 1}–
             {Math.min(startIndex + PAGE_SIZE, filteredExams.length)} trong tổng{" "}
             <strong>{filteredExams.length}</strong> đề thi
           </div>

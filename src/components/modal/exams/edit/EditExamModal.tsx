@@ -12,7 +12,11 @@ import type {
 } from "@/types/exam";
 import { getCategoriesService } from "@/services/categories";
 import type { Category } from "@/types/categories";
-
+import {
+  checkExamCodeExistsService,
+  checkExamNameExistsService,
+} from "@/services/examAdminService";
+import { toast } from "react-toastify";
 export type { EditExam };
 
 /* =========================================================
@@ -40,43 +44,58 @@ interface EditExamModalProps {
 }
 
 /* =========================================================
-   VALIDATION
+   VALIDATION – factory function để truyền excludeExamId (exam đang sửa)
    Dùng `categoryId` thay vì `category` để khớp với CreateExamFormValues
-========================================================= */
+   ========================================================= */
 
-const validationSchema = Yup.object({
-  code: Yup.string()
-    .trim()
-    .required("Vui lòng nhập mã đề thi")
-    .max(50, "Mã đề thi tối đa 50 ký tự"),
+const createValidationSchema = (excludeExamId?: string) =>
+  Yup.object({
+    code: Yup.string()
+      .trim()
+      .required("Vui lòng nhập mã đề thi")
+      .max(50, "Mã đề thi tối đa 50 ký tự")
+      // ✅ Kiểm tra trùng mã đề thi (bỏ qua chính exam đang sửa)
 
-  name: Yup.string()
-    .trim()
-    .required("Vui lòng nhập tên đề thi")
-    .max(200, "Tên đề thi tối đa 200 ký tự"),
+      .test("unique-code", "Mã đề thi đã tồn tại", async (value) => {
+        if (!value?.trim()) return true;
 
-  categoryId: Yup.string().required("Vui lòng chọn danh mục"),
+        return !(await checkExamCodeExistsService(value.trim(), excludeExamId));
+      }),
 
-  examGroupId: Yup.string().required("Vui lòng chọn nhóm đề thi"),
+    name: Yup.string()
+      .trim()
+      .required("Vui lòng nhập tên đề thi")
+      .max(200, "Tên đề thi tối đa 200 ký tự")
+      // ✅ Kiểm tra trùng tên đề thi (bỏ qua chính exam đang sửa)
 
-  duration: Yup.number()
-    .typeError("Thời gian phải là số")
-    .required("Vui lòng nhập thời gian")
-    .min(1, "Thời gian phải lớn hơn 0")
-    .max(600, "Thời gian tối đa 600 phút"),
+      .test("unique-name", "Tên đề thi đã tồn tại", async (value) => {
+        if (!value?.trim()) return true;
 
-  passScore: Yup.number()
-    .typeError("Điểm phải là số")
-    .required("Vui lòng nhập điểm pass")
-    .min(0, "Điểm tối thiểu là 0")
-    .max(10, "Điểm tối đa là 10"),
+        return !(await checkExamNameExistsService(value.trim(), excludeExamId));
+      }),
 
-  status: Yup.string().oneOf(["Hoạt động", "Khóa"]).required(),
+    categoryId: Yup.string().required("Vui lòng chọn danh mục"),
 
-  questionIds: Yup.array()
-    .of(Yup.string())
-    .min(1, "Vui lòng chọn ít nhất 1 câu hỏi"),
-});
+    examGroupId: Yup.string().required("Vui lòng chọn nhóm đề thi"),
+
+    duration: Yup.number()
+      .typeError("Thời gian phải là số")
+      .required("Vui lòng nhập thời gian")
+      .min(1, "Thời gian phải lớn hơn 0")
+      .max(600, "Thời gian tối đa 600 phút"),
+
+    passScore: Yup.number()
+      .typeError("Điểm phải là số")
+      .required("Vui lòng nhập điểm pass")
+      .min(0, "Điểm tối thiểu là 0")
+      .max(10, "Điểm tối đa là 10"),
+
+    status: Yup.string().oneOf(["Hoạt động", "Khóa"]).required(),
+
+    questionIds: Yup.array()
+      .of(Yup.string())
+      .min(1, "Vui lòng chọn ít nhất 1 câu hỏi"),
+  });
 
 /* =========================================================
    COMPONENT
@@ -126,19 +145,44 @@ const EditExamModal = ({
       duration: exam?.duration ?? 45,
       passScore: exam?.passScore ?? 5,
       status: exam?.status ?? "Hoạt động",
-      questionIds: exam?.questionIds ?? [],
+      // ✅ Filter null elements để tránh lỗi "questionIds[0] cannot be null"
+
+      questionIds: (exam?.questionIds ?? []).filter(
+        (id): id is string => id != null,
+      ) as string[],
     },
 
-    validationSchema,
+    validationSchema: createValidationSchema(exam?.id),
 
     onSubmit: async (values, { setSubmitting }) => {
       if (!exam) return;
 
       try {
         await onUpdate(exam.id, values);
+
         onClose();
       } catch (error) {
         console.error(error);
+
+        // Xử lý lỗi trùng (fallback cho race condition)
+
+        if (error instanceof Error) {
+          const msg = error.message;
+
+          if (msg.startsWith("EXAM_CODE_EXISTS:")) {
+            formik.setFieldError("code", "Mã đề thi đã tồn tại!");
+            toast.error("Mã đề thi đã tồn tại!");
+            return;
+          }
+
+          if (msg.startsWith("EXAM_NAME_EXISTS:")) {
+            formik.setFieldError("name", "Tên đề thi đã tồn tại!");
+            toast.error("Tên đề thi đã tồn tại!");
+            return;
+          }
+        }
+
+        toast.error("Không thể cập nhật đề thi!");
       } finally {
         setSubmitting(false);
       }

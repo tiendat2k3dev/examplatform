@@ -5,6 +5,11 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
 import { User } from "@/types/user";
+import {
+  checkUsernameExists,
+  checkEmailExists,
+  checkPhoneExists,
+} from "@/services/userService";
 
 interface EditMembersModalProps {
   show: boolean;
@@ -14,30 +19,51 @@ interface EditMembersModalProps {
 }
 
 // =========================
-// VALIDATION
+// FACTORY TẠO VALIDATION SCHEMA (excludeUserId để bỏ qua chính user đang sửa)
 // =========================
-const validationSchema = Yup.object({
-  username: Yup.string().trim().required("Vui lòng nhập tên đăng nhập"),
 
-  fullName: Yup.string().trim().required("Vui lòng nhập họ tên"),
+const createValidationSchema = (excludeUserId?: string | number) =>
+  Yup.object({
+    username: Yup.string()
+      .trim()
+      .required("Vui lòng nhập tên đăng nhập")
+      .test("unique-username", "Tên đăng nhập đã tồn tại!", async (value) => {
+        if (!value || value.trim().length === 0) return true;
 
-  address: Yup.string().trim().required("Vui lòng nhập địa chỉ"),
+        return !(await checkUsernameExists(value, excludeUserId));
+      }),
 
-  phone: Yup.string().trim().required("Vui lòng nhập số điện thoại"),
+    fullName: Yup.string().trim().required("Vui lòng nhập họ tên"),
 
-  email: Yup.string()
-    .trim()
-    .email("Email không hợp lệ")
-    .required("Vui lòng nhập email"),
+    address: Yup.string().trim().required("Vui lòng nhập địa chỉ"),
 
-  role: Yup.string()
-    .oneOf(["Admin", "Member"])
-    .required("Vui lòng chọn vai trò"),
+    phone: Yup.string()
+      .trim()
+      .required("Vui lòng nhập số điện thoại")
+      .test("unique-phone", "Số điện thoại đã tồn tại!", async (value) => {
+        if (!value || value.trim().length === 0) return true;
 
-  status: Yup.string()
-    .oneOf(["Mở", "Khóa"])
-    .required("Vui lòng chọn trạng thái"),
-});
+        return !(await checkPhoneExists(value, excludeUserId));
+      }),
+
+    email: Yup.string()
+      .trim()
+      .email("Email không hợp lệ")
+      .required("Vui lòng nhập email")
+      .test("unique-email", "Email đã tồn tại!", async (value) => {
+        if (!value || !value.trim()) return true;
+
+        return !(await checkEmailExists(value, excludeUserId));
+      }),
+
+    role: Yup.string()
+      .oneOf(["Admin", "Member"])
+      .required("Vui lòng chọn vai trò"),
+
+    status: Yup.string()
+      .oneOf(["Mở", "Khóa"])
+      .required("Vui lòng chọn trạng thái"),
+  });
 
 // =========================
 // COMPONENT
@@ -61,7 +87,7 @@ const EditMembersModal = ({
       status: member?.status ?? "Mở",
     },
 
-    validationSchema,
+    validationSchema: createValidationSchema(member?.id),
 
     onSubmit: async (values, { setSubmitting }) => {
       if (!member) {
@@ -85,13 +111,31 @@ const EditMembersModal = ({
 
         await onUpdate(updatedMember);
 
-        toast.success("Cập nhật người dùng thành công!");
-
         onClose();
       } catch (error) {
         console.error("Lỗi khi cập nhật người dùng:", error);
 
-        toast.error("Không thể cập nhật người dùng!");
+        // Xử lý lỗi trùng lặp từ service (fallback nếu Yup validation không bắt được)
+
+        if (error instanceof Error) {
+          const errorMessage = error.message;
+
+          if (errorMessage.includes("USERNAME_EXISTS")) {
+            formik.setFieldError("username", "Tên đăng nhập đã tồn tại!");
+          }
+
+          if (errorMessage.includes("EMAIL_EXISTS")) {
+            formik.setFieldError("email", "Email đã tồn tại!");
+          }
+
+          if (errorMessage.includes("PHONE_EXISTS")) {
+            formik.setFieldError("phone", "Số điện thoại đã tồn tại!");
+          }
+
+          toast.error("Không thể cập nhật người dùng!");
+        } else {
+          toast.error("Không thể cập nhật người dùng!");
+        }
       } finally {
         setSubmitting(false);
       }

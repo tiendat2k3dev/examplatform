@@ -5,7 +5,11 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
 import { User } from "@/types/user";
-
+import {
+  checkUsernameExists,
+  checkEmailExists,
+  checkPhoneExists,
+} from "@/services/userService";
 interface CreateMembersModalProps {
   show: boolean;
   onClose: () => void;
@@ -13,27 +17,74 @@ interface CreateMembersModalProps {
 }
 
 const validationSchema = Yup.object({
-  username: Yup.string().trim().required("Vui lòng nhập tên đăng nhập"),
+  // 3–30 ký tự, chỉ chữ/số/gạch dưới, không khoảng trắng
+  username: Yup.string()
+    .trim()
+    .required("Vui lòng nhập tên đăng nhập")
+    .min(3, "Tên đăng nhập tối thiểu 3 ký tự")
+    .max(30, "Tên đăng nhập tối đa 30 ký tự")
+    .matches(
+      /^[a-zA-Z0-9_]+$/,
+      "Tên đăng nhập chỉ được chứa chữ, số và dấu gạch dưới (_), không có khoảng trắng",
+    )
+    // ✅ Kiểm tra trùng tên đăng nhập thời gian thực (trên blur)
+    .test("unique-username", "Tên đăng nhập đã tồn tại!", async (value) => {
+      if (!value || value.trim().length < 3) return true;
 
-  password: Yup.string().trim().required("Vui lòng nhập mật khẩu"),
+      return !(await checkUsernameExists(value));
+    }),
 
-  fullName: Yup.string().trim().required("Vui lòng nhập họ tên"),
+  // 6–50 ký tự
+  password: Yup.string()
+    .trim()
+    .required("Vui lòng nhập mật khẩu")
+    .min(6, "Mật khẩu tối thiểu 6 ký tự")
+    .max(50, "Mật khẩu tối đa 50 ký tự"),
 
-  address: Yup.string().trim().required("Vui lòng nhập địa chỉ"),
+  // 2–100 ký tự, cho phép chữ tiếng Việt và khoảng trắng
+  fullName: Yup.string()
+    .trim()
+    .required("Vui lòng nhập họ tên")
+    .min(2, "Họ tên tối thiểu 2 ký tự")
+    .max(100, "Họ tên tối đa 100 ký tự"),
 
-  phone: Yup.string().trim().required("Vui lòng nhập số điện thoại"),
-
+  // Đúng định dạng email
   email: Yup.string()
     .trim()
-    .email("Email không hợp lệ")
-    .required("Vui lòng nhập email"),
+    .required("Vui lòng nhập email")
+    .email("Email không đúng định dạng")
+    // ✅ Kiểm tra trùng email thời gian thực (trên blur)
+    .test("unique-email", "Email đã tồn tại!", async (value) => {
+      if (!value || !value.trim()) return true;
+
+      return !(await checkEmailExists(value));
+    }),
+
+  // 10 số, bắt đầu bằng 0
+  phone: Yup.string()
+    .trim()
+    .required("Vui lòng nhập số điện thoại")
+    .matches(/^0\d{9}$/, "Số điện thoại phải có 10 số và bắt đầu bằng 0")
+    // ✅ Kiểm tra trùng số điện thoại thời gian thực (trên blur)
+    .test("unique-phone", "Số điện thoại đã tồn tại!", async (value) => {
+      if (!value || value.trim().length < 10) return true;
+
+      return !(await checkPhoneExists(value));
+    }),
+
+  // 5–255 ký tự
+  address: Yup.string()
+    .trim()
+    .required("Vui lòng nhập địa chỉ")
+    .min(5, "Địa chỉ tối thiểu 5 ký tự")
+    .max(255, "Địa chỉ tối đa 255 ký tự"),
 
   role: Yup.string()
-    .oneOf(["Admin", "Member"])
+    .oneOf(["Admin", "Member"], "Vui lòng chọn vai trò hợp lệ")
     .required("Vui lòng chọn vai trò"),
 
   status: Yup.string()
-    .oneOf(["Mở", "Khóa"])
+    .oneOf(["Mở", "Khóa"], "Vui lòng chọn trạng thái hợp lệ")
     .required("Vui lòng chọn trạng thái"),
 });
 
@@ -83,8 +134,6 @@ const CreateMembersModal = ({
         // ==============================
         // THÀNH CÔNG
         // ==============================
-
-        toast.success("Thêm người dùng thành công!");
 
         // Reset form
         resetForm();
@@ -229,21 +278,15 @@ const CreateMembersModal = ({
 
                 <div className="col-md-6">
                   <label className="form-label small fw-semibold">
-                    Mật khẩu{" "}
-                    <span className="text-danger">*</span>
+                    Mật khẩu <span className="text-danger">*</span>
                   </label>
 
                   <div className="input-group input-group-sm">
                     <input
-                      type={
-                        showPassword
-                          ? "text"
-                          : "password"
-                      }
+                      type={showPassword ? "text" : "password"}
                       name="password"
                       className={`form-control ${
-                        formik.touched.password &&
-                        formik.errors.password
+                        formik.touched.password && formik.errors.password
                           ? "is-invalid"
                           : ""
                       }`}
@@ -256,19 +299,19 @@ const CreateMembersModal = ({
                     <button
                       type="button"
                       className="btn btn-outline-secondary"
-                      onClick={() =>
-                        setShowPassword((prev) => !prev)
-                      }
+                      onClick={() => setShowPassword((prev) => !prev)}
                       tabIndex={-1}
                     >
                       <i
-                        className={`bi ${
-                          showPassword
-                            ? "bi-eye-slash"
-                            : "bi-eye"
-                        }`}
+                        className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`}
                       />
                     </button>
+
+                    {formik.touched.password && formik.errors.password && (
+                      <div className="invalid-feedback">
+                        {formik.errors.password}
+                      </div>
+                    )}
                   </div>
                 </div>
 

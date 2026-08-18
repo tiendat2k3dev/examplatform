@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
-
+import { checkExamGroupNameExistsService } from "../../../../services/examGroupService";
 import type { ExamGroup } from "../../../../types/examGroup";
 import { renderExamGroupIcon } from "../../../../utils/examGroupIcon";
 
@@ -15,15 +15,32 @@ interface EditProps {
   onUpdate: (group: ExamGroup) => Promise<void> | void;
 }
 
-const validationSchema = Yup.object({
-  name: Yup.string().trim().required("Vui lòng nhập tên nhóm đề thi"),
+// =========================
+// FACTORY TẠO VALIDATION SCHEMA (excludeId để bỏ qua group đang sửa)
+// =========================
 
-  description: Yup.string().trim().required("Vui lòng nhập mô tả"),
+const createValidationSchema = (excludeGroupId?: string) =>
+  Yup.object({
+    name: Yup.string()
+      .trim()
+      .required("Vui lòng nhập tên nhóm đề thi")
+      // ✅ Kiểm tra trùng tên nhóm đề thi thời gian thực (trên blur)
 
-  icon: Yup.string().trim().required("Vui lòng nhập icon"),
+      .test("unique-name", "Tên nhóm đề thi đã tồn tại!", async (value) => {
+        if (!value || !value.trim()) return true; // Bỏ qua nếu rỗng
 
-  iconClass: Yup.string().trim().required("Vui lòng chọn màu icon"),
-});
+        return !(await checkExamGroupNameExistsService(
+          value.trim(),
+          excludeGroupId,
+        ));
+      }),
+
+    description: Yup.string().trim().required("Vui lòng nhập mô tả"),
+
+    icon: Yup.string().trim().required("Vui lòng nhập icon"),
+
+    iconClass: Yup.string().trim().required("Vui lòng chọn màu icon"),
+  });
 
 const colorOptions = [
   {
@@ -67,7 +84,7 @@ const Edit = ({ show, group, onClose, onUpdate }: EditProps) => {
       iconClass: group?.color ?? "bg-primary-subtle text-primary",
     },
 
-    validationSchema,
+    validationSchema: createValidationSchema(group?.id),
 
     onSubmit: async (values, { resetForm }) => {
       if (!group) {
@@ -89,6 +106,16 @@ const Edit = ({ show, group, onClose, onUpdate }: EditProps) => {
         onClose();
       } catch (error) {
         console.error("Lỗi khi cập nhật nhóm đề thi:", error);
+
+        // Xử lý lỗi tên trùng (fallback nếu Yup async validation bị race condition)
+
+        if (error instanceof Error) {
+          if (error.message.startsWith("EXAM_GROUP_NAME_EXISTS:")) {
+            formik.setFieldError("name", "Tên nhóm đề thi đã tồn tại!");
+            toast.error("Tên nhóm đề thi đã tồn tại!");
+            return;
+          }
+        }
 
         toast.error("Không thể cập nhật nhóm đề thi!");
       } finally {

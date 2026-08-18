@@ -74,8 +74,6 @@ const DeleteMembersModal = ({
                   try {
                     await onConfirm();
 
-                    toast.success("Xóa người dùng thành công!");
-
                     onClose();
                   } catch (error) {
                     console.error("Lỗi khi xóa người dùng:", error);

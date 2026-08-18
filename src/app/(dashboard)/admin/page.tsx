@@ -1,44 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import api from "@/lib/apiClient";
-import type { Exam } from "@/types/exam";
-import type { Category } from "@/types/categories";
+import { useEffect, useState, useCallback } from "react";
+import { User } from "@/types/user";
+import { Question } from "@/types/question";
+import { History } from "@/types/history";
+import { Exam } from "@/types/exam";
+import { Category } from "@/types/categories";
 
-/* =========================================================
-   TYPES
-========================================================= */
-
-interface User {
-  id: string;
-  fullName: string;
-  email: string;
-  role: string;
-  status: string;
-  createdAt: string;
-  avatarUrl?: string;
-}
-
-interface History {
-  id: string;
-  userId: string;
-  userName: string;
-  examId: string;
-  examTitle: string;
-  score: number;
-  totalQuestions: number;
-  correctAnswersCount: number;
-  timeTaken: number;
-  completedAt: string;
-}
-
-interface Question {
-  id: string;
-}
+import { getUsersService } from "@/services/userService";
+import { getExamsService } from "@/services/examService";
+import { getQuestionsService } from "@/services/questionService";
+import { getAllHistoriesService } from "@/services/historyService";
+import { getCategoriesService } from "@/services/categories";
 
 /* =========================================================
    HELPERS
-========================================================= */
+   ========================================================= */
 
 const formatDate = (iso: string) =>
   new Date(iso).toLocaleString("vi-VN", {
@@ -63,24 +40,47 @@ const AdminPage = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    Promise.all([
-      api.get<User[]>("/users"),
-      api.get<Exam[]>("/exams"),
-      api.get<Question[]>("/questions"),
-      api.get<History[]>("/histories"),
-      api.get<Category[]>("/categories"),
-    ])
-      .then(([u, e, q, h, c]) => {
-        setUsers(Array.isArray(u.data) ? u.data : []);
-        setExams(Array.isArray(e.data) ? e.data : []);
-        setQuestions(Array.isArray(q.data) ? q.data : []);
-        setHistories(Array.isArray(h.data) ? h.data : []);
-        setCategories(Array.isArray(c.data) ? c.data : []);
-      })
-      .catch((err) => console.error("Lỗi tải dữ liệu:", err))
-      .finally(() => setLoading(false));
+  // ====================================================================
+  // FETCH ALL DATA — dùng Promise.allSettled để tránh fail toàn bộ
+  // khi 1 API lỗi. Mỗi service tự throw, allSettled bắt từng cái.
+  // ====================================================================
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+
+    const results = await Promise.allSettled([
+      getUsersService(),
+      getExamsService(),
+      getQuestionsService(),
+      getAllHistoriesService(),
+      getCategoriesService(),
+    ]);
+
+    // results[0] = users, [1] = exams, [2] = questions, [3] = histories, [4] = categories
+
+    const [userRes, examRes, questionRes, historyRes, categoryRes] = results;
+
+    if (userRes.status === "fulfilled") setUsers(userRes.value); else setUsers([]);
+    if (examRes.status === "fulfilled") setExams(examRes.value); else setExams([]);
+    if (questionRes.status === "fulfilled") setQuestions(questionRes.value); else setQuestions([]);
+    if (historyRes.status === "fulfilled") setHistories(historyRes.value); else setHistories([]);
+    if (categoryRes.status === "fulfilled") setCategories(categoryRes.value); else setCategories([]);
+
+    // Log bất kỳ API nào thất bại
+
+    results.forEach((res, i) => {
+      if (res.status === "rejected") {
+        const labels = ["users", "exams", "questions", "histories", "categories"];
+        console.error(`Lỗi tải ${labels[i]}:`, res.reason);
+      }
+    });
+
+    setLoading(false);
   }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   /* -------------------------------------------------------
      COMPUTED
@@ -103,11 +103,17 @@ const AdminPage = () => {
   ).length;
 
   const recentExams = [...exams]
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    )
     .slice(0, 5);
 
   const recentMembers = [...members]
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    )
     .slice(0, 5);
 
   // Top members — dùng tên mới nhất từ userMap
@@ -116,7 +122,7 @@ const AdminPage = () => {
     if (!h.userId || h.userId.startsWith("Public-")) return;
     const prev = scoreMap.get(h.userId);
     scoreMap.set(h.userId, {
-      name: userMap.get(h.userId)?.fullName ?? h.userName,
+      name: userMap.get(h.userId)?.fullName ?? h.userName ?? "",
       total: (prev?.total ?? 0) + h.score,
     });
   });
@@ -137,7 +143,9 @@ const AdminPage = () => {
   });
   histories.forEach((h) => {
     if (!h.completedAt) return;
-    const found = chartDays.find((d) => d.dateStr === h.completedAt.slice(0, 10));
+    const found = chartDays.find(
+      (d) => d.dateStr === h.completedAt.slice(0, 10),
+    );
     if (found) found.count += 1;
   });
 
@@ -234,31 +242,99 @@ const AdminPage = () => {
   ------------------------------------------------------- */
   return (
     <div className="container-fluid bg-light min-vh-100 p-4">
-
       {/* ===== HEADER ===== */}
       <div
         className="card border-0 shadow-sm mb-4 overflow-hidden"
-        style={{ background: "linear-gradient(135deg, #f8faff 0%, #eef2ff 100%)" }}
+        style={{
+          background: "linear-gradient(135deg, #f8faff 0%, #eef2ff 100%)",
+        }}
       >
-        <div className="card-body p-4">
-          <div className="d-flex justify-content-between align-items-center">
-            <div>
-              <h4 className="fw-bold text-dark mb-1">Chào mừng trở lại, Admin! 👋</h4>
-              <p className="text-secondary mb-0">
-                Quản lý và theo dõi hệ thống trắc nghiệm của bạn.
-              </p>
-            </div>
-            {/* Illustration */}
-            <div className="d-none d-md-block" style={{ width: "120px" }}>
-              <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="10" y="10" width="100" height="60" rx="8" fill="#c7d2fe" />
-                <rect x="20" y="20" width="80" height="40" rx="4" fill="white" />
-                <rect x="28" y="28" width="12" height="24" rx="2" fill="#6366f1" opacity="0.6" />
-                <rect x="46" y="34" width="12" height="18" rx="2" fill="#6366f1" opacity="0.8" />
-                <rect x="64" y="30" width="12" height="22" rx="2" fill="#6366f1" />
-                <rect x="82" y="36" width="12" height="16" rx="2" fill="#6366f1" opacity="0.5" />
+           <div className="card-body p-4">
+             <div className="d-flex justify-content-between align-items-center">
+               <div>
+                 <h4 className="fw-bold text-dark mb-1">
+                   Chào mừng trở lại, Admin! 👋
+                 </h4>
+                 <p className="text-secondary mb-0">
+                   Quản lý và theo dõi hệ thống trắc nghiệm của bạn.
+                 </p>
+               </div>
+               {/* Refresh button */}
+               <button
+                 type="button"
+                 className="btn btn-outline-primary btn-sm d-flex align-items-center gap-1"
+                 onClick={fetchData}
+                 disabled={loading}
+               >
+                 <i className={`bi ${loading ? "bi-arrow-counterclockwise" : "bi-arrow-clockwise"}`} />
+                 Làm mới
+               </button>
+               {/* Illustration */}
+               <div className="d-none d-md-block" style={{ width: "120px" }}>
+              <svg
+                viewBox="0 0 120 80"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect
+                  x="10"
+                  y="10"
+                  width="100"
+                  height="60"
+                  rx="8"
+                  fill="#c7d2fe"
+                />
+                <rect
+                  x="20"
+                  y="20"
+                  width="80"
+                  height="40"
+                  rx="4"
+                  fill="white"
+                />
+                <rect
+                  x="28"
+                  y="28"
+                  width="12"
+                  height="24"
+                  rx="2"
+                  fill="#6366f1"
+                  opacity="0.6"
+                />
+                <rect
+                  x="46"
+                  y="34"
+                  width="12"
+                  height="18"
+                  rx="2"
+                  fill="#6366f1"
+                  opacity="0.8"
+                />
+                <rect
+                  x="64"
+                  y="30"
+                  width="12"
+                  height="22"
+                  rx="2"
+                  fill="#6366f1"
+                />
+                <rect
+                  x="82"
+                  y="36"
+                  width="12"
+                  height="16"
+                  rx="2"
+                  fill="#6366f1"
+                  opacity="0.5"
+                />
                 <circle cx="96" cy="14" r="12" fill="#818cf8" />
-                <path d="M90 14 L96 20 L104 10" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path
+                  d="M90 14 L96 20 L104 10"
+                  stroke="white"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             </div>
           </div>
@@ -276,13 +352,18 @@ const AdminPage = () => {
                     className="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
                     style={{ width: "50px", height: "50px", background: s.bg }}
                   >
-                    <i className={`bi ${s.icon}`} style={{ fontSize: "22px", color: s.iconColor }} />
+                    <i
+                      className={`bi ${s.icon}`}
+                      style={{ fontSize: "22px", color: s.iconColor }}
+                    />
                   </div>
                   <div>
                     <div className="text-secondary small">{s.title}</div>
                     <div className="fw-bold fs-4 lh-1 text-dark">{s.value}</div>
                     <div className="small mt-1">
-                      <span className="text-success fw-semibold">{s.change}</span>{" "}
+                      <span className="text-success fw-semibold">
+                        {s.change}
+                      </span>{" "}
                       <span className="text-secondary">{s.changeText}</span>
                     </div>
                   </div>
@@ -295,16 +376,15 @@ const AdminPage = () => {
 
       {/* ===== CHART + MEMBERS ===== */}
       <div className="row g-3 mb-4">
-
         {/* Line chart */}
         <div className="col-12 col-xl-7">
           <div className="card border-0 shadow-sm h-100">
             <div className="card-body">
               <div className="d-flex justify-content-between align-items-center mb-3">
-                <h6 className="fw-semibold mb-0">Thống kê lượt thi trong 7 ngày qua</h6>
-                <span className="badge bg-light text-secondary border rounded-pill px-3">
-                  7 ngày qua ∨
-                </span>
+                <h6 className="fw-semibold mb-0">
+                  Thống kê lượt thi trong 7 ngày qua
+                </h6>
+                <span className="badge bg-light text-secondary border rounded-pill px-3"></span>
               </div>
 
               <svg
@@ -317,10 +397,23 @@ const AdminPage = () => {
                   const y = padT + (i / 4) * innerH;
                   return (
                     <g key={tick}>
-                      <line x1={padL} y1={y} x2={chartW - padR} y2={y}
-                        stroke="#f1f5f9" strokeWidth="1" />
-                      <text x={padL - 6} y={y + 4} fontSize="10" fill="#94a3b8"
-                        textAnchor="end">{tick}</text>
+                      <line
+                        x1={padL}
+                        y1={y}
+                        x2={chartW - padR}
+                        y2={y}
+                        stroke="#f1f5f9"
+                        strokeWidth="1"
+                      />
+                      <text
+                        x={padL - 6}
+                        y={y + 4}
+                        fontSize="10"
+                        fill="#94a3b8"
+                        textAnchor="end"
+                      >
+                        {tick}
+                      </text>
                     </g>
                   );
                 })}
@@ -344,14 +437,25 @@ const AdminPage = () => {
                     <circle cx={p.x} cy={p.y} r="4" fill="#6366f1" />
                     <circle cx={p.x} cy={p.y} r="2" fill="white" />
                     {p.count > 0 && (
-                      <text x={p.x} y={p.y - 10} fontSize="10"
-                        fill="#6366f1" textAnchor="middle" fontWeight="600">
+                      <text
+                        x={p.x}
+                        y={p.y - 10}
+                        fontSize="10"
+                        fill="#6366f1"
+                        textAnchor="middle"
+                        fontWeight="600"
+                      >
                         {p.count}
                       </text>
                     )}
                     {/* X-axis label */}
-                    <text x={p.x} y={chartH - 4} fontSize="10"
-                      fill="#94a3b8" textAnchor="middle">
+                    <text
+                      x={p.x}
+                      y={chartH - 4}
+                      fontSize="10"
+                      fill="#94a3b8"
+                      textAnchor="middle"
+                    >
                       {p.label}
                     </text>
                   </g>
@@ -367,34 +471,59 @@ const AdminPage = () => {
             <div className="card-body">
               <div className="d-flex justify-content-between align-items-center mb-3">
                 <h6 className="fw-semibold mb-0">Thành viên mới nhất</h6>
-                <a href="/admin/members" className="text-primary small text-decoration-none">
+                <a
+                  href="/admin/members"
+                  className="text-primary small text-decoration-none"
+                >
                   Xem tất cả
                 </a>
               </div>
 
               {recentMembers.length === 0 ? (
-                <p className="text-secondary small text-center py-3">Chưa có thành viên</p>
+                <p className="text-secondary small text-center py-3">
+                  Chưa có thành viên
+                </p>
               ) : (
                 recentMembers.map((m) => (
-                  <div key={m.id}
-                    className="d-flex align-items-center justify-content-between py-2 border-bottom">
+                  <div
+                    key={m.id}
+                    className="d-flex align-items-center justify-content-between py-2 border-bottom"
+                  >
                     <div className="d-flex align-items-center gap-2">
                       {m.avatarUrl ? (
-                        <img src={m.avatarUrl} alt={m.fullName}
+                        <img
+                          src={m.avatarUrl}
+                          alt={m.fullName}
                           className="rounded-circle object-fit-cover flex-shrink-0"
-                          style={{ width: "36px", height: "36px" }} />
+                          style={{ width: "36px", height: "36px" }}
+                        />
                       ) : (
-                        <div className="rounded-circle d-flex align-items-center justify-content-center fw-semibold flex-shrink-0"
-                          style={{ width: "36px", height: "36px", background: "#eef2ff", color: "#6366f1" }}>
+                        <div
+                          className="rounded-circle d-flex align-items-center justify-content-center fw-semibold flex-shrink-0"
+                          style={{
+                            width: "36px",
+                            height: "36px",
+                            background: "#eef2ff",
+                            color: "#6366f1",
+                          }}
+                        >
                           {getInitial(m.fullName)}
                         </div>
                       )}
                       <div>
                         <div className="fw-semibold small">{m.fullName}</div>
-                        <div className="text-secondary" style={{ fontSize: "12px" }}>{m.email}</div>
+                        <div
+                          className="text-secondary"
+                          style={{ fontSize: "12px" }}
+                        >
+                          {m.email}
+                        </div>
                       </div>
                     </div>
-                    <small className="text-secondary text-nowrap ms-2" style={{ fontSize: "11px" }}>
+                    <small
+                      className="text-secondary text-nowrap ms-2"
+                      style={{ fontSize: "11px" }}
+                    >
                       {formatDate(m.createdAt)}
                     </small>
                   </div>
@@ -407,14 +536,16 @@ const AdminPage = () => {
 
       {/* ===== EXAMS + RANKING ===== */}
       <div className="row g-3">
-
         {/* Recent exams */}
         <div className="col-12 col-xl-7">
           <div className="card border-0 shadow-sm h-100">
             <div className="card-body p-0">
               <div className="d-flex justify-content-between align-items-center px-3 pt-3 pb-2">
                 <h6 className="fw-semibold mb-0">Đề thi được tạo gần đây</h6>
-                <a href="/admin/exams" className="text-primary small text-decoration-none">
+                <a
+                  href="/admin/exams"
+                  className="text-primary small text-decoration-none"
+                >
                   Xem tất cả
                 </a>
               </div>
@@ -423,17 +554,30 @@ const AdminPage = () => {
                 <table className="table table-hover align-middle mb-0">
                   <thead className="table-light">
                     <tr>
-                      <th className="small text-secondary fw-normal">Mã đề thi</th>
-                      <th className="small text-secondary fw-normal">Tên đề thi</th>
-                      <th className="small text-secondary fw-normal">Danh mục</th>
-                      <th className="small text-secondary fw-normal">Thời gian</th>
-                      <th className="small text-secondary fw-normal">Trạng thái</th>
+                      <th className="small text-secondary fw-normal">
+                        Mã đề thi
+                      </th>
+                      <th className="small text-secondary fw-normal">
+                        Tên đề thi
+                      </th>
+                      <th className="small text-secondary fw-normal">
+                        Danh mục
+                      </th>
+                      <th className="small text-secondary fw-normal">
+                        Thời gian
+                      </th>
+                      <th className="small text-secondary fw-normal">
+                        Trạng thái
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {recentExams.length === 0 ? (
                       <tr>
-                        <td colSpan={5} className="text-center text-secondary py-4">
+                        <td
+                          colSpan={5}
+                          className="text-center text-secondary py-4"
+                        >
                           Chưa có đề thi nào
                         </td>
                       </tr>
@@ -442,18 +586,23 @@ const AdminPage = () => {
                         const isActive = exam.status === "ACTIVE";
                         return (
                           <tr key={exam.id}>
-                            <td className="small fw-semibold text-primary">{exam.code}</td>
+                            <td className="small fw-semibold text-primary">
+                              {exam.code}
+                            </td>
                             <td className="small">{exam.name}</td>
                             <td className="small text-secondary">
-                              {categoryMap.get(exam.categoryId) ?? exam.categoryId}
+                              {categoryMap.get(exam.categoryId) ??
+                                exam.categoryId}
                             </td>
                             <td className="small">{exam.duration} phút</td>
                             <td>
-                              <span className={`badge rounded-pill fw-normal px-3 ${
-                                isActive
-                                  ? "bg-success-subtle text-success"
-                                  : "bg-danger-subtle text-danger"
-                              }`}>
+                              <span
+                                className={`badge rounded-pill fw-normal px-3 ${
+                                  isActive
+                                    ? "bg-success-subtle text-success"
+                                    : "bg-danger-subtle text-danger"
+                                }`}
+                              >
                                 {isActive ? "Hoạt động" : "Khóa"}
                               </span>
                             </td>
@@ -474,7 +623,10 @@ const AdminPage = () => {
             <div className="card-body p-0">
               <div className="d-flex justify-content-between align-items-center px-3 pt-3 pb-2">
                 <h6 className="fw-semibold mb-0">Top thành viên có điểm cao</h6>
-                <a href="/admin/ranking" className="text-primary small text-decoration-none">
+                <a
+                  href="/admin/ranking"
+                  className="text-primary small text-decoration-none"
+                >
                   Xem tất cả
                 </a>
               </div>
@@ -484,14 +636,21 @@ const AdminPage = () => {
                   <thead className="table-light">
                     <tr>
                       <th className="small text-secondary fw-normal">Hạng</th>
-                      <th className="small text-secondary fw-normal">Thành viên</th>
-                      <th className="small text-secondary fw-normal text-end">Tổng điểm</th>
+                      <th className="small text-secondary fw-normal">
+                        Thành viên
+                      </th>
+                      <th className="small text-secondary fw-normal text-end">
+                        Tổng điểm
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {topMembers.length === 0 ? (
                       <tr>
-                        <td colSpan={3} className="text-center text-secondary py-4">
+                        <td
+                          colSpan={3}
+                          className="text-center text-secondary py-4"
+                        >
                           Chưa có dữ liệu
                         </td>
                       </tr>
@@ -506,7 +665,9 @@ const AdminPage = () => {
                                   {rank === 1 ? "🥇" : rank === 2 ? "🥈" : "🥉"}
                                 </span>
                               ) : (
-                                <span className="small fw-semibold ms-1">{rank}</span>
+                                <span className="small fw-semibold ms-1">
+                                  {rank}
+                                </span>
                               )}
                             </td>
                             <td className="small">{member.name}</td>

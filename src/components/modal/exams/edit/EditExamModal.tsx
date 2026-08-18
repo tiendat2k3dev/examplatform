@@ -10,6 +10,8 @@ import type {
   ExamGroup,
   QuestionWithAnswers,
 } from "@/types/exam";
+import { getCategoriesService } from "@/services/categories";
+import type { Category } from "@/types/categories";
 
 export type { EditExam };
 
@@ -96,6 +98,14 @@ const EditExamModal = ({
 }: EditExamModalProps) => {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  // Fetch danh mục từ API một lần khi mount
+  useEffect(() => {
+    getCategoriesService()
+      .then(setCategories)
+      .catch((err) => console.error("Lỗi tải danh mục:", err));
+  }, []);
 
   const pageSize = 4;
 
@@ -148,7 +158,7 @@ const EditExamModal = ({
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [search]);
+  }, [search, formik.values.categoryId]);
 
   /* =======================================================
      FILTERED QUESTIONS
@@ -156,13 +166,21 @@ const EditExamModal = ({
 
   const filteredQuestions = useMemo(() => {
     const keyword = search.trim().toLowerCase();
-    if (!keyword) return questions;
-    return questions.filter(
-      (q) =>
+
+    return questions.filter((q) => {
+      // Lọc theo danh mục đang chọn trong form
+      const matchCategory =
+        !formik.values.categoryId || q.categoryId === formik.values.categoryId;
+
+      // Lọc theo từ khoá tìm kiếm
+      const matchSearch =
+        !keyword ||
         q.content.toLowerCase().includes(keyword) ||
-        (q.categoryName ?? "").toLowerCase().includes(keyword),
-    );
-  }, [questions, search]);
+        (q.categoryName ?? "").toLowerCase().includes(keyword);
+
+      return matchCategory && matchSearch;
+    });
+  }, [questions, search, formik.values.categoryId]);
 
   /* =======================================================
      PAGINATION
@@ -341,10 +359,11 @@ const EditExamModal = ({
                         onBlur={formik.handleBlur}
                       >
                         <option value="">Chọn danh mục</option>
-                        <option value="Toán học">Toán học</option>
-                        <option value="Vật lý">Vật lý</option>
-                        <option value="Hóa học">Hóa học</option>
-                        <option value="Sinh học">Sinh học</option>
+                        {categories.map((cat) => (
+                          <option key={cat.id} value={cat.id}>
+                            {cat.name}
+                          </option>
+                        ))}
                       </select>
                       {formik.touched.categoryId &&
                         formik.errors.categoryId && (

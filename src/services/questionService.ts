@@ -42,14 +42,83 @@ export const getQuestionDetailService = async (
 // GET QUESTIONS BY EXAM ID
 // ======================================================
 
+// ======================================================
+// GET QUESTIONS BY EXAM ID
+// Luồng đúng:
+// 1. GET /exam_questions?examId=... → lấy danh sách questionId (sắp xếp theo questionOrder)
+// 2. Fetch song song từng GET /questions/:id + GET /answers?questionId=:id
+// 3. Map sang Question có questionText, options[], correctAnswer (number index)
+//    để QuizQuestionBox và chấm điểm hoạt động đúng
+// ======================================================
+
+interface RawExamQuestion {
+  id: string;
+  examId: string;
+  questionId: string;
+  questionOrder: number;
+}
+
+interface RawAnswer {
+  id: string;
+  content: string;
+  label: string;
+  isCorrect: boolean;
+  questionId: string;
+}
+
 export const getQuestionsByExamIdService = async (
   examId: string,
 ): Promise<Question[]> => {
-  const response = await api.get<Question[]>(
-    `/questions?examId=${encodeURIComponent(examId)}`,
+  // Bước 1: lấy danh sách questionId theo thứ tự
+  const eqRes = await api.get<RawExamQuestion[]>(
+    `/exam_questions?examId=${encodeURIComponent(examId)}`,
+  );
+  const examQuestions = Array.isArray(eqRes.data) ? eqRes.data : [];
+
+  if (examQuestions.length === 0) return [];
+
+  // Sắp xếp theo questionOrder
+  const sorted = [...examQuestions].sort(
+    (a, b) => a.questionOrder - b.questionOrder,
   );
 
-  return response.data;
+  // Bước 2: fetch song song question + answers cho từng câu
+  const results = await Promise.all(
+    sorted.map(async ({ questionId }) => {
+      const [qRes, aRes] = await Promise.all([
+        api.get<Question>(`/questions/${encodeURIComponent(questionId)}`),
+        api.get<RawAnswer[]>(
+          `/answers?questionId=${encodeURIComponent(questionId)}`,
+        ),
+      ]);
+
+      const raw = qRes.data;
+      const answers = Array.isArray(aRes.data) ? aRes.data : [];
+
+      // Sắp xếp đáp án theo label A→D
+      const sortedAnswers = [...answers].sort((a, b) =>
+        a.label.localeCompare(b.label),
+      );
+
+      // options: mảng string hiển thị cho QuizQuestionBox
+      const options = sortedAnswers.map((a) => a.content);
+
+      // correctAnswer: index trong mảng options (số nguyên)
+      const correctIdx = sortedAnswers.findIndex((a) => a.isCorrect);
+
+      return {
+        ...raw,
+        // QuizQuestionBox dùng questionText để render nội dung câu hỏi
+        questionText: raw.content,
+        options,
+        correctAnswer: correctIdx !== -1 ? correctIdx : 0,
+        // Giữ lại answers raw để dùng ở nơi khác nếu cần
+        answers: sortedAnswers as unknown as Answer[],
+      } satisfies Question;
+    }),
+  );
+
+  return results;
 };
 
 // ======================================================

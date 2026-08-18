@@ -1,19 +1,20 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import type { EditExam } from "@/types/exam";
+import { getCategoriesService } from "@/services/categories";
+import type { Category } from "@/types/categories";
 
 /** Props cho DeleteExamModal */
 interface DeleteExamModalProps {
   show: boolean;
   onClose: () => void;
   onConfirm: () => void;
-  /** Đề thi cần xóa; null khi modal chưa mở */
   exam: EditExam | null;
 }
 
 /**
  * DeleteExamModal – modal xác nhận xóa đề thi.
- * Nhận `exam` (EditExam) và hiển thị tên, mã đề thi trước khi xóa.
  */
 const DeleteExamModal = ({
   show,
@@ -21,9 +22,18 @@ const DeleteExamModal = ({
   onConfirm,
   exam,
 }: DeleteExamModalProps) => {
-  if (!show || !exam) {
-    return null;
-  }
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    getCategoriesService()
+      .then(setCategories)
+      .catch((err) => console.error("Lỗi tải danh mục:", err));
+  }, []);
+
+  if (!show || !exam) return null;
+
+  const categoryName =
+    categories.find((c) => c.id === exam.categoryId)?.name ?? exam.categoryId;
 
   return (
     <>
@@ -54,8 +64,8 @@ const DeleteExamModal = ({
 
               <div className="mt-3 p-3 border rounded bg-light">
                 <strong>{exam.name}</strong>
-                <div className="text-secondary small mt-1">{exam.categoryId}</div>
-                <div className="text-secondary small">Mã: {exam.id}</div>
+                <div className="text-secondary small mt-1">{categoryName}</div>
+                <div className="text-secondary small">Mã: {exam.code}</div>
               </div>
             </div>
 

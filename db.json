@@ -48,6 +48,12 @@
       "name": "Toán",
       "createdAt": "2026-08-17T04:00:00.000Z",
       "updatedAt": "2026-08-17T05:52:11.231Z"
+    },
+    {
+      "name": "java",
+      "createdAt": "2026-08-18T02:28:23.011Z",
+      "updatedAt": null,
+      "id": "Ed_EG2fIZ8k"
     }
   ],
   "ExamGroup": [
@@ -57,6 +63,13 @@
       "description": "toan cap1",
       "icon": "bi bi-cup-hot-fill",
       "color": "bg-primary-subtle text-primary"
+    },
+    {
+      "name": "Java",
+      "description": "java",
+      "icon": "bi bi-cup-hot-fill",
+      "color": "bg-danger-subtle text-danger",
+      "id": "pa-JYSNC8ag"
     }
   ],
   "exams": [
@@ -71,27 +84,52 @@
       "status": "ACTIVE",
       "creatorId": "user001",
       "createdAt": "2026-08-17T10:20:00.000Z",
-      "updatedAt": "2026-08-18T01:57:56.879Z"
+      "updatedAt": "2026-08-18T02:43:33.843Z"
+    },
+    {
+      "id": "jnsXuOT02Ss",
+      "code": "EX002",
+      "name": "toan lop1",
+      "categoryId": "cat001",
+      "examGroupId": "Xy59dRK75qk",
+      "duration": 45,
+      "passScore": 5,
+      "status": "ACTIVE",
+      "creatorId": "admin",
+      "createdAt": "2026-08-18T02:44:06.374Z",
+      "updatedAt": "2026-08-18T02:44:06.374Z"
     }
   ],
   "exam_questions": [
     {
-      "id": "eq-toan-001",
+      "id": "fzgHarA25R0",
       "examId": "ex-toan-001",
       "questionId": "q-toan-001",
       "questionOrder": 1
     },
     {
-      "id": "eq-toan-002",
+      "id": "i_xc_bwTsyg",
       "examId": "ex-toan-001",
       "questionId": "gvpQVc8xsxk",
       "questionOrder": 2
     },
     {
-      "id": "eq-toan-003",
+      "id": "abolwVXF-PY",
       "examId": "ex-toan-001",
       "questionId": "T_gOvtUzzYs",
       "questionOrder": 3
+    },
+    {
+      "id": "UOcVeqcmzTU",
+      "examId": "jnsXuOT02Ss",
+      "questionId": "q-toan-001",
+      "questionOrder": 1
+    },
+    {
+      "id": "_u96aQ_Kh4s",
+      "examId": "jnsXuOT02Ss",
+      "questionId": "gvpQVc8xsxk",
+      "questionOrder": 2
     }
   ],
   "questions": [
@@ -115,6 +153,13 @@
       "categoryId": "cat001",
       "createdAt": "2026-08-17T10:13:52.667Z",
       "updatedAt": "2026-08-17T10:13:52.667Z"
+    },
+    {
+      "id": "OwB_aX_9x-8",
+      "content": "Từ khóa nào dùng để tạo một class trong Java?",
+      "categoryId": "Ed_EG2fIZ8k",
+      "createdAt": "2026-08-18T02:30:05.362Z",
+      "updatedAt": "2026-08-18T02:30:05.362Z"
     }
   ],
   "answers": [
@@ -225,8 +270,95 @@
       "questionId": "T_gOvtUzzYs",
       "createdAt": "2026-08-17T10:13:52.667Z",
       "updatedAt": "2026-08-17T10:13:52.667Z"
+    },
+    {
+      "id": "XE9Tjy3U35s",
+      "content": "object",
+      "label": "A",
+      "isCorrect": false,
+      "questionId": "OwB_aX_9x-8",
+      "createdAt": "2026-08-18T02:30:05.362Z",
+      "updatedAt": "2026-08-18T02:30:05.362Z"
+    },
+    {
+      "id": "n5BZSzhwq6s",
+      "content": "class",
+      "label": "B",
+      "isCorrect": true,
+      "questionId": "OwB_aX_9x-8",
+      "createdAt": "2026-08-18T02:30:05.362Z",
+      "updatedAt": "2026-08-18T02:30:05.362Z"
+    },
+    {
+      "id": "nzlIQS0sfQs",
+      "content": "new",
+      "label": "C",
+      "isCorrect": false,
+      "questionId": "OwB_aX_9x-8",
+      "createdAt": "2026-08-18T02:30:05.362Z",
+      "updatedAt": "2026-08-18T02:30:05.362Z"
+    },
+    {
+      "id": "lkY0EQro0FY",
+      "content": "struct",
+      "label": "D",
+      "isCorrect": false,
+      "questionId": "OwB_aX_9x-8",
+      "createdAt": "2026-08-18T02:30:05.362Z",
+      "updatedAt": "2026-08-18T02:30:05.362Z"
     }
   ],
-  "histories": [],
+  "histories": [
+    {
+      "userId": "Public-456545",
+      "userName": "ANONYMOUS",
+      "examId": "ex-toan-001",
+      "examTitle": "Đề thi Toán cấp 1 cơ bản",
+      "score": 100,
+      "totalQuestions": 2,
+      "correctAnswersCount": 2,
+      "timeTaken": 18,
+      "userAnswers": {
+        "gvpQVc8xsxk": 0,
+        "q-toan-001": 0
+      },
+      "completedAt": "2026-08-18T02:19:18.740Z",
+      "id": "37Qa-5oVXo0"
+    },
+    {
+      "userId": "rG2EfvkY9CQ",
+      "userName": "Hai Dong",
+      "examId": "ex-toan-001",
+      "examTitle": "Đề thi Toán cấp 1 cơ bản",
+      "score": 0,
+      "totalQuestions": 3,
+      "correctAnswersCount": 0,
+      "timeTaken": 6,
+      "userAnswers": {
+        "q-toan-001": 0,
+        "gvpQVc8xsxk": 1,
+        "T_gOvtUzzYs": 2
+      },
+      "completedAt": "2026-08-18T02:21:51.903Z",
+      "id": "Upyu76tay-A"
+    },
+    {
+      "userId": "rG2EfvkY9CQ",
+      "userName": "Hai Dong",
+      "examId": "ex-toan-001",
+      "examTitle": "Đề thi Toán cấp 1 cơ bản",
+      "score": 100,
+      "totalQuestions": 3,
+      "correctAnswersCount": 3,
+      "timeTaken": 9,
+      "userAnswers": {
+        "gvpQVc8xsxk": 0,
+        "T_gOvtUzzYs": 0,
+        "q-toan-001": 3
+      },
+      "completedAt": "2026-08-18T02:22:31.798Z",
+      "id": "SPRZxdFf9Ek"
+    }
+  ],
   "$schema": "./node_modules/json-server/schema.json"
 }

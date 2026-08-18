@@ -158,6 +158,26 @@ const ExamPage = () => {
 
   const currentQ = questions[currentQuestionIndex];
 
+  // Chặn truy cập nếu đề thi đang bị khóa
+  if (currentExam && currentExam.status !== "ACTIVE") {
+    return (
+      <div className="d-flex flex-column justify-content-center align-items-center min-vh-100 bg-dark text-white text-center px-3">
+        <i className="bi bi-lock-fill fs-1 text-danger mb-3"></i>
+        <h4 className="fw-bold mb-2">Đề thi đã bị khóa</h4>
+        <p className="text-secondary mb-4">
+          Đề thi này hiện không khả dụng. Vui lòng liên hệ quản trị viên.
+        </p>
+        <button
+          type="button"
+          className="btn btn-outline-light rounded-pill px-4"
+          onClick={() => router.back()}
+        >
+          <i className="bi bi-arrow-left me-2"></i>Quay lại
+        </button>
+      </div>
+    );
+  }
+
   if (quizLoading || !currentQ) {
     return (
       <div className="d-flex justify-content-center align-items-center min-vh-100 bg-dark text-white">

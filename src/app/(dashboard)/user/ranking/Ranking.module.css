@@ -1,0 +1,159 @@
+/* src/app/(dashboard)/ranking/Ranking.module.css */
+.rankingWrapper {
+  background-color: #090d16;
+  min-height: 100vh;
+  color: #f1f5f9;
+  position: relative;
+  overflow: hidden;
+}
+
+.glowBg1 {
+  position: absolute;
+  top: -100px;
+  left: 10%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(14, 165, 233, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+  pointer-events: none;
+}
+
+.glowBg2 {
+  position: absolute;
+  top: 30%;
+  right: 5%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.12) 0%, rgba(0, 0, 0, 0) 70%);
+  pointer-events: none;
+}
+
+/* Glass Cards */
+.glassCard {
+  background: rgba(17, 24, 39, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+}
+
+/* 4 Stat Cards cân bằng chiều cao */
+.statCard {
+  background: rgba(17, 24, 39, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  height: 100%;
+}
+
+.userStatCard {
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.15) 0%, rgba(99, 102, 241, 0.15) 100%);
+  border: 1px solid rgba(14, 165, 233, 0.4);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  height: 100%;
+}
+
+.iconBox {
+  width: 54px;
+  height: 54px;
+  border-radius: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+
+/* Gradient Titles */
+.gradientTitle {
+  background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.goldText {
+  color: #fbbf24;
+}
+
+/* Table Card Header */
+.tableCardHeader {
+  background: rgba(15, 23, 42, 0.95);
+  padding: 1.1rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.tableCardHeaderTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* Table Styling */
+.tableHeader {
+  background: rgba(15, 23, 42, 0.9) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.tableHeader th {
+  color: #94a3b8 !important;
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 1rem 1.25rem;
+  background: transparent !important;
+  border: none !important;
+}
+
+.tableRow {
+  background-color: #ffffff !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  transition: background-color 0.15s ease;
+}
+
+.currentUserRow {
+  background-color: #f0fdf4 !important;
+  border-left: 4px solid #0ea5e9 !important;
+}
+
+.tableRow td {
+  padding: 1rem 1.25rem;
+}
+
+/* Chữ đen cho hàng dữ liệu bảng */
+.textBlackPrimary {
+  color: #111827 !important;
+  font-weight: 700;
+}
+
+.textBlackSecondary {
+  color: #4b5563 !important;
+  font-size: 0.8rem;
+}
+
+/* Danh sách thành viên mới */
+.memberList {
+  max-height: 480px;
+  overflow-y: auto;
+}
+
+.memberAvatarBox {
+  width: 44px;
+  height: 44px;
+  margin-right: 12px;
+  flex-shrink: 0;
+  border-radius: 0.5rem;
+  background-color: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}

@@ -30,7 +30,7 @@ const menuItems = [
   },
   {
     label: "Xếp Hạng",
-    href: "/leaderboard",
+    href: "/user/ranking", // Đã đổi sang /ranking
     icon: "bi-trophy-fill",
     requiresAuth: true,
   },

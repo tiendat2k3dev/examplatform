@@ -94,6 +94,41 @@ export const getAdminExamGroupsService = async (): Promise<ExamGroup[]> => {
   return Array.isArray(res.data) ? res.data : [];
 };
 
+// =====================================================
+// CHECK DUPLICATE: CODE & NAME
+// Dùng cho Yup async validation trong Create/Edit ExamModal
+// =====================================================
+
+export const checkExamCodeExistsService = async (
+  code: string,
+  excludeId?: string,
+): Promise<boolean> => {
+  const exams = await getAdminExamsService();
+
+  const normalizedCode = code.trim().toUpperCase();
+
+  return exams.some(
+    (e) =>
+      e.code?.trim().toUpperCase() === normalizedCode &&
+      (excludeId ? String(e.id) !== excludeId : true),
+  );
+};
+
+export const checkExamNameExistsService = async (
+  name: string,
+  excludeId?: string,
+): Promise<boolean> => {
+  const exams = await getAdminExamsService();
+
+  const normalizedName = name.trim().toLowerCase();
+
+  return exams.some(
+    (e) =>
+      e.name?.trim().toLowerCase() === normalizedName &&
+      (excludeId ? String(e.id) !== excludeId : true),
+  );
+};
+
 // =========================================================
 // QUESTIONS (ngân hàng câu hỏi)
 // =========================================================
@@ -196,7 +231,26 @@ export const createAdminExamService = async (
 ): Promise<Exam> => {
   const now = new Date().toISOString();
 
-  // Tạo đề thi
+  // =================================================
+  // 1. KIỂM TRA TRÙNG CODE & NAME
+  // =================================================
+
+  const isCodeTaken = await checkExamCodeExistsService(values.code);
+
+  if (isCodeTaken) {
+    throw new Error(`EXAM_CODE_EXISTS:${values.code}`);
+  }
+
+  const isNameTaken = await checkExamNameExistsService(values.name);
+
+  if (isNameTaken) {
+    throw new Error(`EXAM_NAME_EXISTS:${values.name}`);
+  }
+
+  // =================================================
+  // 2. TẠO EXAM
+  // =================================================
+
   const examPayload: Omit<Exam, "totalQuestions" | "questionIds"> = {
     id: generateId(),
     code: values.code.trim(),
@@ -253,7 +307,25 @@ export const updateAdminExamService = async (
 ): Promise<Exam> => {
   const now = new Date().toISOString();
 
-  // PATCH exam
+  // =================================================
+  // 1. KIỂM TRA TRÙNG CODE & NAME (bỏ qua chính exam đang sửa)
+  // =================================================
+
+  const isCodeTaken = await checkExamCodeExistsService(values.code, examId);
+
+  if (isCodeTaken) {
+    throw new Error(`EXAM_CODE_EXISTS:${values.code}`);
+  }
+
+  const isNameTaken = await checkExamNameExistsService(values.name, examId);
+
+  if (isNameTaken) {
+    throw new Error(`EXAM_NAME_EXISTS:${values.name}`);
+  }
+
+  // =================================================
+  // 2. PATCH EXAM
+  // =================================================
   const examPayload: Partial<Omit<Exam, "id" | "createdAt">> = {
     code: values.code.trim(),
     name: values.name.trim(),
@@ -275,9 +347,7 @@ export const updateAdminExamService = async (
   const oldEqs = Array.isArray(oldEqRes.data) ? oldEqRes.data : [];
 
   // Xóa tất cả exam_questions cũ
-  await Promise.all(
-    oldEqs.map((eq) => api.delete(`/exam_questions/${eq.id}`)),
-  );
+  await Promise.all(oldEqs.map((eq) => api.delete(`/exam_questions/${eq.id}`)));
 
   // Tạo exam_questions mới
   if (values.questionIds.length > 0) {
@@ -315,7 +385,8 @@ export const toggleAdminExamStatusService = async (
   examId: string,
   current: Exam["status"],
 ): Promise<Exam["status"]> => {
-  const newStatus: Exam["status"] = current === "ACTIVE" ? "INACTIVE" : "ACTIVE";
+  const newStatus: Exam["status"] =
+    current === "ACTIVE" ? "INACTIVE" : "ACTIVE";
 
   await api.patch(`/exams/${examId}`, {
     status: newStatus,

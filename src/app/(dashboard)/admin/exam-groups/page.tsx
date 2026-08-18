@@ -128,10 +128,14 @@ const ExamGroups = () => {
       console.error("Lỗi khi thêm nhóm đề thi:", error);
 
       if (error instanceof Error) {
-        toast.error(error.message);
-      } else {
-        toast.error("Không thể thêm nhóm đề thi!");
+        if (error.message.startsWith("EXAM_GROUP_NAME_EXISTS:")) {
+          const name = error.message.substring("EXAM_GROUP_NAME_EXISTS:".length);
+          toast.error(`Tên nhóm đề thi "${name}" đã tồn tại!`);
+          return;
+        }
       }
+
+      toast.error("Không thể thêm nhóm đề thi!");
     }
   };
 
@@ -175,10 +179,14 @@ const ExamGroups = () => {
       console.error("Lỗi khi cập nhật nhóm đề thi:", error);
 
       if (error instanceof Error) {
-        toast.error(error.message);
-      } else {
-        toast.error("Không thể cập nhật nhóm đề thi!");
+        if (error.message.startsWith("EXAM_GROUP_NAME_EXISTS:")) {
+          const name = error.message.substring("EXAM_GROUP_NAME_EXISTS:".length);
+          toast.error(`Tên nhóm đề thi "${name}" đã tồn tại!`);
+          return;
+        }
       }
+
+      toast.error("Không thể cập nhật nhóm đề thi!");
     }
   };
 

@@ -63,6 +63,31 @@ export const getExamGroupsService = async (): Promise<ExamGroup[]> => {
 };
 
 // =====================================================
+// KIỂM TRA TÊN NHÓM ĐỀ THI TRÙNG
+// Dùng cho Yup async validation trong modal Add/Edit
+// =====================================================
+
+export const checkExamGroupNameExistsService = async (
+  name: string,
+  excludeId?: string,
+): Promise<boolean> => {
+  try {
+    const groups = await getExamGroupsService();
+
+    const normalizedName = name.trim();
+
+    return groups.some(
+      (group) =>
+        group.name.trim() === normalizedName &&
+        (excludeId ? String(group.id) !== excludeId : true),
+    );
+  } catch (error) {
+    console.error("Lỗi khi kiểm tra tên nhóm đề thi:", error);
+    throw error;
+  }
+};
+
+// =====================================================
 // LẤY NHÓM ĐỀ THI THEO ID
 // =====================================================
 
@@ -87,6 +112,12 @@ export const createExamGroupService = async (
   groupData: Omit<ExamGroup, "id">,
 ): Promise<ExamGroup> => {
   try {
+    const exists = await checkExamGroupNameExistsService(groupData.name);
+
+    if (exists) {
+      throw new Error(`EXAM_GROUP_NAME_EXISTS:${groupData.name}`);
+    }
+
     const response = await api.post<ExamGroup>("/ExamGroup", groupData);
 
     return response.data;
@@ -105,7 +136,19 @@ export const updateExamGroupService = async (
   groupData: Partial<ExamGroup>,
 ): Promise<ExamGroup> => {
   try {
-    // Không thêm updatedAt vì ExamGroup không có thuộc tính này
+    // Kiểm tra duplicate name (bỏ qua chính group đang sửa)
+
+    if (groupData.name !== undefined) {
+      const exists = await checkExamGroupNameExistsService(
+        groupData.name,
+        String(id),
+      );
+
+      if (exists) {
+        throw new Error(`EXAM_GROUP_NAME_EXISTS:${groupData.name}`);
+      }
+    }
+
     const response = await api.patch<ExamGroup>(`/ExamGroup/${id}`, groupData);
 
     return response.data;

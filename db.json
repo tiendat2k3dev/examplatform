@@ -4,42 +4,41 @@
       "id": "JF1LyebLkG4",
       "username": "Admin",
       "password": "$2b$10$feYiYWLp4D3gAn4kBiUFL.UfeVuIpL4rEQ2vPNdIseFgLoFsBcWOa",
-      "fullName": "Admin",
+      "fullName": "Admin9",
       "email": "Admin-QuanLyDe@gmail.com",
-      "phone": "0367797348",
+      "phone": "036779734",
       "address": "Tổ 8A, Kp Bảo Vinh A, Bảo Vinh, Đồng Nai",
       "role": "Admin",
       "status": "Mở",
       "avatarUrl": "",
       "createdAt": "2026-08-13T06:18:07.851Z",
-      "updatedAt": "2026-08-16T14:24:51.249Z"
+      "updatedAt": "2026-08-18T08:08:16.233Z"
     },
     {
-      "id": "rG2EfvkY9CQ",
+      "id": "BB_zznwgRJg",
       "username": "tiendat2k3",
-      "password": "$2b$10$tclGfV4N.W1YhPmSy8nng.N.dOZL28bAlV9irVJqwQbQGJs9n3dWi",
-      "fullName": "Nguyễn Văn A",
-      "address": "Quận Cầu Giấy, Hà Nội",
-      "phone": "0987104234",
-      "email": "tiendat2k3.devs@gmail.com",
-      "role": "Member",
-      "status": "Mở",
-      "createdAt": "2026-08-16T14:10:47.867Z",
-      "updatedAt": "2026-08-18T03:34:25.623Z",
-      "avatarUrl": "https://media-cdn-zspms.kurogame.net/pnswebsite/website2.0/images/1784217600000/p4njjomrzglqi8ov4q-17842832869677.jpg"
-    },
-    {
-      "id": "dyPYKnBKtVM",
-      "username": "nguyenvanb",
-      "password": "$2b$10$ZHzImbYRKmBKg0gQ43hLue6.f6peYMCM6mjAi16oUC06bt5Na15BS",
-      "fullName": "Nguyễn Văn B",
+      "password": "$2b$10$bixS0FMcvOhquCa/Rw2kvui7RVWohJzn6tglV11zaiDmJ07GpNrG2",
+      "fullName": "Nguyen van A",
       "address": "Quận Cầu Giấy, Hà Nội",
       "phone": "0367797348",
-      "email": "tiendat2k3.dev@gmail.com",
+      "email": "tiendat2k3.odev@gmail.com",
       "role": "Member",
       "status": "Mở",
-      "createdAt": "2026-08-16T14:18:16.406Z",
-      "updatedAt": "2026-08-18T03:23:59.277Z"
+      "createdAt": "2026-08-18T08:09:35.450Z",
+      "updatedAt": "2026-08-18T08:16:07.525Z"
+    },
+    {
+      "id": "BeSZYzVkiEM",
+      "username": "admin3",
+      "password": "$2b$10$4WWmYCV2wOWLoBTJzBx7eumenwNZKjGkuzF5C1czmgSbgB9ojKsmW",
+      "fullName": "Nguyen van B",
+      "address": "Quận Cầu Giấy, Hà Nội",
+      "phone": "0367797349",
+      "email": "tiendat2k3.devd@gmail.com",
+      "role": "Member",
+      "status": "Mở",
+      "createdAt": "2026-08-18T08:11:13.485Z",
+      "updatedAt": "2026-08-18T08:15:07.196Z"
     }
   ],
   "categories": [
@@ -47,25 +46,25 @@
       "id": "cat001",
       "name": "Toán",
       "createdAt": "2026-08-17T04:00:00.000Z",
-      "updatedAt": "2026-08-17T05:52:11.231Z"
+      "updatedAt": "2026-08-18T07:35:43.890Z"
     },
     {
       "name": "java",
-      "createdAt": "2026-08-18T02:28:23.011Z",
+      "createdAt": "2026-08-18T07:39:45.742Z",
       "updatedAt": null,
-      "id": "Ed_EG2fIZ8k"
+      "id": "xcr_bZoi2-o"
     }
   ],
   "ExamGroup": [
     {
       "id": "Xy59dRK75qk",
-      "name": "Toan cap 1",
+      "name": "Toán cấp 1",
       "description": "toan cap1",
       "icon": "bi bi-cup-hot-fill",
       "color": "bg-primary-subtle text-primary"
     },
     {
-      "name": "Java",
+      "name": "Java cơ bản",
       "description": "java",
       "icon": "bi bi-cup-hot-fill",
       "color": "bg-danger-subtle text-danger",
@@ -75,7 +74,7 @@
   "exams": [
     {
       "id": "ex-toan-001",
-      "code": "EX001",
+      "code": "Toan1",
       "name": "Đề thi Toán cấp 1 cơ bản",
       "categoryId": "cat001",
       "examGroupId": "Xy59dRK75qk",
@@ -84,11 +83,11 @@
       "status": "ACTIVE",
       "creatorId": "user001",
       "createdAt": "2026-08-17T10:20:00.000Z",
-      "updatedAt": "2026-08-18T02:43:33.843Z"
+      "updatedAt": "2026-08-18T08:13:06.117Z"
     },
     {
       "id": "jnsXuOT02Ss",
-      "code": "EX002",
+      "code": "Toan2",
       "name": "toan lop1",
       "categoryId": "cat001",
       "examGroupId": "Xy59dRK75qk",
@@ -97,48 +96,78 @@
       "status": "ACTIVE",
       "creatorId": "admin",
       "createdAt": "2026-08-18T02:44:06.374Z",
-      "updatedAt": "2026-08-18T02:44:06.374Z"
+      "updatedAt": "2026-08-18T07:48:01.791Z"
+    },
+    {
+      "id": "DpQztDrRzv4",
+      "code": "Toan39",
+      "name": "Toan 30",
+      "categoryId": "cat001",
+      "examGroupId": "Xy59dRK75qk",
+      "duration": 45,
+      "passScore": 5,
+      "status": "ACTIVE",
+      "creatorId": "admin",
+      "createdAt": "2026-08-18T07:32:20.790Z",
+      "updatedAt": "2026-08-18T08:11:30.333Z"
     }
   ],
   "exam_questions": [
     {
-      "id": "fzgHarA25R0",
-      "examId": "ex-toan-001",
+      "id": "KNcWil3U060",
+      "examId": "jnsXuOT02Ss",
       "questionId": "q-toan-001",
       "questionOrder": 1
     },
     {
-      "id": "i_xc_bwTsyg",
-      "examId": "ex-toan-001",
+      "id": "9F20GUXgKq4",
+      "examId": "jnsXuOT02Ss",
       "questionId": "gvpQVc8xsxk",
       "questionOrder": 2
     },
     {
-      "id": "abolwVXF-PY",
-      "examId": "ex-toan-001",
+      "id": "3CfYB88qE-I",
+      "examId": "DpQztDrRzv4",
       "questionId": "T_gOvtUzzYs",
+      "questionOrder": 1
+    },
+    {
+      "id": "Ex0iNydm6xU",
+      "examId": "DpQztDrRzv4",
+      "questionId": "gvpQVc8xsxk",
+      "questionOrder": 2
+    },
+    {
+      "id": "i3A4OufbIf4",
+      "examId": "DpQztDrRzv4",
+      "questionId": "q-toan-001",
       "questionOrder": 3
     },
     {
-      "id": "UOcVeqcmzTU",
-      "examId": "jnsXuOT02Ss",
+      "id": "ABB68Kmv9tY",
+      "examId": "ex-toan-001",
       "questionId": "q-toan-001",
       "questionOrder": 1
     },
     {
-      "id": "_u96aQ_Kh4s",
-      "examId": "jnsXuOT02Ss",
+      "id": "SnNZj6Ssaw0",
+      "examId": "ex-toan-001",
       "questionId": "gvpQVc8xsxk",
       "questionOrder": 2
+    },
+    {
+      "id": "3hhSfVB9aTA",
+      "examId": "ex-toan-001",
+      "questionId": "T_gOvtUzzYs",
+      "questionOrder": 3
     }
   ],
   "questions": [
     {
-      "id": "q-toan-001",
       "content": "1 + 1 = ?",
       "categoryId": "cat001",
-      "createdAt": "2026-08-17T10:00:00.000Z",
-      "updatedAt": "2026-08-17T10:00:00.000Z"
+      "updatedAt": "2026-08-18T07:33:56.454Z",
+      "id": "q-toan-001"
     },
     {
       "id": "gvpQVc8xsxk",
@@ -148,18 +177,16 @@
       "updatedAt": "2026-08-17T10:14:09.791Z"
     },
     {
-      "id": "T_gOvtUzzYs",
       "content": "3 + 5 = ?",
       "categoryId": "cat001",
-      "createdAt": "2026-08-17T10:13:52.667Z",
-      "updatedAt": "2026-08-17T10:13:52.667Z"
+      "updatedAt": "2026-08-18T07:59:11.580Z",
+      "id": "T_gOvtUzzYs"
     },
     {
-      "id": "OwB_aX_9x-8",
       "content": "Từ khóa nào dùng để tạo một class trong Java?",
-      "categoryId": "Ed_EG2fIZ8k",
-      "createdAt": "2026-08-18T02:30:05.362Z",
-      "updatedAt": "2026-08-18T02:30:05.362Z"
+      "categoryId": "xcr_bZoi2-o",
+      "updatedAt": "2026-08-18T08:00:07.558Z",
+      "id": "OwB_aX_9x-8"
     }
   ],
   "answers": [
@@ -170,7 +197,7 @@
       "isCorrect": true,
       "questionId": "q-toan-001",
       "createdAt": "2026-08-17T00:00:00.000Z",
-      "updatedAt": "2026-08-17T00:00:00.000Z"
+      "updatedAt": "2026-08-18T07:33:56.454Z"
     },
     {
       "id": "ans-toan-001-b",
@@ -179,7 +206,7 @@
       "isCorrect": false,
       "questionId": "q-toan-001",
       "createdAt": "2026-08-17T00:00:00.000Z",
-      "updatedAt": "2026-08-17T00:00:00.000Z"
+      "updatedAt": "2026-08-18T07:33:56.454Z"
     },
     {
       "id": "ans-toan-001-c",
@@ -188,7 +215,7 @@
       "isCorrect": false,
       "questionId": "q-toan-001",
       "createdAt": "2026-08-17T00:00:00.000Z",
-      "updatedAt": "2026-08-17T00:00:00.000Z"
+      "updatedAt": "2026-08-18T07:33:56.454Z"
     },
     {
       "id": "ans-toan-001-d",
@@ -197,7 +224,7 @@
       "isCorrect": false,
       "questionId": "q-toan-001",
       "createdAt": "2026-08-17T00:00:00.000Z",
-      "updatedAt": "2026-08-17T00:00:00.000Z"
+      "updatedAt": "2026-08-18T07:33:56.454Z"
     },
     {
       "id": "jSfIaCEdp7M",
@@ -242,7 +269,7 @@
       "isCorrect": true,
       "questionId": "T_gOvtUzzYs",
       "createdAt": "2026-08-17T10:13:52.667Z",
-      "updatedAt": "2026-08-17T10:13:52.667Z"
+      "updatedAt": "2026-08-18T07:59:11.580Z"
     },
     {
       "id": "794_tfBqML4",
@@ -251,7 +278,7 @@
       "isCorrect": false,
       "questionId": "T_gOvtUzzYs",
       "createdAt": "2026-08-17T10:13:52.667Z",
-      "updatedAt": "2026-08-17T10:13:52.667Z"
+      "updatedAt": "2026-08-18T07:59:11.580Z"
     },
     {
       "id": "fxvCB_ZvPCE",
@@ -260,7 +287,7 @@
       "isCorrect": false,
       "questionId": "T_gOvtUzzYs",
       "createdAt": "2026-08-17T10:13:52.667Z",
-      "updatedAt": "2026-08-17T10:13:52.667Z"
+      "updatedAt": "2026-08-18T07:59:11.580Z"
     },
     {
       "id": "DL2GSpOrlr4",
@@ -269,7 +296,7 @@
       "isCorrect": false,
       "questionId": "T_gOvtUzzYs",
       "createdAt": "2026-08-17T10:13:52.667Z",
-      "updatedAt": "2026-08-17T10:13:52.667Z"
+      "updatedAt": "2026-08-18T07:59:11.580Z"
     },
     {
       "id": "XE9Tjy3U35s",
@@ -278,7 +305,7 @@
       "isCorrect": false,
       "questionId": "OwB_aX_9x-8",
       "createdAt": "2026-08-18T02:30:05.362Z",
-      "updatedAt": "2026-08-18T02:30:05.362Z"
+      "updatedAt": "2026-08-18T08:00:07.558Z"
     },
     {
       "id": "n5BZSzhwq6s",
@@ -287,7 +314,7 @@
       "isCorrect": true,
       "questionId": "OwB_aX_9x-8",
       "createdAt": "2026-08-18T02:30:05.362Z",
-      "updatedAt": "2026-08-18T02:30:05.362Z"
+      "updatedAt": "2026-08-18T08:00:07.558Z"
     },
     {
       "id": "nzlIQS0sfQs",
@@ -296,7 +323,7 @@
       "isCorrect": false,
       "questionId": "OwB_aX_9x-8",
       "createdAt": "2026-08-18T02:30:05.362Z",
-      "updatedAt": "2026-08-18T02:30:05.362Z"
+      "updatedAt": "2026-08-18T08:00:07.558Z"
     },
     {
       "id": "lkY0EQro0FY",
@@ -305,12 +332,12 @@
       "isCorrect": false,
       "questionId": "OwB_aX_9x-8",
       "createdAt": "2026-08-18T02:30:05.362Z",
-      "updatedAt": "2026-08-18T02:30:05.362Z"
+      "updatedAt": "2026-08-18T08:00:07.558Z"
     }
   ],
   "histories": [
     {
-      "userId": "rG2EfvkY9CQ",
+      "userId": null,
       "userName": "Hai Dong",
       "examId": "ex-toan-001",
       "examTitle": "Đề thi Toán cấp 1 cơ bản",
@@ -327,7 +354,7 @@
       "id": "Upyu76tay-A"
     },
     {
-      "userId": "rG2EfvkY9CQ",
+      "userId": null,
       "userName": "Hai Dong",
       "examId": "ex-toan-001",
       "examTitle": "Đề thi Toán cấp 1 cơ bản",
@@ -344,7 +371,7 @@
       "id": "SPRZxdFf9Ek"
     },
     {
-      "userId": "dyPYKnBKtVM",
+      "userId": null,
       "userName": "Nguyễn Văn B",
       "examId": "ex-toan-001",
       "examTitle": "Đề thi Toán cấp 1 cơ bản",
@@ -361,7 +388,7 @@
       "id": "urea46V8aEo"
     },
     {
-      "userId": "dyPYKnBKtVM",
+      "userId": null,
       "userName": "Nguyễn Văn B",
       "examId": "ex-toan-001",
       "examTitle": "Đề thi Toán cấp 1 cơ bản",
@@ -378,7 +405,7 @@
       "id": "kriktHkcAyk"
     },
     {
-      "userId": "dyPYKnBKtVM",
+      "userId": null,
       "userName": "Nguyễn Văn B",
       "examId": "jnsXuOT02Ss",
       "examTitle": "toan lop1",
@@ -394,7 +421,7 @@
       "id": "MoABVFrNjGU"
     },
     {
-      "userId": "dyPYKnBKtVM",
+      "userId": null,
       "userName": "Nguyễn Văn B",
       "examId": "ex-toan-001",
       "examTitle": "Đề thi Toán cấp 1 cơ bản",
@@ -409,6 +436,88 @@
       },
       "completedAt": "2026-08-18T03:51:04.034Z",
       "id": "ZKju06645XQ"
+    },
+    {
+      "userId": null,
+      "userName": "Nguyễn Văn A",
+      "examId": null,
+      "examTitle": "Java cơ bản",
+      "score": 0,
+      "totalQuestions": 1,
+      "correctAnswersCount": 0,
+      "timeTaken": 4,
+      "userAnswers": {
+        "OwB_aX_9x-8": 1
+      },
+      "completedAt": "2026-08-18T06:33:12.644Z",
+      "id": "gqdTZ8k0x1A"
+    },
+    {
+      "userId": "Public-581129",
+      "userName": "ANONYMOUS",
+      "examId": "ex-toan-001",
+      "examTitle": "Đề thi Toán cấp 1 cơ bản",
+      "score": 33,
+      "totalQuestions": 3,
+      "correctAnswersCount": 1,
+      "timeTaken": 4,
+      "userAnswers": {
+        "T_gOvtUzzYs": 0,
+        "q-toan-001": 2,
+        "gvpQVc8xsxk": 1
+      },
+      "completedAt": "2026-08-18T08:15:41.572Z",
+      "id": "jLJI-LfJX1s"
+    },
+    {
+      "userId": "Public-497815",
+      "userName": "ANONYMOUS",
+      "examId": "ex-toan-001",
+      "examTitle": "Đề thi Toán cấp 1 cơ bản",
+      "score": 100,
+      "totalQuestions": 3,
+      "correctAnswersCount": 3,
+      "timeTaken": 7,
+      "userAnswers": {
+        "T_gOvtUzzYs": 1,
+        "q-toan-001": 0,
+        "gvpQVc8xsxk": 0
+      },
+      "completedAt": "2026-08-18T08:16:53.362Z",
+      "id": "Mje0GBmoIg8"
+    },
+    {
+      "userId": "BB_zznwgRJg",
+      "userName": "Nguyen van A",
+      "examId": "ex-toan-001",
+      "examTitle": "Đề thi Toán cấp 1 cơ bản",
+      "score": 0,
+      "totalQuestions": 3,
+      "correctAnswersCount": 0,
+      "timeTaken": 6,
+      "userAnswers": {
+        "gvpQVc8xsxk": 2,
+        "T_gOvtUzzYs": 1,
+        "q-toan-001": 1
+      },
+      "completedAt": "2026-08-18T08:17:21.631Z",
+      "id": "Kzv0aDUIFZ0"
+    },
+    {
+      "userId": "BB_zznwgRJg",
+      "userName": "Nguyen van A",
+      "examId": "jnsXuOT02Ss",
+      "examTitle": "toan lop1",
+      "score": 100,
+      "totalQuestions": 2,
+      "correctAnswersCount": 2,
+      "timeTaken": 5,
+      "userAnswers": {
+        "q-toan-001": 0,
+        "gvpQVc8xsxk": 2
+      },
+      "completedAt": "2026-08-18T08:17:39.062Z",
+      "id": "CvRhU8DYELU"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

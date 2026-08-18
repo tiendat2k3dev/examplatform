@@ -6,6 +6,7 @@ import * as Yup from "yup";
 import { toast } from "react-toastify";
 import type { ExamGroup } from "../../../../types/examGroup";
 import { renderExamGroupIcon } from "../../../../utils/examGroupIcon";
+import { checkExamGroupNameExistsService } from "../../../../services/examGroupService";
 
 interface AddProps {
   show: boolean;
@@ -21,7 +22,20 @@ const initialValues = {
 };
 
 const validationSchema = Yup.object({
-  name: Yup.string().trim().required("Vui lòng nhập tên nhóm đề thi"),
+  name: Yup.string()
+    .trim()
+    .required("Vui lòng nhập tên nhóm đề thi")
+    // ✅ Kiểm tra trùng tên nhóm đề thi thời gian thực (trên blur)
+
+    .test(
+      "unique-name",
+      "Tên nhóm đề thi đã tồn tại!",
+      async (value) => {
+        if (!value || !value.trim()) return true; // Bỏ qua nếu rỗng
+
+        return !(await checkExamGroupNameExistsService(value.trim()));
+      },
+    ),
 
   description: Yup.string().trim().required("Vui lòng nhập mô tả"),
 
@@ -77,8 +91,24 @@ const Add = ({ show, onClose, onCreate }: AddProps) => {
 
         resetForm();
         onClose();
-      } catch (error) {
+       } catch (error) {
         console.error(error);
+
+        // Xử lý lỗi tên trùng (fallback nếu Yup async validation bị race condition)
+
+        if (error instanceof Error) {
+          if (error.message.startsWith("EXAM_GROUP_NAME_EXISTS:")) {
+            formik.setFieldError(
+              "name",
+              "Tên nhóm đề thi đã tồn tại!",
+            );
+
+            toast.error("Tên nhóm đề thi đã tồn tại!");
+
+            return;
+          }
+        }
+
         toast.error("Không thể thêm nhóm đề thi!");
       } finally {
         setSubmitting(false);

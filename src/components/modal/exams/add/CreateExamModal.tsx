@@ -12,6 +12,8 @@ import type {
 } from "@/types/exam";
 import { getCategoriesService } from "@/services/categories";
 import type { Category } from "@/types/categories";
+import { checkExamCodeExistsService } from "@/services/examAdminService";
+import { checkExamNameExistsService } from "@/services/examAdminService";
 
 /* =========================================================
    PROPS
@@ -36,12 +38,39 @@ const validationSchema = Yup.object({
   code: Yup.string()
     .trim()
     .required("Vui lòng nhập mã đề thi")
-    .max(50, "Mã đề thi tối đa 50 ký tự"),
+    .max(50, "Mã đề thi tối đa 50 ký tự")
+    .test("unique-code", "Mã đề thi đã tồn tại", async function (value) {
+      if (!value?.trim()) return true;
+
+      try {
+        const exists = await checkExamCodeExistsService(value);
+
+        return !exists;
+      } catch (error) {
+        console.error("Lỗi kiểm tra mã đề thi:", error);
+
+        // Không chặn form nếu API kiểm tra bị lỗi
+        return true;
+      }
+    }),
 
   name: Yup.string()
     .trim()
     .required("Vui lòng nhập tên đề thi")
-    .max(200, "Tên đề thi tối đa 200 ký tự"),
+    .max(200, "Tên đề thi tối đa 200 ký tự")
+    .test("unique-name", "Tên đề thi đã tồn tại", async function (value) {
+      if (!value?.trim()) return true;
+
+      try {
+        const exists = await checkExamNameExistsService(value);
+
+        return !exists;
+      } catch (error) {
+        console.error("Lỗi kiểm tra tên đề thi:", error);
+
+        return true;
+      }
+    }),
 
   categoryId: Yup.string().required("Vui lòng chọn danh mục"),
 
@@ -65,7 +94,6 @@ const validationSchema = Yup.object({
     .of(Yup.string())
     .min(1, "Vui lòng chọn ít nhất 1 câu hỏi"),
 });
-
 /* =========================================================
    INITIAL VALUES
    Khớp hoàn toàn với CreateExamFormValues từ @/types/exam
@@ -125,7 +153,7 @@ const CreateExamModal = ({
     onSubmit: async (values, { setSubmitting, resetForm }) => {
       try {
         await onCreate(values);
-        toast.success("Tạo đề thi thành công!");
+
         resetForm();
         onClose();
       } catch (error) {

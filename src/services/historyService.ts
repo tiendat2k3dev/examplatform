@@ -103,3 +103,19 @@ export const getUserHistoriesService = async (
     throw error;
   }
 };
+
+// =====================================================
+// LẤY TẤT CẢ LỊCH SỬ (Dùng cho trang Admin Dashboard)
+// =====================================================
+
+export const getAllHistoriesService = async (): Promise<History[]> => {
+  try {
+    const response = await api.get<History[]>("/histories");
+
+    return Array.isArray(response.data) ? response.data : [];
+  } catch (error) {
+    console.error("Lỗi khi tải toàn bộ lịch sử:", error);
+
+    throw error;
+  }
+};

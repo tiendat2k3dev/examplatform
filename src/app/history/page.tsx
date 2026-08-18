@@ -1,62 +1,139 @@
 // src/app/history/page.tsx
+
 "use client";
+
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
+import { toast } from "react-toastify";
+
 import { RootState, AppDispatch } from "@/redux/store";
 import { initCurrentUser } from "@/redux/reducers/AuthReducer";
 import { fetchUserHistoriesApiAsync } from "@/redux/reducers/HistoryReducer";
+
 import { History } from "@/types/history";
-import { toast } from "react-toastify";
+import { Category } from "@/types/categories";
+import { Exam } from "../../types/exam";
+
+import { getCategoriesService } from "@/services/categories";
+import { getExamsService } from "../../services/examService";
 
 const HistoryPage = () => {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
+
+  // ==========================
+  // STATE
+  // ==========================
+
   const [isClientReady, setIsClientReady] = useState(false);
+
   const [selectedHistory, setSelectedHistory] = useState<History | null>(null);
 
-  // Phân trang Client-side cho lịch sử thi
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [exams, setExams] = useState<Exam[]>([]);
+
+  // Phân trang
   const [currentPage, setCurrentPage] = useState(1);
+
   const itemsPerPage = 5;
 
+  // ==========================
+  // REDUX
+  // ==========================
+
   const { currentUser } = useSelector((state: RootState) => state.authReducer);
+
   const { userHistories = [], loading } = useSelector(
     (state: RootState) => state.historyReducer,
   );
 
-  // 1. Đồng bộ người dùng từ LocalStorage
+  // ==========================
+  // 1. ĐỒNG BỘ USER
+  // ==========================
+
   useEffect(() => {
     dispatch(initCurrentUser());
     setIsClientReady(true);
   }, [dispatch]);
 
-  // 2. Tải lịch sử làm bài thi
+  // ==========================
+  // 2. LẤY CATEGORY + EXAM
+  // ==========================
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [categoriesData, examsData] = await Promise.all([
+          getCategoriesService(),
+          getExamsService(),
+        ]);
+
+        setCategories(categoriesData || []);
+        setExams(examsData || []);
+      } catch (error) {
+        console.error("Lỗi lấy dữ liệu:", error);
+
+        toast.error("Không thể tải danh sách môn học và đề thi");
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // ==========================
+  // 3. TẢI LỊCH SỬ THI
+  // ==========================
+
   useEffect(() => {
     if (!isClientReady) return;
 
     if (!currentUser) {
       toast.warning("Vui lòng đăng nhập để xem lịch sử làm bài!");
+
       router.push("/login");
+
       return;
     }
 
     dispatch(fetchUserHistoriesApiAsync(currentUser.id as string));
   }, [dispatch, currentUser, isClientReady, router]);
 
-  // Format mm:ss phút
+  // ==========================
+  // FORMAT THỜI GIAN
+  // ==========================
+
   const formatDuration = (seconds: number) => {
+    if (!seconds || seconds < 0) {
+      return "00:00 phút";
+    }
+
     const mins = Math.floor(seconds / 60);
+
     const secs = seconds % 60;
+
     return `${mins.toString().padStart(2, "0")}:${secs
       .toString()
       .padStart(2, "0")} phút`;
   };
 
-  // Format ngày dd/mm/yyyy
+  // ==========================
+  // FORMAT NGÀY
+  // ==========================
+
   const formatDate = (isoString: string) => {
+    if (!isoString) {
+      return "";
+    }
+
     try {
       const date = new Date(isoString);
+
+      if (isNaN(date.getTime())) {
+        return isoString;
+      }
+
       return date.toLocaleDateString("vi-VN", {
         day: "2-digit",
         month: "2-digit",
@@ -67,36 +144,93 @@ const HistoryPage = () => {
     }
   };
 
-  // Lấy danh mục / môn học dựa vào Exam ID
-  const getSubjectBadge = (examId: string) => {
-    if (examId.includes("java")) {
-      return { name: "Java", color: "danger" };
+  // ==========================
+  // LẤY EXAM THEO EXAM ID
+  // ==========================
+
+  const getExamById = (examId: string) => {
+    if (!examId) {
+      return undefined;
     }
-    if (examId.includes("csharp")) {
-      return { name: "C# .NET", color: "primary" };
-    }
-    if (examId.includes("frontend")) {
-      return { name: "Frontend", color: "warning" };
-    }
-    if (examId.includes("db")) {
-      return { name: "SQL", color: "success" };
-    }
-    if (examId.includes("cpp")) {
-      return { name: "C++", color: "info" };
-    }
-    if (examId.includes("python")) {
-      return { name: "Python", color: "secondary" };
-    }
-    return { name: "IT General", color: "info" };
+
+    return exams.find((exam) => exam.id === examId);
   };
 
-  // Tính toán phân trang
+  // ==========================
+  // LẤY CATEGORY THEO CATEGORY ID
+  // ==========================
+
+  const getCategoryById = (categoryId: string) => {
+    if (!categoryId) {
+      return undefined;
+    }
+
+    return categories.find((category) => category.id === categoryId);
+  };
+
+  // ==========================
+  // LẤY TÊN MÔN HỌC
+  // ==========================
+
+  const getSubjectBadge = (examId: string) => {
+    const exam = getExamById(examId);
+
+    if (!exam) {
+      return {
+        name: "Không xác định",
+        color: "secondary",
+      };
+    }
+
+    const category = getCategoryById(exam.categoryId);
+
+    if (!category) {
+      return {
+        name: "Không xác định",
+        color: "secondary",
+      };
+    }
+
+    return {
+      name: category.name,
+      color: "primary",
+    };
+  };
+
+  // ==========================
+  // LẤY TÊN ĐỀ THI
+  // ==========================
+
+  const getExamTitle = (history: History) => {
+    if (history.examTitle) {
+      return history.examTitle;
+    }
+
+    const exam = getExamById(history.examId);
+
+    if (exam) {
+      return exam.name;
+    }
+
+    return `Bài thi ${history.examId}`;
+  };
+
+  // ==========================
+  // PHÂN TRANG
+  // ==========================
+
   const totalPages = Math.ceil(userHistories.length / itemsPerPage);
+
   const startIndex = (currentPage - 1) * itemsPerPage;
+
   const currentItems = userHistories.slice(
     startIndex,
     startIndex + itemsPerPage,
   );
+
+  // ==========================
+  // LOADING
+  // ==========================
 
   if (loading || !isClientReady) {
     return (
@@ -108,9 +242,14 @@ const HistoryPage = () => {
     );
   }
 
+  // ==========================
+  // UI
+  // ==========================
+
   return (
     <main className="container my-auto py-5 position-relative">
-      {/* Vòng tròn gradient hiệu ứng nền */}
+      {/* Background gradient */}
+
       <div
         className="position-absolute rounded-circle opacity-30"
         style={{
@@ -122,19 +261,25 @@ const HistoryPage = () => {
           left: "-50px",
           pointerEvents: "none",
         }}
-      ></div>
+      />
 
       <div className="position-relative z-1">
-        {/* Header Lịch Sử */}
+        {/* ==========================
+            HEADER
+        ========================== */}
+
         <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
           <div>
             <span
               className="badge text-primary border border-primary px-3 py-2 rounded-pill mb-2 fw-bold"
-              style={{ backgroundColor: "rgba(13, 110, 253, 0.1)" }}
+              style={{
+                backgroundColor: "rgba(13, 110, 253, 0.1)",
+              }}
             >
-              <i className="bi bi-clock-history me-1"></i> Nhật Ký Thi Trắc
-              Nghiệm
+              <i className="bi bi-clock-history me-1"></i>
+              Nhật Ký Thi Trắc Nghiệm
             </span>
+
             <h2 className="fw-bold display-6 m-0 text-dark">
               Lịch Sử Làm Bài Thi
             </h2>
@@ -145,12 +290,16 @@ const HistoryPage = () => {
               href="/exam-group"
               className="btn btn-outline-primary fw-bold rounded-pill px-4"
             >
-              <i className="bi bi-plus-circle me-1"></i> Thi Bài Mới
+              <i className="bi bi-plus-circle me-1"></i>
+              Thi Bài Mới
             </Link>
           </div>
         </div>
 
-        {/* Bảng Danh Sách Lịch Sử - Dark Glassmorphism */}
+        {/* ==========================
+            TABLE
+        ========================== */}
+
         <div
           className="card border border-primary border-opacity-50 shadow-lg rounded-4 text-white overflow-hidden mb-4"
           style={{
@@ -162,35 +311,65 @@ const HistoryPage = () => {
             <div className="table-responsive">
               <table
                 className="table table-dark table-hover align-middle m-0"
-                style={{ background: "transparent" }}
+                style={{
+                  background: "transparent",
+                }}
               >
+                {/* ==========================
+                    THEAD
+                ========================== */}
+
                 <thead className="border-bottom border-secondary border-opacity-25 bg-primary bg-opacity-10 text-info">
                   <tr>
                     <th className="py-3 ps-4">STT</th>
+
                     <th className="py-3">Tên Bài Thi</th>
+
                     <th className="py-3">Môn Học</th>
+
                     <th className="py-3">Ngày Làm</th>
+
                     <th className="py-3">Thời Gian</th>
+
                     <th className="py-3">Điểm Số</th>
+
                     <th className="py-3">Trạng Thái</th>
+
                     <th className="py-3 text-end pe-4">Thao Tác</th>
                   </tr>
                 </thead>
+
+                {/* ==========================
+                    TBODY
+                ========================== */}
+
                 <tbody>
                   {currentItems && currentItems.length > 0 ? (
                     currentItems.map((h, idx) => {
                       const isPassed = h.score >= 50;
+
                       const score10 = ((h.score / 100) * 10).toFixed(1);
+
+                      // Lấy môn học từ API
+
                       const badgeInfo = getSubjectBadge(h.examId);
 
                       return (
                         <tr key={h.id || idx}>
+                          {/* STT */}
+
                           <td className="ps-4 text-light opacity-75">
                             {startIndex + idx + 1}
                           </td>
+
+                          {/* TÊN BÀI THI */}
+
                           <td className="fw-bold text-white">
-                            {h.examTitle || `Bài thi ${h.examId}`}
+                            {getExamTitle(h)}
                           </td>
+
+                          {/* MÔN HỌC */}
+
                           <td>
                             <span
                               className={`badge text-${badgeInfo.color} border border-${badgeInfo.color}`}
@@ -201,12 +380,21 @@ const HistoryPage = () => {
                               {badgeInfo.name}
                             </span>
                           </td>
+
+                          {/* NGÀY */}
+
                           <td className="text-light opacity-75">
                             {formatDate(h.completedAt)}
                           </td>
+
+                          {/* THỜI GIAN */}
+
                           <td className="text-light opacity-75">
                             {formatDuration(h.timeTaken)}
                           </td>
+
+                          {/* ĐIỂM */}
+
                           <td
                             className={`fw-bold fs-6 ${
                               isPassed ? "text-success" : "text-danger"
@@ -214,6 +402,9 @@ const HistoryPage = () => {
                           >
                             {score10} / 10
                           </td>
+
+                          {/* TRẠNG THÁI */}
+
                           <td>
                             {isPassed ? (
                               <span
@@ -235,6 +426,9 @@ const HistoryPage = () => {
                               </span>
                             )}
                           </td>
+
+                          {/* THAO TÁC */}
+
                           <td className="text-end pe-4">
                             <button
                               type="button"
@@ -265,11 +459,16 @@ const HistoryPage = () => {
           </div>
         </div>
 
-        {/* PHÂN TRANG */}
+        {/* ==========================
+            PAGINATION
+        ========================== */}
+
         {totalPages > 1 && (
           <div className="d-flex justify-content-center">
             <nav aria-label="Page navigation">
               <ul className="pagination pagination-md m-0">
+                {/* PREVIOUS */}
+
                 <li
                   className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
                 >
@@ -284,8 +483,12 @@ const HistoryPage = () => {
                   </button>
                 </li>
 
+                {/* PAGE NUMBER */}
+
                 {Array.from(
-                  { length: totalPages },
+                  {
+                    length: totalPages,
+                  },
                   (_, index) => index + 1,
                 ).map((page) => (
                   <li
@@ -306,6 +509,8 @@ const HistoryPage = () => {
                     </button>
                   </li>
                 ))}
+
+                {/* NEXT */}
 
                 <li
                   className={`page-item ${
@@ -328,7 +533,10 @@ const HistoryPage = () => {
         )}
       </div>
 
-      {/* ================= MODAL CHI TIẾT LƯỢT THI ================= */}
+      {/* ==========================
+          MODAL CHI TIẾT
+      ========================== */}
+
       {selectedHistory && (
         <div
           className="modal fade show d-block"
@@ -345,11 +553,14 @@ const HistoryPage = () => {
                 background: "linear-gradient(145deg, #0f172a 0%, #1e1b4b 100%)",
               }}
             >
+              {/* HEADER */}
+
               <div className="modal-header border-secondary border-opacity-25 p-4">
                 <h5 className="modal-title fw-bold text-info">
                   <i className="bi bi-file-earmark-check me-2"></i>
                   Chi Tiết Lượt Thi
                 </h5>
+
                 <button
                   type="button"
                   onClick={() => setSelectedHistory(null)}
@@ -357,48 +568,72 @@ const HistoryPage = () => {
                 ></button>
               </div>
 
+              {/* BODY */}
+
               <div className="modal-body p-4">
                 <h5 className="fw-bold text-white mb-3">
-                  {selectedHistory.examTitle ||
-                    `Mã đề: ${selectedHistory.examId}`}
+                  {getExamTitle(selectedHistory)}
                 </h5>
+
+                {/* MÔN HỌC */}
+
+                <div className="mb-3">
+                  <span className="text-light opacity-75 me-2">Môn học:</span>
+
+                  <span className="badge text-primary border border-primary">
+                    {getSubjectBadge(selectedHistory.examId).name}
+                  </span>
+                </div>
+
+                {/* THÔNG TIN */}
 
                 <div
                   className="p-3 rounded-3 border border-secondary border-opacity-25 mb-3"
-                  style={{ backgroundColor: "rgba(255, 255, 255, 0.05)" }}
+                  style={{
+                    backgroundColor: "rgba(255, 255, 255, 0.05)",
+                  }}
                 >
                   <div className="d-flex justify-content-between mb-2">
                     <span className="text-light opacity-75">
                       Điểm số (Thang 10):
                     </span>
+
                     <span className="fw-bold text-info fs-5">
                       {((selectedHistory.score / 100) * 10).toFixed(1)} / 10
                     </span>
                   </div>
+
                   <div className="d-flex justify-content-between mb-2">
                     <span className="text-light opacity-75">
                       Số câu trả lời đúng:
                     </span>
+
                     <span className="fw-bold text-success">
                       {selectedHistory.correctAnswersCount} /{" "}
                       {selectedHistory.totalQuestions}
                     </span>
                   </div>
+
                   <div className="d-flex justify-content-between mb-2">
                     <span className="text-light opacity-75">
                       Thời gian hoàn thành:
                     </span>
+
                     <span className="text-white">
                       {formatDuration(selectedHistory.timeTaken)}
                     </span>
                   </div>
+
                   <div className="d-flex justify-content-between">
                     <span className="text-light opacity-75">Ngày nộp bài:</span>
+
                     <span className="text-white">
                       {formatDate(selectedHistory.completedAt)}
                     </span>
                   </div>
                 </div>
+
+                {/* THI LẠI */}
 
                 <div className="d-grid mt-4">
                   <button
@@ -413,7 +648,8 @@ const HistoryPage = () => {
                       border: "none",
                     }}
                   >
-                    <i className="bi bi-arrow-repeat me-1"></i> Thi Lại Đề Này
+                    <i className="bi bi-arrow-repeat me-1"></i>
+                    Thi Lại Đề Này
                   </button>
                 </div>
               </div>

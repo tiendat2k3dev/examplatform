@@ -137,12 +137,15 @@ const AdminPage = () => {
     .slice(0, 5);
 
   // Top thành viên: gộp histories theo userId, tính tổng score
+  // Ưu tiên fullName mới nhất từ bảng users thay vì userName trong history
+  const userMap = new Map(users.map((u) => [u.id, u]));
   const scoreMap = new Map<string, { name: string; total: number }>();
   histories.forEach((h) => {
     if (!h.userId || h.userId.startsWith("Public-")) return;
     const prev = scoreMap.get(h.userId);
+    const currentName = userMap.get(h.userId)?.fullName ?? h.userName;
     scoreMap.set(h.userId, {
-      name: h.userName,
+      name: currentName,
       total: (prev?.total ?? 0) + h.score,
     });
   });

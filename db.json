@@ -18,28 +18,28 @@
       "id": "rG2EfvkY9CQ",
       "username": "tiendat2k3",
       "password": "$2b$10$tclGfV4N.W1YhPmSy8nng.N.dOZL28bAlV9irVJqwQbQGJs9n3dWi",
-      "fullName": "Hai Dong",
+      "fullName": "Nguyễn Văn A",
       "address": "Quận Cầu Giấy, Hà Nội",
       "phone": "0987104234",
-      "email": "tiendat2k3.dev@gmail.com",
+      "email": "tiendat2k3.devs@gmail.com",
       "role": "Member",
       "status": "Mở",
       "createdAt": "2026-08-16T14:10:47.867Z",
-      "updatedAt": "2026-08-17T08:00:19.593Z",
+      "updatedAt": "2026-08-18T03:34:25.623Z",
       "avatarUrl": "https://media-cdn-zspms.kurogame.net/pnswebsite/website2.0/images/1784217600000/p4njjomrzglqi8ov4q-17842832869677.jpg"
     },
     {
       "id": "dyPYKnBKtVM",
-      "username": "admin",
+      "username": "nguyenvanb",
       "password": "$2b$10$ZHzImbYRKmBKg0gQ43hLue6.f6peYMCM6mjAi16oUC06bt5Na15BS",
-      "fullName": "Hai Dong",
+      "fullName": "Nguyễn Văn B",
       "address": "Quận Cầu Giấy, Hà Nội",
       "phone": "0367797348",
       "email": "tiendat2k3.dev@gmail.com",
       "role": "Member",
       "status": "Mở",
       "createdAt": "2026-08-16T14:18:16.406Z",
-      "updatedAt": "2026-08-16T14:19:10.112Z"
+      "updatedAt": "2026-08-18T03:23:59.277Z"
     }
   ],
   "categories": [
@@ -358,6 +358,73 @@
       },
       "completedAt": "2026-08-18T02:22:31.798Z",
       "id": "SPRZxdFf9Ek"
+    },
+    {
+      "userId": "Public-658797",
+      "userName": "ANONYMOUS",
+      "examId": "ex-toan-001",
+      "examTitle": "Đề thi Toán cấp 1 cơ bản",
+      "score": 100,
+      "totalQuestions": 3,
+      "correctAnswersCount": 3,
+      "timeTaken": 18,
+      "userAnswers": {
+        "T_gOvtUzzYs": 0,
+        "gvpQVc8xsxk": 2,
+        "q-toan-001": 2
+      },
+      "completedAt": "2026-08-18T03:13:34.472Z",
+      "id": "AUfyAxy5jKg"
+    },
+    {
+      "userId": "dyPYKnBKtVM",
+      "userName": "Nguyễn Văn B",
+      "examId": "ex-toan-001",
+      "examTitle": "Đề thi Toán cấp 1 cơ bản",
+      "score": 0,
+      "totalQuestions": 3,
+      "correctAnswersCount": 0,
+      "timeTaken": 6,
+      "userAnswers": {
+        "T_gOvtUzzYs": 0,
+        "q-toan-001": 1,
+        "gvpQVc8xsxk": 3
+      },
+      "completedAt": "2026-08-18T03:24:31.132Z",
+      "id": "urea46V8aEo"
+    },
+    {
+      "userId": "dyPYKnBKtVM",
+      "userName": "Nguyễn Văn B",
+      "examId": "ex-toan-001",
+      "examTitle": "Đề thi Toán cấp 1 cơ bản",
+      "score": 100,
+      "totalQuestions": 3,
+      "correctAnswersCount": 3,
+      "timeTaken": 12,
+      "userAnswers": {
+        "gvpQVc8xsxk": 1,
+        "T_gOvtUzzYs": 0,
+        "q-toan-001": 1
+      },
+      "completedAt": "2026-08-18T03:27:41.326Z",
+      "id": "kriktHkcAyk"
+    },
+    {
+      "userId": "dyPYKnBKtVM",
+      "userName": "Nguyễn Văn B",
+      "examId": "jnsXuOT02Ss",
+      "examTitle": "toan lop1",
+      "score": 100,
+      "totalQuestions": 2,
+      "correctAnswersCount": 2,
+      "timeTaken": 8,
+      "userAnswers": {
+        "q-toan-001": 2,
+        "gvpQVc8xsxk": 2
+      },
+      "completedAt": "2026-08-18T03:28:05.480Z",
+      "id": "MoABVFrNjGU"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
